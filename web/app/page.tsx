@@ -1,255 +1,279 @@
-import GoldDivider from '@/components/shared/GoldDivider'
 import SeatCount from '@/components/landing/SeatCount'
-
-// ============================================================
-// The Cabana — Landing Page
-// Pure Server Component. No client-side JS except SeatCount.
-// ============================================================
 
 export default function LandingPage() {
   return (
-    <main style={{ backgroundColor: '#2D1B47' }}>
-
-      {/* ── Section 1: Hero ─────────────────────────────────── */}
-      <section
-        style={{
-          minHeight: '100dvh',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '2rem',
-          textAlign: 'center',
-        }}
-      >
-        {/* est. 2026 */}
-        <p style={{
-          fontFamily: 'var(--font-sans)',
-          fontSize: '11px',
-          letterSpacing: '0.3em',
-          textTransform: 'uppercase',
-          color: '#D4AF37',
-          marginBottom: '1.25rem',
-        }}>
-          est. 2026
-        </p>
-
-        {/* Wordmark */}
-        <h1 style={{
+    <>
+      {/* ── Nav ───────────────────────────────────────────── */}
+      <nav style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 50,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '0 2rem',
+        height: '60px',
+        backgroundColor: '#F5F0E8',
+      }}>
+        <span style={{
           fontFamily: 'var(--font-serif)',
-          fontSize: 'clamp(2.5rem, 8vw, 4rem)',
+          fontSize: '1.1rem',
+          color: '#2D1B47',
           fontWeight: 400,
-          color: '#F5F0E8',
           letterSpacing: '0.02em',
-          lineHeight: 1.1,
-          marginBottom: '1rem',
         }}>
           The Cabana
-        </h1>
+        </span>
 
-        {/* Tagline */}
-        <p style={{
-          fontFamily: 'var(--font-sans)',
-          fontSize: '11px',
-          letterSpacing: '0.3em',
-          textTransform: 'uppercase',
-          color: '#D4AF37',
-        }}>
-          poolside · after dark
-        </p>
-
-        <GoldDivider />
-
-        {/* Event date */}
-        <p style={{
-          fontFamily: 'var(--font-sans)',
-          fontSize: '14px',
-          color: '#F5F0E8',
-          opacity: 0.7,
-          letterSpacing: '0.05em',
-        }}>
-          July 12, 2026
-        </p>
-      </section>
-
-      {/* ── Section 2: Tonight's Menu ────────────────────────── */}
-      <section
-        style={{
-          maxWidth: '480px',
-          margin: '0 auto',
-          padding: '4rem 2rem',
-        }}
-      >
-        {/* Section header */}
-        <p style={{
-          fontFamily: 'var(--font-sans)',
-          fontSize: '11px',
-          letterSpacing: '0.3em',
-          textTransform: 'uppercase',
-          color: '#D4AF37',
-          textAlign: 'center',
-          marginBottom: '3rem',
-        }}>
-          tonight&apos;s menu
-        </p>
-
-        {/* Course: The Pour */}
-        <CourseItem
-          label="the pour"
-          dish="Sunset Spritz"
-          ingredients="mango · pineapple · tajín"
-        />
-
-        <GoldDivider />
-
-        {/* Course: The Bite */}
-        <CourseItem
-          label="the bite"
-          dish="Slider Trio"
-          ingredients="three sauces · slaw · brioche"
-        />
-
-        <GoldDivider />
-
-        {/* Course: The Cut */}
-        <CourseItem
-          label="the cut"
-          dish="Steak, tableside"
-          ingredients="compound butter · truffle fries"
-        />
-
-        <GoldDivider />
-
-        {/* Course: The Finish — hidden */}
-        <CourseItem
-          label="the finish"
-          dish="???"
-          ingredients="revealed at the table"
-          isHidden
-        />
-      </section>
-
-      {/* ── Section 3: The Chefs ─────────────────────────────── */}
-      <section
-        style={{
-          maxWidth: '480px',
-          margin: '0 auto',
-          padding: '2rem 2rem 4rem',
-          textAlign: 'center',
-        }}
-      >
-        <p style={{
-          fontFamily: 'var(--font-sans)',
-          fontSize: '11px',
-          letterSpacing: '0.3em',
-          textTransform: 'uppercase',
-          color: '#D4AF37',
-          marginBottom: '2.5rem',
-        }}>
-          your chefs tonight
-        </p>
-
-        <div style={{
-          display: 'flex',
-          justifyContent: 'center',
-          gap: '3rem',
-          flexWrap: 'wrap',
-        }}>
-          <ChefAvatar initials="K" name="King" />
-          <ChefAvatar initials="?" name="Guest Chef" />
-        </div>
-      </section>
-
-      {/* ── Section 4: CTA ───────────────────────────────────── */}
-      <section
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          padding: '2rem 2rem 6rem',
-          textAlign: 'center',
-          gap: '1.25rem',
-        }}
-      >
-        {/* Live seat count — client component */}
-        <SeatCount sessionId="2026-july" />
-
-        {/* Enter button */}
-        <a
-          href="/experience"
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '0.75rem',
-            backgroundColor: '#D4AF37',
-            color: '#2D1B47',
+        <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
+          <a href="#menu" style={navLinkStyle}>Menu</a>
+          <a href="#chefs" style={navLinkStyle}>Chefs</a>
+          <a href="/experience" style={{
+            backgroundColor: '#2D1B47',
+            color: '#F5F0E8',
             fontFamily: 'var(--font-sans)',
-            fontSize: '13px',
+            fontSize: '11px',
             fontWeight: 500,
             letterSpacing: '0.15em',
             textTransform: 'uppercase',
             textDecoration: 'none',
+            padding: '0.6rem 1.25rem',
+          }}>
+            Enter
+          </a>
+        </div>
+      </nav>
+
+      {/* ── Hero ──────────────────────────────────────────── */}
+      <main style={{
+        minHeight: '100dvh',
+        backgroundColor: '#F5F0E8',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        position: 'relative',
+        paddingTop: '60px',
+        overflow: 'hidden',
+      }}>
+
+        {/* Decorative circle */}
+        <div style={{
+          position: 'absolute',
+          width: 'min(520px, 90vw)',
+          height: 'min(520px, 90vw)',
+          borderRadius: '50%',
+          border: '1px solid rgba(45, 27, 71, 0.12)',
+          pointerEvents: 'none',
+        }} />
+
+        {/* Content */}
+        <div style={{
+          position: 'relative',
+          textAlign: 'center',
+          padding: '2rem',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 0,
+        }}>
+
+          {/* est. 2026 */}
+          <p style={{
+            fontFamily: 'var(--font-sans)',
+            fontSize: '11px',
+            letterSpacing: '0.3em',
+            textTransform: 'uppercase',
+            color: '#D4AF37',
+            marginBottom: '1rem',
+          }}>
+            Est. 2026
+          </p>
+
+          {/* Wordmark */}
+          <h1 style={{
+            fontFamily: 'var(--font-serif)',
+            fontSize: 'clamp(5rem, 18vw, 9rem)',
+            fontWeight: 400,
+            color: '#2D1B47',
+            lineHeight: 0.9,
+            letterSpacing: '-0.01em',
+            marginBottom: '1.5rem',
+          }}>
+            The<br />Cabana
+          </h1>
+
+          {/* Gold divider */}
+          <div style={{
+            width: '40px',
+            height: '1px',
+            backgroundColor: '#D4AF37',
+            opacity: 0.6,
+            marginBottom: '1.25rem',
+          }} />
+
+          {/* Tagline */}
+          <p style={{
+            fontFamily: 'var(--font-serif)',
+            fontSize: '1.1rem',
+            fontStyle: 'italic',
+            color: '#2D1B47',
+            opacity: 0.75,
+            marginBottom: '1rem',
+            letterSpacing: '0.02em',
+          }}>
+            poolside, after dark
+          </p>
+
+          {/* Date */}
+          <p style={{
+            fontFamily: 'var(--font-sans)',
+            fontSize: '11px',
+            letterSpacing: '0.2em',
+            textTransform: 'uppercase',
+            color: '#2D1B47',
+            opacity: 0.45,
+            marginBottom: '2.5rem',
+          }}>
+            July 12, 2026
+          </p>
+
+          {/* Seat count */}
+          <SeatCount sessionId="2026-july" />
+
+          {/* CTA */}
+          <a href="/experience" style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.75rem',
+            backgroundColor: '#2D1B47',
+            color: '#F5F0E8',
+            fontFamily: 'var(--font-sans)',
+            fontSize: '11px',
+            fontWeight: 500,
+            letterSpacing: '0.2em',
+            textTransform: 'uppercase',
+            textDecoration: 'none',
             padding: '1rem 2rem',
-            border: 'none',
-            cursor: 'pointer',
-          }}
-        >
-          Enter The Cabana
-          <span style={{ fontSize: '16px' }}>→</span>
-        </a>
+            marginTop: '0.5rem',
+          }}>
+            Enter The Cabana
+            <span style={{ fontSize: '14px', letterSpacing: 0 }}>→</span>
+          </a>
+        </div>
+
+        {/* Scroll indicator */}
+        <div style={{
+          position: 'absolute',
+          bottom: '2rem',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '0.5rem',
+        }}>
+          <div style={{
+            width: '1px',
+            height: '40px',
+            backgroundColor: '#2D1B47',
+            opacity: 0.2,
+          }} />
+          <p style={{
+            fontFamily: 'var(--font-sans)',
+            fontSize: '9px',
+            letterSpacing: '0.3em',
+            textTransform: 'uppercase',
+            color: '#2D1B47',
+            opacity: 0.35,
+          }}>
+            Scroll
+          </p>
+        </div>
+      </main>
+
+      {/* ── Section 2: Menu ───────────────────────────────── */}
+      <section id="menu" style={{
+        backgroundColor: '#2D1B47',
+        padding: '6rem 2rem',
+      }}>
+        <div style={{ maxWidth: '480px', margin: '0 auto', textAlign: 'center' }}>
+          <p style={sectionLabelStyle}>tonight&apos;s menu</p>
+
+          <div style={{ marginTop: '3rem' }}>
+            <CourseItem label="the pour" dish="Sunset Spritz" ingredients="mango · pineapple · tajín" />
+            <Divider />
+            <CourseItem label="the bite" dish="Slider Trio" ingredients="three sauces · slaw · brioche" />
+            <Divider />
+            <CourseItem label="the cut" dish="Steak, tableside" ingredients="compound butter · truffle fries" />
+            <Divider />
+            <CourseItem label="the finish" dish="???" ingredients="revealed at the table" isHidden />
+          </div>
+        </div>
       </section>
 
-    </main>
+      {/* ── Section 3: Chefs ──────────────────────────────── */}
+      <section id="chefs" style={{
+        backgroundColor: '#2D1B47',
+        padding: '4rem 2rem 6rem',
+        borderTop: '1px solid rgba(212, 175, 55, 0.15)',
+      }}>
+        <div style={{ maxWidth: '480px', margin: '0 auto', textAlign: 'center' }}>
+          <p style={sectionLabelStyle}>your chefs tonight</p>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '3rem', marginTop: '2.5rem', flexWrap: 'wrap' }}>
+            <ChefAvatar initials="K" name="King" />
+            <ChefAvatar initials="?" name="Guest Chef" />
+          </div>
+        </div>
+      </section>
+    </>
   )
+}
+
+// ── Styles ────────────────────────────────────────────────────
+
+const navLinkStyle: React.CSSProperties = {
+  fontFamily: 'var(--font-sans)',
+  fontSize: '11px',
+  letterSpacing: '0.15em',
+  textTransform: 'uppercase',
+  color: '#2D1B47',
+  textDecoration: 'none',
+  opacity: 0.6,
+}
+
+const sectionLabelStyle: React.CSSProperties = {
+  fontFamily: 'var(--font-sans)',
+  fontSize: '11px',
+  letterSpacing: '0.3em',
+  textTransform: 'uppercase',
+  color: '#D4AF37',
 }
 
 // ── Sub-components ────────────────────────────────────────────
 
-function CourseItem({
-  label,
-  dish,
-  ingredients,
-  isHidden = false,
-}: {
-  label: string
-  dish: string
-  ingredients: string
-  isHidden?: boolean
+function Divider() {
+  return (
+    <div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
+      <div style={{ width: '40px', height: '1px', backgroundColor: '#D4AF37', opacity: 0.4 }} />
+    </div>
+  )
+}
+
+function CourseItem({ label, dish, ingredients, isHidden = false }: {
+  label: string; dish: string; ingredients: string; isHidden?: boolean
 }) {
   return (
     <div style={{ textAlign: 'center' }}>
-      {/* Course label */}
-      <p style={{
-        fontFamily: 'var(--font-sans)',
-        fontSize: '11px',
-        letterSpacing: '0.3em',
-        textTransform: 'uppercase',
-        color: '#D4AF37',
-        marginBottom: '0.5rem',
-      }}>
+      <p style={{ fontFamily: 'var(--font-sans)', fontSize: '11px', letterSpacing: '0.3em', textTransform: 'uppercase', color: '#D4AF37', marginBottom: '0.5rem' }}>
         {label}
       </p>
-
-      {/* Dish name */}
-      <h2 style={{
-        fontFamily: 'var(--font-serif)',
-        fontSize: '1.75rem',
-        fontWeight: 400,
-        color: '#F5F0E8',
-        marginBottom: '0.4rem',
-        letterSpacing: '0.02em',
-      }}>
+      <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '1.75rem', fontWeight: 400, color: '#F5F0E8', marginBottom: '0.4rem', letterSpacing: '0.02em' }}>
         {dish}
       </h2>
-
-      {/* Ingredients */}
-      <p style={{
-        fontFamily: 'var(--font-sans)',
-        fontSize: '13px',
-        fontStyle: 'italic',
-        color: isHidden ? '#A8C5DA' : '#A8C5DA',
-        opacity: isHidden ? 0.8 : 1,
-      }}>
+      <p style={{ fontFamily: 'var(--font-sans)', fontSize: '13px', fontStyle: 'italic', color: '#A8C5DA', opacity: isHidden ? 0.8 : 1 }}>
         {ingredients}
       </p>
     </div>
@@ -258,42 +282,11 @@ function CourseItem({
 
 function ChefAvatar({ initials, name }: { initials: string; name: string }) {
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      gap: '0.75rem',
-    }}>
-      {/* Avatar circle */}
-      <div style={{
-        width: '72px',
-        height: '72px',
-        borderRadius: '50%',
-        border: '1px solid #D4AF37',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: 'rgba(212, 175, 55, 0.08)',
-      }}>
-        <span style={{
-          fontFamily: 'var(--font-serif)',
-          fontSize: '1.5rem',
-          color: '#D4AF37',
-          fontWeight: 400,
-        }}>
-          {initials}
-        </span>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem' }}>
+      <div style={{ width: '72px', height: '72px', borderRadius: '50%', border: '1px solid #D4AF37', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(212, 175, 55, 0.08)' }}>
+        <span style={{ fontFamily: 'var(--font-serif)', fontSize: '1.5rem', color: '#D4AF37', fontWeight: 400 }}>{initials}</span>
       </div>
-
-      {/* Chef name */}
-      <p style={{
-        fontFamily: 'var(--font-sans)',
-        fontSize: '13px',
-        color: '#F5F0E8',
-        letterSpacing: '0.05em',
-      }}>
-        {name}
-      </p>
+      <p style={{ fontFamily: 'var(--font-sans)', fontSize: '13px', color: '#F5F0E8', letterSpacing: '0.05em' }}>{name}</p>
     </div>
   )
 }

@@ -48,10 +48,11 @@ export default function SeatCount({ sessionId }: { sessionId: string }) {
   return (
     <p style={{
       fontFamily: 'var(--font-sans)',
-      fontSize: '12px',
-      color: '#A8C5DA',
-      letterSpacing: '0.05em',
-      opacity: 0.8,
+      fontSize: '11px',
+      color: '#2D1B47',
+      letterSpacing: '0.1em',
+      opacity: 0.4,
+      marginBottom: '0.75rem',
     }}>
       {isFull
         ? `${MAX_SEATS} of ${MAX_SEATS} — house full`
