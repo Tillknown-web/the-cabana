@@ -1,60 +1,154 @@
-// Coming soon — full guest experience app
-// This placeholder prevents a 404 while the experience is being built.
+'use client'
+
+import { useEffect, useState, useCallback } from 'react'
+import { createClient } from '@/lib/supabase/client'
+import { COURSE_CARDS } from '@/lib/constants'
+import CheckIn from '@/components/experience/CheckIn'
+import WelcomeCard from '@/components/experience/WelcomeCard'
+import CourseCard from '@/components/experience/CourseCard'
+import IntermissionCard from '@/components/experience/IntermissionCard'
+import GalleryView from '@/components/experience/GalleryView'
+import ProgressBar from '@/components/shared/ProgressBar'
+import ChefNoteToast from '@/components/shared/ChefNoteToast'
+import TableSidePrompt from '@/components/shared/TableSidePrompt'
+import NowPlayingBar from '@/components/shared/NowPlayingBar'
+import SongRequestModal from '@/components/shared/SongRequestModal'
+import PhotoBoothButton from '@/components/shared/PhotoBoothButton'
+
+export type Guest = {
+  id: string
+  name: string
+}
+
+const SESSION_ID = process.env.NEXT_PUBLIC_SESSION_ID!
 
 export default function ExperiencePage() {
+  const [guest, setGuest] = useState<Guest | null>(null)
+  const [currentCard, setCurrentCard] = useState<string>('welcome')
+  const [loading, setLoading] = useState(true)
+  const [songModalOpen, setSongModalOpen] = useState(false)
+
+  const supabase = createClient()
+
+  // Restore guest from localStorage + verify Supabase auth session
+  useEffect(() => {
+    async function restore() {
+      try {
+        const stored = localStorage.getItem('cabana:guest')
+        if (!stored) { setLoading(false); return }
+
+        const guestData = JSON.parse(stored) as Guest
+        const { data: { session } } = await supabase.auth.getSession()
+
+        if (!session) {
+          localStorage.removeItem('cabana:guest')
+          setLoading(false)
+          return
+        }
+
+        setGuest(guestData)
+      } catch {
+        localStorage.removeItem('cabana:guest')
+      } finally {
+        setLoading(false)
+      }
+    }
+    restore()
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Subscribe to session state once guest is confirmed
+  useEffect(() => {
+    if (!guest) return
+
+    // Fetch initial state
+    supabase
+      .from('session_state')
+      .select('current_card')
+      .eq('session_id', SESSION_ID)
+      .single()
+      .then(({ data }) => {
+        if (data?.current_card) setCurrentCard(data.current_card)
+      })
+
+    // Live updates
+    const channel = supabase
+      .channel(`exp-state-${SESSION_ID}`)
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'session_state', filter: `session_id=eq.${SESSION_ID}` },
+        (payload) => {
+          const newCard = (payload.new as { current_card: string }).current_card
+          setCurrentCard(newCard)
+          if (COURSE_CARDS.has(newCard)) playChime()
+        }
+      )
+      .subscribe()
+
+    return () => { supabase.removeChannel(channel) }
+  }, [guest]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleCheckedIn = useCallback((g: Guest) => {
+    localStorage.setItem('cabana:guest', JSON.stringify(g))
+    setGuest(g)
+  }, [])
+
+  function renderCard() {
+    if (!guest) return null
+    if (currentCard === 'welcome') return <WelcomeCard guest={guest} sessionId={SESSION_ID} />
+    if (currentCard === 'gallery') return <GalleryView guest={guest} sessionId={SESSION_ID} />
+    if (COURSE_CARDS.has(currentCard)) return <CourseCard card={currentCard} guest={guest} sessionId={SESSION_ID} />
+    if (currentCard.startsWith('intermission')) return <IntermissionCard card={currentCard} sessionId={SESSION_ID} />
+    return <WelcomeCard guest={guest} sessionId={SESSION_ID} />
+  }
+
+  if (loading) return <LoadingScreen />
+  if (!guest) return <CheckIn sessionId={SESSION_ID} onCheckedIn={handleCheckedIn} />
+
+  return (
+    <main style={{ minHeight: '100dvh', backgroundColor: '#2D1B47', position: 'relative', paddingBottom: '4rem' }}>
+      <ProgressBar currentCard={currentCard} />
+      {renderCard()}
+      <ChefNoteToast sessionId={SESSION_ID} />
+      <TableSidePrompt sessionId={SESSION_ID} currentCard={currentCard} />
+      <NowPlayingBar sessionId={SESSION_ID} onSongRequest={() => setSongModalOpen(true)} />
+      {(COURSE_CARDS.has(currentCard) || currentCard.startsWith('intermission')) && (
+        <PhotoBoothButton guest={guest} sessionId={SESSION_ID} />
+      )}
+      {songModalOpen && (
+        <SongRequestModal sessionId={SESSION_ID} onClose={() => setSongModalOpen(false)} />
+      )}
+    </main>
+  )
+}
+
+function LoadingScreen() {
   return (
     <main style={{
       minHeight: '100dvh',
       backgroundColor: '#2D1B47',
       display: 'flex',
-      flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      textAlign: 'center',
-      padding: '2rem',
     }}>
-      <p style={{
-        fontFamily: 'var(--font-sans)',
-        fontSize: '11px',
-        letterSpacing: '0.3em',
-        textTransform: 'uppercase',
-        color: '#D4AF37',
-        marginBottom: '1.5rem',
-      }}>
-        coming soon
-      </p>
-
-      <h1 style={{
-        fontFamily: 'var(--font-serif)',
-        fontSize: 'clamp(2.5rem, 8vw, 4rem)',
-        fontWeight: 400,
-        color: '#F5F0E8',
-        marginBottom: '1rem',
-      }}>
-        The Cabana
-      </h1>
-
-      <p style={{
-        fontFamily: 'var(--font-sans)',
-        fontSize: '13px',
-        color: '#F5F0E8',
-        opacity: 0.5,
-        marginBottom: '3rem',
-      }}>
-        The guest experience opens the night of the event.
-      </p>
-
-      <a href="/" style={{
-        fontFamily: 'var(--font-sans)',
-        fontSize: '11px',
-        letterSpacing: '0.15em',
-        textTransform: 'uppercase',
-        color: '#D4AF37',
-        textDecoration: 'none',
-        opacity: 0.7,
-      }}>
-        ← Back
-      </a>
+      <div style={{ width: '1px', height: '48px', backgroundColor: '#D4AF37', opacity: 0.5 }} />
     </main>
   )
+}
+
+function playChime() {
+  try {
+    type AudioContextCtor = typeof AudioContext
+    const Ctx: AudioContextCtor = window.AudioContext ?? (window as unknown as { webkitAudioContext: AudioContextCtor }).webkitAudioContext
+    const ctx = new Ctx()
+    const osc = ctx.createOscillator()
+    const gain = ctx.createGain()
+    osc.connect(gain)
+    gain.connect(ctx.destination)
+    osc.frequency.value = 528
+    osc.type = 'sine'
+    gain.gain.setValueAtTime(0.25, ctx.currentTime)
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.8)
+    osc.start(ctx.currentTime)
+    osc.stop(ctx.currentTime + 1.8)
+  } catch { /* audio not available */ }
 }
