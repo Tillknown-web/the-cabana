@@ -20,7 +20,7 @@ export type Guest = {
   name: string
 }
 
-const SESSION_ID = process.env.NEXT_PUBLIC_SESSION_ID!
+const SESSION_ID = (process.env.NEXT_PUBLIC_SESSION_ID ?? '').trim()
 
 export default function ExperiencePage() {
   const [guest, setGuest] = useState<Guest | null>(null)
@@ -41,6 +41,15 @@ export default function ExperiencePage() {
         const { data: { session } } = await supabase.auth.getSession()
 
         if (!session) {
+          localStorage.removeItem('cabana:guest')
+          setLoading(false)
+          return
+        }
+
+        // If the auth UID no longer matches the stored guest ID (e.g. after a
+        // new anonymous session was issued), the storage upload would fail RLS.
+        // Clear and force re-check-in rather than silently uploading to the wrong path.
+        if (session.user.id !== guestData.id) {
           localStorage.removeItem('cabana:guest')
           setLoading(false)
           return
@@ -112,7 +121,7 @@ export default function ExperiencePage() {
       <TableSidePrompt sessionId={SESSION_ID} currentCard={currentCard} />
       <NowPlayingBar sessionId={SESSION_ID} onSongRequest={() => setSongModalOpen(true)} />
       {(COURSE_CARDS.has(currentCard) || currentCard.startsWith('intermission')) && (
-        <PhotoBoothButton guest={guest} sessionId={SESSION_ID} />
+        <PhotoBoothButton sessionId={SESSION_ID} />
       )}
       {songModalOpen && (
         <SongRequestModal sessionId={SESSION_ID} onClose={() => setSongModalOpen(false)} />

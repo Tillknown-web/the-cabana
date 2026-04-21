@@ -26,8 +26,12 @@ Deno.serve(async (req) => {
   const authHeader = req.headers.get('Authorization')
   if (!authHeader) return errorResponse('Missing authorization header', 401)
 
+  const token = authHeader.replace(/^Bearer\s+/i, '')
   const userClient = createUserClient(authHeader)
-  const { data: { user }, error: authError } = await userClient.auth.getUser()
+  // Pass the token explicitly so supabase-js validates it server-side via
+  // /auth/v1/user rather than attempting a local JWT decode (which fails on
+  // ES256-signed tokens with older jose versions bundled in the runtime).
+  const { data: { user }, error: authError } = await userClient.auth.getUser(token)
   if (authError || !user) return errorResponse('Invalid token', 401)
 
   let body: { sessionId?: string; course?: string; storagePath?: string }
@@ -37,7 +41,9 @@ Deno.serve(async (req) => {
     return errorResponse('Invalid JSON body', 400)
   }
 
-  const { sessionId, course, storagePath } = body
+  const sessionId = body.sessionId?.trim()
+  const course = body.course?.trim()
+  const storagePath = body.storagePath?.trim()
   if (!sessionId || !course || !storagePath) {
     return errorResponse('sessionId, course, and storagePath are required', 400)
   }

@@ -22,13 +22,14 @@ on conflict (id) do nothing;
 -- ============================================================
 
 -- Guests can upload photos to their own folder only.
--- Path must start with {sessionId}/{auth.uid()}/
+-- Path format: {sessionId}/{guestId}/{course}.jpg
+-- split_part is used instead of storage.foldername()[N] for explicit, reliable indexing.
 create policy "storage_photos_insert_own"
   on storage.objects for insert
   to authenticated
   with check (
     bucket_id = 'photos'
-    and (storage.foldername(name))[2] = auth.uid()::text
+    and split_part(name, '/', 2) = auth.uid()::text
   );
 
 -- Guests can read their own photos (for preview after upload).
@@ -37,7 +38,7 @@ create policy "storage_photos_read_own"
   to authenticated
   using (
     bucket_id = 'photos'
-    and (storage.foldername(name))[2] = auth.uid()::text
+    and split_part(name, '/', 2) = auth.uid()::text
   );
 
 -- Guests can replace (update) their own photos (retake flow).
@@ -46,5 +47,5 @@ create policy "storage_photos_update_own"
   to authenticated
   using (
     bucket_id = 'photos'
-    and (storage.foldername(name))[2] = auth.uid()::text
+    and split_part(name, '/', 2) = auth.uid()::text
   );

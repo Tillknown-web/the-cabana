@@ -87,7 +87,6 @@ export default function CourseCard({ card, guest, sessionId }: Props) {
         ) : showUpload ? (
           <PhotoUpload
             course={card}
-            guestId={guest.id}
             sessionId={sessionId}
             onUploaded={handleUploaded}
             onCancel={() => setShowUpload(false)}

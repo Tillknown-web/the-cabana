@@ -5,16 +5,16 @@ import { createClient } from '@/lib/supabase/client'
 
 interface Props {
   course: string
-  guestId: string
   sessionId: string
   onUploaded: (previewUrl: string) => void
   onCancel: () => void
 }
 
-export default function PhotoUpload({ course, guestId, sessionId, onUploaded, onCancel }: Props) {
+export default function PhotoUpload({ course, sessionId, onUploaded, onCancel }: Props) {
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
+  const cameraInputRef = useRef<HTMLInputElement>(null)
+  const galleryInputRef = useRef<HTMLInputElement>(null)
 
   async function handleFile(file: File) {
     setUploading(true)
@@ -29,34 +29,29 @@ export default function PhotoUpload({ course, guestId, sessionId, onUploaded, on
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) throw new Error('Not authenticated')
 
-      // Storage path must match: {sessionId}/{guestId}/{course}.jpg
-      const storagePath = `${sessionId}/${guestId}/${course}.jpg`
+      // Route the upload through the upload-photo Edge Function, which uses
+      // the service-role (HS256) key to talk to Storage. Uploading directly
+      // to Storage with the guest's ES256 user JWT fails with
+      // "Unsupported JWT algorithm ES256" (Supabase storage bug #741).
+      const form = new FormData()
+      form.append('file', resized, `${course}.jpg`)
+      form.append('sessionId', sessionId)
+      form.append('course', course)
 
-      const { error: uploadError } = await supabase.storage
-        .from('photos')
-        .upload(storagePath, resized, {
-          contentType: 'image/jpeg',
-          upsert: true,
-        })
-
-      if (uploadError) throw new Error(uploadError.message)
-
-      // Record the metadata in the photos table
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/record-photo`,
+        `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/upload-photo`,
         {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
             Authorization: `Bearer ${session.access_token}`,
           },
-          body: JSON.stringify({ sessionId, course, storagePath }),
+          body: form,
         }
       )
 
       if (!res.ok) {
-        const { error: e } = await res.json()
-        throw new Error(e ?? 'Failed to record photo')
+        const body = await res.json().catch(() => ({}))
+        throw new Error(body.error ?? body.message ?? `Server error ${res.status}`)
       }
 
       onUploaded(previewUrl)
@@ -69,15 +64,26 @@ export default function PhotoUpload({ course, guestId, sessionId, onUploaded, on
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (file) handleFile(file)
+    // Reset so the same file can be re-selected after an error
+    e.target.value = ''
   }
 
   return (
     <div style={{ textAlign: 'center' }}>
+      {/* Hidden input that opens the rear camera directly */}
       <input
-        ref={inputRef}
+        ref={cameraInputRef}
         type="file"
         accept="image/*"
         capture="environment"
+        onChange={handleChange}
+        style={{ display: 'none' }}
+      />
+      {/* Hidden input that opens the photo library / file picker */}
+      <input
+        ref={galleryInputRef}
+        type="file"
+        accept="image/*"
         onChange={handleChange}
         style={{ display: 'none' }}
       />
@@ -90,15 +96,21 @@ export default function PhotoUpload({ course, guestId, sessionId, onUploaded, on
           </div>
         </div>
       ) : (
-        <div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           <button
-            onClick={() => inputRef.current?.click()}
+            onClick={() => cameraInputRef.current?.click()}
             style={primaryBtnStyle}
           >
-            <span style={{ fontSize: '1.5rem' }}>📷</span>
-            <span style={{ marginLeft: '0.5rem', fontFamily: 'var(--font-sans)', fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase' as const }}>
-              Open Camera
-            </span>
+            <span style={{ fontSize: '1.3rem' }}>📷</span>
+            <span style={btnLabelStyle}>Take Photo</span>
+          </button>
+
+          <button
+            onClick={() => galleryInputRef.current?.click()}
+            style={secondaryBtnStyle}
+          >
+            <span style={{ fontSize: '1.3rem' }}>🖼️</span>
+            <span style={btnLabelStyle}>Choose from Library</span>
           </button>
 
           {error && (
@@ -173,6 +185,14 @@ const statusStyle: React.CSSProperties = {
   opacity: 0.8,
 }
 
+const btnLabelStyle: React.CSSProperties = {
+  marginLeft: '0.5rem',
+  fontFamily: 'var(--font-sans)',
+  fontSize: '11px',
+  letterSpacing: '0.2em',
+  textTransform: 'uppercase',
+}
+
 const primaryBtnStyle: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
@@ -180,6 +200,18 @@ const primaryBtnStyle: React.CSSProperties = {
   width: '100%',
   padding: '1rem',
   border: '1px solid rgba(212, 175, 55, 0.4)',
+  backgroundColor: 'transparent',
+  color: '#F5F0E8',
+  cursor: 'pointer',
+}
+
+const secondaryBtnStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: '100%',
+  padding: '1rem',
+  border: '1px solid rgba(245, 240, 232, 0.15)',
   backgroundColor: 'transparent',
   color: '#F5F0E8',
   cursor: 'pointer',

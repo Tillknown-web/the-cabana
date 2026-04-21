@@ -11,8 +11,9 @@ export async function requireKitchenAuth(req: Request): Promise<Response | null>
     return errorResponse('Missing authorization header', 401)
   }
 
+  const token = authHeader.replace(/^Bearer\s+/i, '')
   const client = createUserClient(authHeader)
-  const { data: { user }, error } = await client.auth.getUser()
+  const { data: { user }, error } = await client.auth.getUser(token)
 
   if (error || !user) {
     return errorResponse('Invalid or expired token', 401)

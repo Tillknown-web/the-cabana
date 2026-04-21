@@ -2,10 +2,8 @@
 
 import { useRef, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import type { Guest } from '@/app/experience/page'
 
 interface Props {
-  guest: Guest
   sessionId: string
   eventDate?: string
 }
@@ -16,7 +14,7 @@ type BoothState =
   | { stage: 'uploading'; previewUrl: string }
   | { stage: 'done'; previewUrl: string }
 
-export default function PhotoBoothButton({ guest, sessionId, eventDate = 'July 12, 2026' }: Props) {
+export default function PhotoBoothButton({ sessionId, eventDate = 'July 12, 2026' }: Props) {
   const [open, setOpen] = useState(false)
   const [state, setState] = useState<BoothState>({ stage: 'idle' })
   const [error, setError] = useState<string | null>(null)
@@ -50,30 +48,32 @@ export default function PhotoBoothButton({ guest, sessionId, eventDate = 'July 1
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) throw new Error('Not authenticated')
 
+      // Upload through the upload-photo Edge Function (uses service role
+      // to avoid Storage's ES256 JWT rejection — see function for details).
       const timestamp = Date.now()
-      const storagePath = `${sessionId}/${guest.id}/booth_${timestamp}.jpg`
+      const filename = `booth_${timestamp}.jpg`
 
-      const { error: uploadError } = await supabase.storage
-        .from('photos')
-        .upload(storagePath, brandedBlob, { contentType: 'image/jpeg', upsert: false })
-
-      if (uploadError) throw new Error(uploadError.message)
+      const form = new FormData()
+      form.append('file', brandedBlob, filename)
+      form.append('sessionId', sessionId)
+      form.append('course', 'booth')
+      form.append('filename', filename)
+      form.append('upsert', 'false')
 
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/record-photo`,
+        `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/upload-photo`,
         {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
             Authorization: `Bearer ${session.access_token}`,
           },
-          body: JSON.stringify({ sessionId, course: 'booth', storagePath }),
+          body: form,
         }
       )
 
       if (!res.ok) {
-        const json = await res.json()
-        throw new Error(json.error ?? 'Failed to save photo')
+        const json = await res.json().catch(() => ({}))
+        throw new Error(json.error ?? json.message ?? 'Failed to save photo')
       }
 
       setState({ stage: 'done', previewUrl })

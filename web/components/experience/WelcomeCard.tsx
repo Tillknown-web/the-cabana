@@ -138,7 +138,6 @@ export default function WelcomeCard({ guest, sessionId }: Props) {
         {showUpload ? (
           <PhotoUpload
             course="guest"
-            guestId={guest.id}
             sessionId={sessionId}
             onUploaded={() => setHasPhoto(true)}
             onCancel={() => setShowUpload(false)}

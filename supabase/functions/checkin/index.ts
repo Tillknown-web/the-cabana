@@ -17,8 +17,9 @@ Deno.serve(async (req) => {
   const authHeader = req.headers.get('Authorization')
   if (!authHeader) return errorResponse('Missing authorization header', 401)
 
+  const token = authHeader.replace(/^Bearer\s+/i, '')
   const userClient = createUserClient(authHeader)
-  const { data: { user }, error: authError } = await userClient.auth.getUser()
+  const { data: { user }, error: authError } = await userClient.auth.getUser(token)
   if (authError || !user) return errorResponse('Invalid token', 401)
 
   let body: { name?: string; sessionId?: string }
