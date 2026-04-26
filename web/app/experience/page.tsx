@@ -55,6 +55,20 @@ export default function ExperiencePage() {
           return
         }
 
+        // Verify the guest row still exists in the DB. It may have been deleted
+        // by a kitchen reset even though the auth session and localStorage are intact.
+        const { data: existingGuest } = await supabase
+          .from('guests')
+          .select('id')
+          .eq('id', guestData.id)
+          .maybeSingle()
+
+        if (!existingGuest) {
+          localStorage.removeItem('cabana:guest')
+          setLoading(false)
+          return
+        }
+
         setGuest(guestData)
       } catch {
         localStorage.removeItem('cabana:guest')
