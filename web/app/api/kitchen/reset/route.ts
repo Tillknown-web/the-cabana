@@ -1,13 +1,16 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
+import { createClient as createServerClient } from '@/lib/supabase/server'
 
 const SESSION_ID = process.env.NEXT_PUBLIC_SESSION_ID!
 
 function serviceClient() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!url || !key) {
+    throw new Error('Server misconfigured: NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY is not set')
+  }
+  return createClient(url, key)
 }
 
 /**
@@ -19,6 +22,13 @@ function serviceClient() {
  */
 export async function POST() {
   try {
+    // Verify the caller is a signed-in kitchen user
+    const authClient = await createServerClient()
+    const { data: { user } } = await authClient.auth.getUser()
+    if (!user || user.user_metadata?.role !== 'kitchen') {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     const supabase = serviceClient()
 
     // Ensure the session row exists (idempotent). Required so that the
