@@ -21,15 +21,23 @@ export async function POST() {
   try {
     const supabase = serviceClient()
 
-    // Reset session state
+    // Ensure the session row exists (idempotent). Required so that the
+    // session_state FK is satisfied even if the seed was never run.
+    const today = new Date().toISOString().split('T')[0]
+    await supabase
+      .from('sessions')
+      .upsert({ session_id: SESSION_ID, event_date: today }, { onConflict: 'session_id', ignoreDuplicates: true })
+
+    // Reset (or initialise) session state via upsert so the row is created
+    // if it was never seeded, not just updated.
     const { error: stateError } = await supabase
       .from('session_state')
-      .update({
+      .upsert({
+        session_id: SESSION_ID,
         current_card: 'welcome',
         released_cards: [],
         updated_at: new Date().toISOString(),
-      })
-      .eq('session_id', SESSION_ID)
+      }, { onConflict: 'session_id' })
 
     if (stateError) throw new Error(stateError.message)
 

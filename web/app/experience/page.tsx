@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { COURSE_CARDS } from '@/lib/constants'
 import CheckIn from '@/components/experience/CheckIn'
@@ -27,6 +27,12 @@ export default function ExperiencePage() {
   const [currentCard, setCurrentCard] = useState<string>('welcome')
   const [loading, setLoading] = useState(true)
   const [songModalOpen, setSongModalOpen] = useState(false)
+
+  // True when the guest just freshly checked in (vs. restored from localStorage).
+  // New guests always start at 'welcome' — we do NOT fetch the global session card
+  // for them, because mid-session joiners would otherwise skip straight to whatever
+  // course is currently live (e.g. steak) instead of starting from the beginning.
+  const isNewCheckInRef = useRef(false)
 
   const supabase = createClient()
 
@@ -69,6 +75,8 @@ export default function ExperiencePage() {
           return
         }
 
+        // Restored guest — they need to catch up to the current card.
+        isNewCheckInRef.current = false
         setGuest(guestData)
       } catch {
         localStorage.removeItem('cabana:guest')
@@ -79,22 +87,29 @@ export default function ExperiencePage() {
     restore()
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Subscribe to session state once guest is confirmed
+  // Subscribe to session state + guest deletion once guest is confirmed
   useEffect(() => {
     if (!guest) return
 
-    // Fetch initial state
-    supabase
-      .from('session_state')
-      .select('current_card')
-      .eq('session_id', SESSION_ID)
-      .single()
-      .then(({ data }) => {
-        if (data?.current_card) setCurrentCard(data.current_card)
-      })
+    const isNew = isNewCheckInRef.current
+    // Reset the flag so future re-runs (if ever) behave as "restored".
+    isNewCheckInRef.current = false
 
-    // Live updates
-    const channel = supabase
+    // Fetch initial state only for returning/restored guests so they catch up
+    // to wherever the session currently is. New guests start at 'welcome'.
+    if (!isNew) {
+      supabase
+        .from('session_state')
+        .select('current_card')
+        .eq('session_id', SESSION_ID)
+        .single()
+        .then(({ data }) => {
+          if (data?.current_card) setCurrentCard(data.current_card)
+        })
+    }
+
+    // Live session-state updates (advances all connected guests together)
+    const stateChannel = supabase
       .channel(`exp-state-${SESSION_ID}`)
       .on(
         'postgres_changes',
@@ -107,11 +122,32 @@ export default function ExperiencePage() {
       )
       .subscribe()
 
-    return () => { supabase.removeChannel(channel) }
+    // Detect when the kitchen resets and deletes this guest's row.
+    // When that happens, clear local state so the check-in form reappears.
+    const guestChannel = supabase
+      .channel(`exp-guest-${guest.id}`)
+      .on(
+        'postgres_changes',
+        { event: 'DELETE', schema: 'public', table: 'guests', filter: `id=eq.${guest.id}` },
+        () => {
+          localStorage.removeItem('cabana:guest')
+          setCurrentCard('welcome')
+          setGuest(null)
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(stateChannel)
+      supabase.removeChannel(guestChannel)
+    }
   }, [guest]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleCheckedIn = useCallback((g: Guest) => {
     localStorage.setItem('cabana:guest', JSON.stringify(g))
+    // Mark as a fresh check-in so the subscribe effect skips the initial
+    // session_state fetch and keeps them at 'welcome'.
+    isNewCheckInRef.current = true
     setGuest(g)
   }, [])
 

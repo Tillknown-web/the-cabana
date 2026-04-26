@@ -52,9 +52,10 @@ Deno.serve(async (req) => {
     .from('session_state')
     .select('current_card, released_cards')
     .eq('session_id', sessionId)
-    .single()
+    .maybeSingle()
 
-  if (stateError || !state) return errorResponse('Session not found', 404)
+  if (stateError) return errorResponse(stateError.message, 500)
+  if (!state) return errorResponse('Session not initialised — click Reset in the kitchen to set up the session', 404)
 
   const currentIndex = CARD_SEQUENCE.indexOf(state.current_card as Card)
   if (currentIndex === -1 || currentIndex >= CARD_SEQUENCE.length - 1) {
