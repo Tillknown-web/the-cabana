@@ -1,0 +1,44 @@
+@import "tailwindcss";
+
+/* ============================================================
+   Brand theme — The Cabana
+   ============================================================ */
+@theme inline {
+  /* Colors */
+  --color-aubergine:  #2D1B47;
+  --color-pool-blue:  #A8C5DA;
+  --color-gold:       #D4AF37;
+  --color-cream:      #F5F0E8;
+  --color-near-black: #1A1A2E;
+
+  /* Fonts */
+  --font-serif: var(--font-cormorant), Georgia, serif;
+  --font-sans:  var(--font-inter), system-ui, sans-serif;
+}
+
+/* ============================================================
+   Base resets
+   ============================================================ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  height: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  min-height: 100%;
+  background-color: #F5F0E8;
+  color: #2D1B47;
+  font-family: var(--font-sans);
+}
+
+/* Prevent horizontal scroll on mobile */
+body, html {
+  overflow-x: hidden;
+}
