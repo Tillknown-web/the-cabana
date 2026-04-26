@@ -1,0 +1,152 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap');
+
+@import "tailwindcss";
+
+:root {
+  /* Landing page — light/fine-dining palette */
+  --egg-white: #F7F3EC;
+  --egg-white-deep: #EFE9DF;
+  --aubergine: #2D1B47;
+  --aubergine-light: #3D2860;
+  --pool-blue: #A8C5DA;
+  --gold: #D4AF37;
+  --gold-dark: #B8941F;
+  --cream: #F5F0E8;
+  --near-black: #1A1A2E;
+  --warm-gray: #8A8078;
+  --border-light: rgba(45, 27, 71, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+  background-color: var(--egg-white);
+  color: var(--aubergine);
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  overscroll-behavior: none;
+}
+
+button,
+[role="button"] {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.font-serif {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+}
+
+/* Gold hairline divider */
+.divider-gold {
+  width: 40px;
+  height: 1px;
+  background-color: var(--gold);
+  opacity: 0.5;
+  margin: 0 auto;
+}
+
+/* Ingredient / pool-blue italic */
+.ingredient {
+  font-style: italic;
+  color: var(--pool-blue);
+  font-size: 13px;
+}
+
+/* Full-screen card (experience/kitchen — kept dark) */
+.screen-card {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── EXPERIENCE / KITCHEN — keep dark ── */
+.dark-bg {
+  background-color: var(--aubergine);
+  color: var(--cream);
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+.animate-pulse-soft {
+  animation: pulse-soft 2.5s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+.shimmer-gold {
+  background: linear-gradient(90deg, var(--gold) 0%, #f0d060 40%, var(--gold) 60%, #a07820 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 2s linear infinite;
+}
+
+@keyframes slide-up-in {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+@keyframes slide-up-out {
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(-8%); opacity: 0; }
+}
+.screen-enter { animation: slide-up-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.screen-exit  { animation: slide-up-out 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+@keyframes toast-in  { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes toast-out { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-100%); opacity: 0; } }
+.toast-enter { animation: toast-in  0.3s ease forwards; }
+.toast-exit  { animation: toast-out 0.3s ease forwards; }
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.animate-fade-in { animation: fade-in 0.6s ease forwards; }
+
+@keyframes letter-reveal {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.letter-reveal {
+  display: inline-block;
+  opacity: 0;
+  animation: letter-reveal 0.08s ease forwards;
+}
+
+/* Landing page fade-in on scroll helper */
+@keyframes reveal-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.reveal-up {
+  animation: reveal-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(45, 27, 71, 0.2); border-radius: 2px; }
+
+/* Kitchen panel (functional, dark) */
+.kitchen-body {
+  background: #0f0f14;
+  color: #e0e0e0;
+  font-family: 'Inter', sans-serif;
+}
