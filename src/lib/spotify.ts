@@ -1,5 +1,7 @@
+import type { SpotifyPlaylist, SpotifyQueueTrack, SpotifyNowPlayingFull } from '@/types'
+
 const SPOTIFY_TOKEN_URL = 'https://accounts.spotify.com/api/token'
-const SPOTIFY_NOW_PLAYING_URL = 'https://api.spotify.com/v1/me/player/currently-playing'
+const SPOTIFY_BASE_URL = 'https://api.spotify.com/v1'
 
 export async function getSpotifyAccessToken(): Promise<string | null> {
   const refreshToken = process.env.SPOTIFY_REFRESH_TOKEN
@@ -27,23 +29,97 @@ export async function getSpotifyAccessToken(): Promise<string | null> {
   return data.access_token ?? null
 }
 
-export async function getNowPlaying() {
+async function getPlaylist(playlistId: string, accessToken: string): Promise<SpotifyPlaylist | null> {
+  const res = await fetch(
+    `${SPOTIFY_BASE_URL}/playlists/${playlistId}?fields=id,name,images,external_urls`,
+    { headers: { Authorization: `Bearer ${accessToken}` } }
+  )
+  if (!res.ok) return null
+  const data = await res.json()
+  return {
+    id: data.id,
+    name: data.name,
+    image: (data.images?.[0]?.url as string) ?? null,
+    url: data.external_urls?.spotify ?? `https://open.spotify.com/playlist/${data.id}`,
+  }
+}
+
+async function getPlayerQueue(accessToken: string): Promise<SpotifyQueueTrack[]> {
+  const res = await fetch(`${SPOTIFY_BASE_URL}/me/player/queue`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  })
+  if (!res.ok) return []
+  const data = await res.json()
+  const items = (data.queue as { name: string; artists: { name: string }[]; album: { images: { url: string }[] } }[]) ?? []
+  return items.slice(0, 5).map((item) => ({
+    track: item.name,
+    artist: item.artists.map((a) => a.name).join(', '),
+    album_art: item.album?.images?.[0]?.url ?? null,
+  }))
+}
+
+export async function getNowPlayingFull(): Promise<SpotifyNowPlayingFull | null> {
   const accessToken = await getSpotifyAccessToken()
   if (!accessToken) return null
 
-  const res = await fetch(SPOTIFY_NOW_PLAYING_URL, {
+  const res = await fetch(`${SPOTIFY_BASE_URL}/me/player/currently-playing`, {
     headers: { Authorization: `Bearer ${accessToken}` },
   })
 
   if (res.status === 204 || !res.ok) return null
-
   const data = await res.json()
   if (!data.item) return null
+
+  const playlistId =
+    data.context?.type === 'playlist'
+      ? (data.context.uri as string).split(':').pop() ?? null
+      : null
+
+  const [playlist, queue] = await Promise.all([
+    playlistId ? getPlaylist(playlistId, accessToken) : Promise.resolve(null),
+    getPlayerQueue(accessToken),
+  ])
 
   return {
     track: data.item.name as string,
     artist: (data.item.artists as { name: string }[]).map((a) => a.name).join(', '),
     album_art: (data.item.album?.images?.[0]?.url as string) ?? null,
     updated_at: new Date().toISOString(),
+    playlist,
+    queue,
   }
+}
+
+export async function getUserPlaylists(): Promise<SpotifyPlaylist[]> {
+  const accessToken = await getSpotifyAccessToken()
+  if (!accessToken) return []
+
+  const res = await fetch(`${SPOTIFY_BASE_URL}/me/playlists?limit=20`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  })
+  if (!res.ok) return []
+  const data = await res.json()
+  const items = (data.items as { id: string; name: string; images: { url: string }[]; external_urls: { spotify: string } }[]) ?? []
+  return items.map((p) => ({
+    id: p.id,
+    name: p.name,
+    image: p.images?.[0]?.url ?? null,
+    url: p.external_urls?.spotify ?? `https://open.spotify.com/playlist/${p.id}`,
+  }))
+}
+
+export async function switchPlaylist(playlistId: string): Promise<boolean> {
+  const accessToken = await getSpotifyAccessToken()
+  if (!accessToken) return false
+
+  const res = await fetch(`${SPOTIFY_BASE_URL}/me/player/play`, {
+    method: 'PUT',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ context_uri: `spotify:playlist:${playlistId}` }),
+  })
+
+  return res.ok || res.status === 204
 }

@@ -3,7 +3,7 @@
 export const dynamic = 'force-dynamic'
 
 import { useState, useEffect, useCallback } from 'react'
-import type { CardId } from '@/types'
+import type { CardId, SpotifyNowPlayingFull, SpotifyPlaylist } from '@/types'
 import { CARD_SEQUENCE, CARD_LABELS, INTERMISSION_CARDS, COURSE_CARDS } from '@/types'
 import { formatTime, formatElapsed, formatDuration } from '@/lib/utils'
 
@@ -41,11 +41,6 @@ interface ChefNote {
 }
 
 export default function KitchenPage() {
-  const [authed, setAuthed] = useState(false)
-  const [password, setPassword] = useState('')
-  const [authError, setAuthError] = useState('')
-  const [loading, setLoading] = useState(false)
-
   const [session, setSession] = useState<Session | null>(null)
   const [guests, setGuests] = useState<Guest[]>([])
   const [notes, setNotes] = useState<ChefNote[]>([])
@@ -54,23 +49,10 @@ export default function KitchenPage() {
   const [noteSending, setNoteSending] = useState(false)
   const [releaseConfirm, setReleaseConfirm] = useState<CardId | null>(null)
   const [tablesideConfirm, setTablesideConfirm] = useState<string | null>(null)
-
-  async function handleLogin(e: React.FormEvent) {
-    e.preventDefault()
-    setLoading(true)
-    setAuthError('')
-    const res = await fetch('/api/kitchen/auth', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password }),
-    })
-    setLoading(false)
-    if (res.ok) {
-      setAuthed(true)
-    } else {
-      setAuthError('Wrong password.')
-    }
-  }
+  const [nowPlaying, setNowPlaying] = useState<SpotifyNowPlayingFull | null>(null)
+  const [playlists, setPlaylists] = useState<SpotifyPlaylist[]>([])
+  const [showPlaylists, setShowPlaylists] = useState(false)
+  const [switchingPlaylist, setSwitchingPlaylist] = useState<string | null>(null)
 
   const fetchDashboard = useCallback(async () => {
     const res = await fetch(`/api/kitchen/dashboard?sessionId=${SESSION_ID}`)
@@ -83,11 +65,50 @@ export default function KitchenPage() {
   }, [])
 
   useEffect(() => {
-    if (!authed) return
     fetchDashboard()
     const interval = setInterval(fetchDashboard, 5000)
     return () => clearInterval(interval)
-  }, [authed, fetchDashboard])
+  }, [fetchDashboard])
+
+  useEffect(() => {
+    async function fetchNowPlaying() {
+      try {
+        const res = await fetch(`/api/spotify/${SESSION_ID}`)
+        if (!res.ok) return
+        const data = await res.json()
+        setNowPlaying(data)
+      } catch {
+        // ignore
+      }
+    }
+    fetchNowPlaying()
+    const interval = setInterval(fetchNowPlaying, 15000)
+    return () => clearInterval(interval)
+  }, [])
+
+  async function fetchPlaylists() {
+    try {
+      const res = await fetch('/api/kitchen/spotify/playlists')
+      if (!res.ok) return
+      const data = await res.json()
+      setPlaylists(data.playlists ?? [])
+    } catch {
+      // ignore
+    }
+  }
+
+  async function handleSwitchPlaylist(playlistId: string) {
+    setSwitchingPlaylist(playlistId)
+    try {
+      await fetch('/api/kitchen/spotify/switch', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ playlistId }),
+      })
+    } finally {
+      setSwitchingPlaylist(null)
+    }
+  }
 
   async function handleRelease(cardId: CardId) {
     setReleaseConfirm(null)
@@ -142,74 +163,6 @@ export default function KitchenPage() {
       body: JSON.stringify({ requestId }),
     })
     fetchDashboard()
-  }
-
-  if (!authed) {
-    return (
-      <div
-        className="kitchen-body"
-        style={{
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: 24,
-        }}
-      >
-        <form
-          onSubmit={handleLogin}
-          style={{
-            width: '100%',
-            maxWidth: 320,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 16,
-            textAlign: 'center',
-          }}
-        >
-          <h1 style={{ fontSize: 22, fontWeight: 500, marginBottom: 4 }}>The Cabana</h1>
-          <p style={{ fontSize: 13, color: '#888', marginBottom: 12 }}>kitchen</p>
-
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password"
-            autoFocus
-            style={{
-              backgroundColor: '#1a1a24',
-              border: '1px solid #333',
-              borderRadius: 4,
-              padding: '14px 16px',
-              color: '#e0e0e0',
-              fontSize: 16,
-              outline: 'none',
-              textAlign: 'center',
-            }}
-          />
-
-          {authError && <p style={{ color: '#f87171', fontSize: 13 }}>{authError}</p>}
-
-          <button
-            type="submit"
-            disabled={loading}
-            style={{
-              backgroundColor: '#D4AF37',
-              color: '#0f0f14',
-              border: 'none',
-              borderRadius: 4,
-              padding: '14px',
-              fontSize: 14,
-              fontWeight: 600,
-              cursor: loading ? 'not-allowed' : 'pointer',
-              opacity: loading ? 0.6 : 1,
-            }}
-          >
-            {loading ? 'Entering…' : 'Enter'}
-          </button>
-        </form>
-      </div>
-    )
   }
 
   if (!session) {
@@ -400,6 +353,136 @@ export default function KitchenPage() {
             subLabel={finishIsLive ? undefined : 'only active when the finish is live'}
             style={{ marginTop: 8 }}
           />
+        </Section>
+
+        {/* ── Music ── */}
+        <Section title="Music">
+          {nowPlaying ? (
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+                {nowPlaying.album_art && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={nowPlaying.album_art}
+                    alt="album art"
+                    style={{ width: 40, height: 40, borderRadius: 4, flexShrink: 0, objectFit: 'cover' }}
+                  />
+                )}
+                <div style={{ overflow: 'hidden' }}>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: '#e0e0e0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {nowPlaying.track}
+                  </p>
+                  <p style={{ fontSize: 12, color: '#888', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {nowPlaying.artist}
+                  </p>
+                  {nowPlaying.playlist && (
+                    <p style={{ fontSize: 11, color: '#D4AF3799', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {nowPlaying.playlist.name}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {nowPlaying.queue.length > 0 && (
+                <div>
+                  <p style={{ fontSize: 11, color: '#555', marginBottom: 8 }}>Up next</p>
+                  {nowPlaying.queue.map((item, i) => (
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                      <span style={{ fontSize: 11, color: '#444', width: 14, flexShrink: 0, textAlign: 'right' }}>{i + 1}</span>
+                      {item.album_art && (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={item.album_art}
+                          alt=""
+                          style={{ width: 28, height: 28, borderRadius: 3, flexShrink: 0, objectFit: 'cover' }}
+                        />
+                      )}
+                      <div style={{ overflow: 'hidden' }}>
+                        <p style={{ fontSize: 12, color: '#ccc', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {item.track}
+                        </p>
+                        <p style={{ fontSize: 11, color: '#666', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {item.artist}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            <p style={{ fontSize: 13, color: '#555', marginBottom: 12 }}>Nothing playing right now.</p>
+          )}
+
+          <button
+            onClick={() => {
+              if (!showPlaylists) fetchPlaylists()
+              setShowPlaylists((v) => !v)
+            }}
+            style={{
+              background: 'none',
+              border: '1px solid #333',
+              borderRadius: 4,
+              color: '#888',
+              fontSize: 12,
+              padding: '6px 12px',
+              cursor: 'pointer',
+              marginBottom: showPlaylists ? 12 : 0,
+            }}
+          >
+            {showPlaylists ? 'Hide playlists' : 'Browse playlists'}
+          </button>
+
+          {showPlaylists && (
+            <div>
+              {playlists.length === 0 ? (
+                <p style={{ fontSize: 12, color: '#555' }}>No playlists found (check token scopes).</p>
+              ) : (
+                playlists.map((pl) => (
+                  <div
+                    key={pl.id}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 10,
+                      padding: '8px 0',
+                      borderBottom: '1px solid #1e1e2e',
+                    }}
+                  >
+                    {pl.image && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={pl.image}
+                        alt=""
+                        style={{ width: 32, height: 32, borderRadius: 3, flexShrink: 0, objectFit: 'cover' }}
+                      />
+                    )}
+                    <p style={{ fontSize: 13, color: '#ccc', flex: 1, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
+                      {pl.name}
+                    </p>
+                    <button
+                      onClick={() => handleSwitchPlaylist(pl.id)}
+                      disabled={switchingPlaylist === pl.id}
+                      style={{
+                        padding: '5px 12px',
+                        backgroundColor: nowPlaying?.playlist?.id === pl.id ? '#1e1e2e' : '#D4AF37',
+                        border: 'none',
+                        borderRadius: 4,
+                        color: nowPlaying?.playlist?.id === pl.id ? '#555' : '#0f0f14',
+                        fontSize: 11,
+                        fontWeight: 600,
+                        cursor: switchingPlaylist === pl.id ? 'not-allowed' : 'pointer',
+                        flexShrink: 0,
+                        opacity: switchingPlaylist === pl.id ? 0.5 : 1,
+                      }}
+                    >
+                      {nowPlaying?.playlist?.id === pl.id ? 'playing' : switchingPlaylist === pl.id ? '…' : 'Play'}
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
+          )}
         </Section>
 
         {/* ── Countdown ETA ── */}

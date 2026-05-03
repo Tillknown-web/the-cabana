@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import type { SpotifyTrack } from '@/types'
+import type { SpotifyNowPlayingFull } from '@/types'
 
 interface NowPlayingBarProps {
   sessionId: string
@@ -9,7 +9,7 @@ interface NowPlayingBarProps {
 }
 
 export default function NowPlayingBar({ sessionId, onRequestSong }: NowPlayingBarProps) {
-  const [track, setTrack] = useState<SpotifyTrack | null>(null)
+  const [track, setTrack] = useState<SpotifyNowPlayingFull | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -85,6 +85,21 @@ export default function NowPlayingBar({ sessionId, onRequestSong }: NowPlayingBa
               >
                 {track.artist}
               </p>
+              {track.playlist && (
+                <p
+                  style={{
+                    fontFamily: "'Inter', sans-serif",
+                    fontSize: 10,
+                    color: 'rgba(212,175,55,0.6)',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    marginTop: 1,
+                  }}
+                >
+                  {track.playlist.name}
+                </p>
+              )}
             </>
           ) : (
             <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 12, color: 'rgba(245,240,232,0.4)' }}>

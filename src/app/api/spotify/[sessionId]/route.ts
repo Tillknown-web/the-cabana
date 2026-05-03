@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getNowPlaying } from '@/lib/spotify'
+import { getNowPlayingFull } from '@/lib/spotify'
+import type { SpotifyNowPlayingFull } from '@/types'
 
 // Simple in-memory cache (process-level, resets on cold start)
-let cached: { data: unknown; cachedAt: number } | null = null
+let cached: { data: SpotifyNowPlayingFull; cachedAt: number } | null = null
 const TTL_MS = 15000
 
 export async function GET(
@@ -15,7 +16,7 @@ export async function GET(
     return NextResponse.json(cached.data)
   }
 
-  const track = await getNowPlaying()
+  const track = await getNowPlayingFull()
 
   if (!track) {
     return NextResponse.json(null)

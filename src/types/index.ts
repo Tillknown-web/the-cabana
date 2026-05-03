@@ -77,6 +77,24 @@ export interface SpotifyTrack {
   updated_at: string
 }
 
+export interface SpotifyPlaylist {
+  id: string
+  name: string
+  image: string | null
+  url: string
+}
+
+export interface SpotifyQueueTrack {
+  track: string
+  artist: string
+  album_art: string | null
+}
+
+export interface SpotifyNowPlayingFull extends SpotifyTrack {
+  playlist: SpotifyPlaylist | null
+  queue: SpotifyQueueTrack[]
+}
+
 export interface SessionState {
   currentCard: CardId
   releasedCards: CardId[]
