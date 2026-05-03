@@ -136,6 +136,7 @@ export default function ExperiencePage() {
           if (newCard !== prevCardRef.current) {
             playCardChime(newCard)
             prevCardRef.current = newCard
+            setWaitingForCard(false)
           }
           setCurrentCard(newCard)
           setReleasedCards(newData.released_cards ?? [])
@@ -205,6 +206,16 @@ export default function ExperiencePage() {
   const handleCourseComplete = useCallback(() => {
     setWaitingForCard(true)
   }, [])
+
+  // Persist guest's current card to DB so page refreshes restore the correct position
+  useEffect(() => {
+    if (!guestId || currentCard === 'checkin') return
+    fetch('/api/guest/advance-card', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ guestId, cardId: currentCard }),
+    })
+  }, [guestId, currentCard])
 
   // Advance to the next released card when the kitchen releases it while guest is waiting
   useEffect(() => {

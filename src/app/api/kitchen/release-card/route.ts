@@ -1,14 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase'
-import { isKitchenAuthed } from '@/lib/kitchen-auth'
 import { CARD_SEQUENCE } from '@/types'
 import type { CardId } from '@/types'
 
 export async function POST(req: NextRequest) {
-  if (!isKitchenAuthed(req)) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
   try {
     const { sessionId, cardId } = await req.json()
     if (!sessionId || !cardId) {

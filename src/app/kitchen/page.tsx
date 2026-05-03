@@ -172,6 +172,7 @@ export default function KitchenPage() {
       </div>
     )
   }
+  
 
   const releasedCards = session.released_cards ?? []
   const sessionAgeMs = Date.now() - new Date(session.created_at).getTime()

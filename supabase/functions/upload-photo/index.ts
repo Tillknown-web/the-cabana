@@ -105,7 +105,14 @@ Deno.serve(async (req) => {
     .select()
     .single()
 
-  if (insertError) return errorResponse(insertError.message)
+  if (insertError) {
+    // FK violation means the guest row was deleted (e.g. after a session reset).
+    // Return a clear message so the client can prompt re-check-in.
+    if (insertError.code === '23503') {
+      return errorResponse('Guest session expired. Please refresh and check in again.', 409)
+    }
+    return errorResponse(insertError.message)
+  }
 
   // Advance the guest's current_card when they complete a course photo.
   const CARD_FOR_COURSE: Record<string, string> = {

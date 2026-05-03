@@ -1,12 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase'
-import { isKitchenAuthed } from '@/lib/kitchen-auth'
 
 export async function GET(req: NextRequest) {
-  if (!isKitchenAuthed(req)) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
   const sessionId = req.nextUrl.searchParams.get('sessionId')
   if (!sessionId) return NextResponse.json({ error: 'Missing sessionId' }, { status: 400 })
 

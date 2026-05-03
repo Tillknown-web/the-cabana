@@ -26,14 +26,23 @@ export default function SessionHeader({ sessionState, sessionId, onReset }: Prop
   const releasedCount = sessionState?.released_cards?.length ?? 0
   const [confirming, setConfirming] = useState(false)
   const [resetting, setResetting] = useState(false)
+  const [resetError, setResetError] = useState<string | null>(null)
 
   async function handleReset() {
     if (!confirming) { setConfirming(true); return }
     setResetting(true)
     setConfirming(false)
+    setResetError(null)
     try {
-      await fetch('/api/kitchen/reset', { method: 'POST' })
+      const res = await fetch('/api/kitchen/reset', { method: 'POST' })
+      if (!res.ok) {
+        const json = await res.json().catch(() => ({}))
+        setResetError((json as { error?: string }).error ?? `Reset failed (${res.status})`)
+        return
+      }
       onReset?.()
+    } catch {
+      setResetError('Network error — reset may not have completed')
     } finally {
       setResetting(false)
     }
@@ -87,6 +96,27 @@ export default function SessionHeader({ sessionState, sessionId, onReset }: Prop
           </div>
         </div>
       </div>
+
+      {/* Reset error */}
+      {resetError && (
+        <div style={{
+          maxWidth: '640px',
+          margin: '0.5rem auto 0',
+          padding: '0.4rem 0.75rem',
+          backgroundColor: 'rgba(168, 197, 218, 0.12)',
+          border: '1px solid rgba(168, 197, 218, 0.3)',
+        }}>
+          <p style={{
+            fontFamily: 'var(--font-sans)',
+            fontSize: '10px',
+            letterSpacing: '0.05em',
+            color: '#A8C5DA',
+            margin: 0,
+          }}>
+            ⚠ {resetError}
+          </p>
+        </div>
+      )}
 
       {/* Released cards progress */}
       {sessionState && releasedCount > 0 && (

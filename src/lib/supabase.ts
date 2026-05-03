@@ -12,7 +12,7 @@ export function createClient() {
 // Uses browser client API with the service role key (no cookie handling needed)
 export function createServiceClient() {
   return createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
 }

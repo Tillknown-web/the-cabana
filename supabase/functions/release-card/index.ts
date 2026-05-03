@@ -55,16 +55,22 @@ Deno.serve(async (req) => {
 
   const serviceClient = createServiceClient()
 
-  // Fetch current state
+  // Fetch current state. Use maybeSingle so a missing row is not treated as an
+  // error — the row may not exist if the seed was never run. In that case we
+  // treat the starting position as 'waiting' (before the sequence begins) and
+  // let this call implicitly initialise the row via upsert below.
   const { data: state, error: stateError } = await serviceClient
     .from('session_state')
     .select('current_card, released_cards')
     .eq('session_id', sessionId)
-    .single()
+    .maybeSingle()
 
-  if (stateError || !state) return errorResponse('Session not found', 404)
+  if (stateError) return errorResponse(stateError.message, 500)
 
-  const currentIndex = CARD_SEQUENCE.indexOf(state.current_card as Card)
+  const currentCard = state?.current_card ?? 'waiting'
+  const currentReleased: string[] = state?.released_cards ?? []
+
+  const currentIndex = CARD_SEQUENCE.indexOf(currentCard as Card)
   const newIndex = CARD_SEQUENCE.indexOf(card as Card)
 
   // Must move forward
@@ -80,16 +86,17 @@ Deno.serve(async (req) => {
     }
   }
 
-  const updatedReleased = [...new Set([...state.released_cards, card])]
+  const updatedReleased = [...new Set([...currentReleased, card])]
 
+  // Upsert so the row is created automatically if it was missing.
   const { error: updateError } = await serviceClient
     .from('session_state')
-    .update({
+    .upsert({
+      session_id: sessionId,
       current_card: card,
       released_cards: updatedReleased,
       updated_at: new Date().toISOString(),
-    })
-    .eq('session_id', sessionId)
+    }, { onConflict: 'session_id' })
 
   if (updateError) return errorResponse(updateError.message)
 
