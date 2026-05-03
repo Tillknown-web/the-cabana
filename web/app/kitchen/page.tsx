@@ -33,6 +33,7 @@ export default function KitchenPage() {
   const [sessionState, setSessionState] = useState<SessionState | null>(null)
   const [loading, setLoading] = useState(true)
   const [authError, setAuthError] = useState<string | null>(null)
+  const [resetCount, setResetCount] = useState(0)
 
   const supabase = createClient()
 
@@ -94,7 +95,10 @@ export default function KitchenPage() {
       <SessionHeader
         sessionState={sessionState}
         sessionId={SESSION_ID}
-        onReset={() => setSessionState({ current_card: 'welcome', released_cards: [] })}
+        onReset={() => {
+          setSessionState({ current_card: 'welcome', released_cards: [] })
+          setResetCount((c) => c + 1)
+        }}
       />
 
       <div style={{ maxWidth: '640px', margin: '0 auto', padding: '1.5rem' }}>
@@ -107,7 +111,7 @@ export default function KitchenPage() {
 
         <SectionDivider />
 
-        <GuestTracker sessionId={SESSION_ID} />
+        <GuestTracker key={resetCount} sessionId={SESSION_ID} />
 
         <SectionDivider />
 

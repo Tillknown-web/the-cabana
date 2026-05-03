@@ -26,18 +26,38 @@ export default function GuestTracker({ sessionId }: Props) {
   const supabase = createClient()
 
   useEffect(() => {
+    function fetchGuests() {
+      supabase.from('guests').select('id, name').eq('session_id', sessionId)
+        .then(({ data }) => { if (data) setGuests(data as GuestRow[]) })
+    }
+
     // Fetch initial data
-    supabase.from('guests').select('id, name').eq('session_id', sessionId)
-      .then(({ data }) => { if (data) setGuests(data as GuestRow[]) })
+    fetchGuests()
 
     supabase.from('photos').select('id, guest_id, course').eq('session_id', sessionId)
       .then(({ data }) => { if (data) setPhotos(data as PhotoRow[]) })
 
-    // Subscribe to new guest check-ins
+    // Polling fallback: re-fetch every 8 s so guests appear even if realtime misses an event
+    const pollInterval = setInterval(fetchGuests, 8000)
+
+    // Subscribe to guest INSERT (new check-in) and UPDATE (re-check-in via upsert)
     const guestChannel = supabase
       .channel(`kt-guests-${sessionId}`)
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'guests', filter: `session_id=eq.${sessionId}` },
-        (payload) => setGuests((prev) => [...prev, payload.new as GuestRow])
+        (payload) => {
+          const g = payload.new as GuestRow
+          setGuests((prev) => prev.some((x) => x.id === g.id) ? prev : [...prev, g])
+        }
+      )
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'guests', filter: `session_id=eq.${sessionId}` },
+        (payload) => {
+          const g = payload.new as GuestRow
+          setGuests((prev) =>
+            prev.some((x) => x.id === g.id)
+              ? prev.map((x) => (x.id === g.id ? g : x))
+              : [...prev, g]
+          )
+        }
       )
       .subscribe()
 
@@ -50,6 +70,7 @@ export default function GuestTracker({ sessionId }: Props) {
       .subscribe()
 
     return () => {
+      clearInterval(pollInterval)
       supabase.removeChannel(guestChannel)
       supabase.removeChannel(photoChannel)
     }
