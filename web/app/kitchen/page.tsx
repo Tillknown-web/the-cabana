@@ -11,7 +11,7 @@ import TableSideTriggers from '@/components/kitchen/TableSideTriggers'
 import SongQueue from '@/components/kitchen/SongQueue'
 import MusicSection from '@/components/kitchen/MusicSection'
 
-const SESSION_ID = process.env.NEXT_PUBLIC_SESSION_ID!
+const SESSION_ID = (process.env.NEXT_PUBLIC_SESSION_ID ?? '').trim()
 
 // Kitchen credentials — auto sign-in, no login form needed
 const KITCHEN_EMAIL = 'kitchen@thecabana.com'

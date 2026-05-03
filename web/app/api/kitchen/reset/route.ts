@@ -2,7 +2,7 @@ import { createClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-const SESSION_ID = process.env.NEXT_PUBLIC_SESSION_ID!
+const SESSION_ID = (process.env.NEXT_PUBLIC_SESSION_ID ?? '').trim()
 
 function serviceClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
