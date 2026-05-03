@@ -15,6 +15,7 @@ interface Props {
 
 export default function NowPlayingBar({ sessionId, onSongRequest }: Props) {
   const [nowPlaying, setNowPlaying] = useState<SpotifyRow | null>(null)
+  const [playlistName, setPlaylistName] = useState<string | null>(null)
 
   const supabase = createClient()
 
@@ -42,6 +43,22 @@ export default function NowPlayingBar({ sessionId, onSongRequest }: Props) {
 
     return () => { supabase.removeChannel(channel) }
   }, [sessionId]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    async function fetchContext() {
+      try {
+        const res = await fetch('/api/spotify/context')
+        if (!res.ok) return
+        const data = await res.json()
+        setPlaylistName(data.playlist?.name ?? null)
+      } catch {
+        // ignore
+      }
+    }
+    fetchContext()
+    const interval = setInterval(fetchContext, 30000)
+    return () => clearInterval(interval)
+  }, [])
 
   // If Spotify isn't set up (no SPOTIFY_REFRESH_TOKEN), don't render
   if (!nowPlaying?.track) return null
@@ -87,6 +104,20 @@ export default function NowPlayingBar({ sessionId, onSongRequest }: Props) {
             textOverflow: 'ellipsis',
           }}>
             {nowPlaying.artist}
+          </p>
+        )}
+        {playlistName && (
+          <p style={{
+            fontFamily: 'var(--font-sans)',
+            fontSize: '9px',
+            color: '#D4AF37',
+            opacity: 0.5,
+            margin: 0,
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}>
+            {playlistName}
           </p>
         )}
       </div>

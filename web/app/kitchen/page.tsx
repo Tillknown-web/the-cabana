@@ -9,6 +9,7 @@ import ChefNoteComposer from '@/components/kitchen/ChefNoteComposer'
 import CountdownSetter from '@/components/kitchen/CountdownSetter'
 import TableSideTriggers from '@/components/kitchen/TableSideTriggers'
 import SongQueue from '@/components/kitchen/SongQueue'
+import MusicSection from '@/components/kitchen/MusicSection'
 
 const SESSION_ID = process.env.NEXT_PUBLIC_SESSION_ID!
 
@@ -127,6 +128,10 @@ export default function KitchenPage() {
           currentCard={sessionState?.current_card ?? ''}
           accessToken={kitchenUser.accessToken}
         />
+
+        <SectionDivider />
+
+        <MusicSection accessToken={kitchenUser.accessToken} />
 
         <SectionDivider />
 
