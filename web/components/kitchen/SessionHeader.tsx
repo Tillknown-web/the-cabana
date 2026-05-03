@@ -6,6 +6,7 @@ import type { SessionState } from '@/app/kitchen/page'
 interface Props {
   sessionState: SessionState | null
   sessionId: string
+  accessToken: string
   onReset?: () => void
 }
 
@@ -21,7 +22,7 @@ const CARD_LABELS: Record<string, string> = {
   gallery: 'Gallery',
 }
 
-export default function SessionHeader({ sessionState, sessionId, onReset }: Props) {
+export default function SessionHeader({ sessionState, sessionId, accessToken, onReset }: Props) {
   const currentCard = sessionState?.current_card ?? '—'
   const releasedCount = sessionState?.released_cards?.length ?? 0
   const [confirming, setConfirming] = useState(false)
@@ -34,7 +35,10 @@ export default function SessionHeader({ sessionState, sessionId, onReset }: Prop
     setConfirming(false)
     setResetError(null)
     try {
-      const res = await fetch('/api/kitchen/reset', { method: 'POST' })
+      const res = await fetch('/api/kitchen/reset', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${accessToken}` },
+      })
       if (!res.ok) {
         const json = await res.json().catch(() => ({}))
         setResetError((json as { error?: string }).error ?? `Reset failed (${res.status})`)

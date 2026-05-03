@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
-import { createClient as createServerClient } from '@/lib/supabase/server'
+import type { NextRequest } from 'next/server'
 
 const SESSION_ID = process.env.NEXT_PUBLIC_SESSION_ID!
 
@@ -20,11 +20,18 @@ function serviceClient() {
  *   - Deletes active countdowns
  *   - Deletes tableside_triggers for the session
  */
-export async function POST() {
+export async function POST(req: NextRequest) {
   try {
-    // Verify the caller is a signed-in kitchen user
-    const authClient = await createServerClient()
-    const { data: { user } } = await authClient.auth.getUser()
+    // Verify the caller is a signed-in kitchen user via Bearer token
+    const token = req.headers.get('Authorization')?.replace(/^Bearer\s+/i, '')
+    if (!token) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    const anonClient = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    )
+    const { data: { user } } = await anonClient.auth.getUser(token)
     if (!user || user.user_metadata?.role !== 'kitchen') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }

@@ -95,6 +95,7 @@ export default function KitchenPage() {
       <SessionHeader
         sessionState={sessionState}
         sessionId={SESSION_ID}
+        accessToken={kitchenUser.accessToken}
         onReset={() => {
           setSessionState({ current_card: 'welcome', released_cards: [] })
           setResetCount((c) => c + 1)
