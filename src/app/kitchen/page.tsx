@@ -41,11 +41,6 @@ interface ChefNote {
 }
 
 export default function KitchenPage() {
-  const [authed, setAuthed] = useState(false)
-  const [password, setPassword] = useState('')
-  const [authError, setAuthError] = useState('')
-  const [loading, setLoading] = useState(false)
-
   const [session, setSession] = useState<Session | null>(null)
   const [guests, setGuests] = useState<Guest[]>([])
   const [notes, setNotes] = useState<ChefNote[]>([])
@@ -54,23 +49,6 @@ export default function KitchenPage() {
   const [noteSending, setNoteSending] = useState(false)
   const [releaseConfirm, setReleaseConfirm] = useState<CardId | null>(null)
   const [tablesideConfirm, setTablesideConfirm] = useState<string | null>(null)
-
-  async function handleLogin(e: React.FormEvent) {
-    e.preventDefault()
-    setLoading(true)
-    setAuthError('')
-    const res = await fetch('/api/kitchen/auth', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password }),
-    })
-    setLoading(false)
-    if (res.ok) {
-      setAuthed(true)
-    } else {
-      setAuthError('Wrong password.')
-    }
-  }
 
   const fetchDashboard = useCallback(async () => {
     const res = await fetch(`/api/kitchen/dashboard?sessionId=${SESSION_ID}`)
@@ -83,11 +61,10 @@ export default function KitchenPage() {
   }, [])
 
   useEffect(() => {
-    if (!authed) return
     fetchDashboard()
     const interval = setInterval(fetchDashboard, 5000)
     return () => clearInterval(interval)
-  }, [authed, fetchDashboard])
+  }, [fetchDashboard])
 
   async function handleRelease(cardId: CardId) {
     setReleaseConfirm(null)
@@ -144,74 +121,6 @@ export default function KitchenPage() {
     fetchDashboard()
   }
 
-  if (!authed) {
-    return (
-      <div
-        className="kitchen-body"
-        style={{
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: 24,
-        }}
-      >
-        <form
-          onSubmit={handleLogin}
-          style={{
-            width: '100%',
-            maxWidth: 320,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 16,
-            textAlign: 'center',
-          }}
-        >
-          <h1 style={{ fontSize: 22, fontWeight: 500, marginBottom: 4 }}>The Cabana</h1>
-          <p style={{ fontSize: 13, color: '#888', marginBottom: 12 }}>kitchen</p>
-
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password"
-            autoFocus
-            style={{
-              backgroundColor: '#1a1a24',
-              border: '1px solid #333',
-              borderRadius: 4,
-              padding: '14px 16px',
-              color: '#e0e0e0',
-              fontSize: 16,
-              outline: 'none',
-              textAlign: 'center',
-            }}
-          />
-
-          {authError && <p style={{ color: '#f87171', fontSize: 13 }}>{authError}</p>}
-
-          <button
-            type="submit"
-            disabled={loading}
-            style={{
-              backgroundColor: '#D4AF37',
-              color: '#0f0f14',
-              border: 'none',
-              borderRadius: 4,
-              padding: '14px',
-              fontSize: 14,
-              fontWeight: 600,
-              cursor: loading ? 'not-allowed' : 'pointer',
-              opacity: loading ? 0.6 : 1,
-            }}
-          >
-            {loading ? 'Entering…' : 'Enter'}
-          </button>
-        </form>
-      </div>
-    )
-  }
-
   if (!session) {
     return (
       <div className="kitchen-body" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -219,6 +128,7 @@ export default function KitchenPage() {
       </div>
     )
   }
+  
 
   const releasedCards = session.released_cards ?? []
   const sessionAgeMs = Date.now() - new Date(session.created_at).getTime()
