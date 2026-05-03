@@ -37,10 +37,7 @@ export default function GuestTracker({ sessionId }: Props) {
     supabase.from('photos').select('id, guest_id, course').eq('session_id', sessionId)
       .then(({ data }) => { if (data) setPhotos(data as PhotoRow[]) })
 
-    // Polling fallback: re-fetch every 8 s so guests appear even if realtime misses an event
-    const pollInterval = setInterval(fetchGuests, 8000)
-
-    // Subscribe to guest INSERT (new check-in) and UPDATE (re-check-in via upsert)
+    // Subscribe to guest INSERT/UPDATE (new/re-check-in) and DELETE (kitchen reset)
     const guestChannel = supabase
       .channel(`kt-guests-${sessionId}`)
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'guests', filter: `session_id=eq.${sessionId}` },
@@ -59,15 +56,38 @@ export default function GuestTracker({ sessionId }: Props) {
           )
         }
       )
+      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'guests', filter: `session_id=eq.${sessionId}` },
+        (payload) => {
+          const deletedId = (payload.old as { id?: string }).id
+          if (deletedId) setGuests((prev) => prev.filter((g) => g.id !== deletedId))
+        }
+      )
       .subscribe()
 
-    // Subscribe to new photos
+    // Subscribe to photo inserts and deletions
     const photoChannel = supabase
       .channel(`kt-photos-${sessionId}`)
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'photos', filter: `session_id=eq.${sessionId}` },
         (payload) => setPhotos((prev) => [...prev, payload.new as PhotoRow])
       )
+      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'photos', filter: `session_id=eq.${sessionId}` },
+        (payload) => {
+          const deletedId = (payload.old as { id?: string }).id
+          if (deletedId) setPhotos((prev) => prev.filter((p) => p.id !== deletedId))
+        }
+      )
       .subscribe()
+
+    // Polling fallback — covers realtime delivery gaps (e.g. RLS-suppressed
+    // DELETE events when REPLICA IDENTITY FULL isn't set on the tables).
+    const pollInterval = setInterval(async () => {
+      const [{ data: gs }, { data: ps }] = await Promise.all([
+        supabase.from('guests').select('id, name').eq('session_id', sessionId),
+        supabase.from('photos').select('id, guest_id, course').eq('session_id', sessionId),
+      ])
+      if (gs) setGuests(gs as GuestRow[])
+      if (ps) setPhotos(ps as PhotoRow[])
+    }, 8000)
 
     return () => {
       clearInterval(pollInterval)
