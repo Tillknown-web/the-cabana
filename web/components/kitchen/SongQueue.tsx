@@ -10,6 +10,10 @@ interface SongRequest {
   seen: boolean
   created_at: string
   guest_id: string
+  spotify_track_name: string | null
+  spotify_artist_name: string | null
+  spotify_album_art: string | null
+  spotify_track_uri: string | null
 }
 
 interface GuestRow {
@@ -30,7 +34,12 @@ export default function SongQueue({ sessionId, accessToken }: Props) {
   const supabase = createClient()
 
   useEffect(() => {
-    supabase.from('song_requests').select('*').eq('session_id', sessionId).eq('seen', false).order('created_at', { ascending: true })
+    supabase
+      .from('song_requests')
+      .select('*')
+      .eq('session_id', sessionId)
+      .eq('seen', false)
+      .order('created_at', { ascending: true })
       .then(({ data }) => { if (data) setRequests(data as SongRequest[]) })
 
     supabase.from('guests').select('id, name').eq('session_id', sessionId)
@@ -38,13 +47,17 @@ export default function SongQueue({ sessionId, accessToken }: Props) {
 
     const channel = supabase
       .channel(`kt-songs-${sessionId}`)
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'song_requests', filter: `session_id=eq.${sessionId}` },
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'song_requests', filter: `session_id=eq.${sessionId}` },
         (payload) => {
           const req = payload.new as SongRequest
           if (!req.seen) setRequests((prev) => [...prev, req])
         }
       )
-      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'song_requests', filter: `session_id=eq.${sessionId}` },
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'song_requests', filter: `session_id=eq.${sessionId}` },
         (payload) => {
           const updated = payload.new as SongRequest
           if (updated.seen) {
@@ -79,47 +92,95 @@ export default function SongQueue({ sessionId, accessToken }: Props) {
         <p style={emptyStyle}>No pending requests.</p>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-          {requests.map((req) => (
-            <div
-              key={req.id}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: '1rem',
-                padding: '0.65rem 0.85rem',
-                border: '1px solid rgba(212, 175, 55, 0.15)',
-                backgroundColor: 'rgba(212, 175, 55, 0.04)',
-              }}
-            >
-              <div style={{ overflow: 'hidden' }}>
-                <p style={{ fontFamily: 'var(--font-sans)', fontSize: '12px', color: '#F5F0E8', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {req.song_text}
-                </p>
-                <p style={{ fontFamily: 'var(--font-sans)', fontSize: '10px', color: '#A8C5DA', opacity: 0.6, margin: 0 }}>
-                  {guestName(req.guest_id)}
-                </p>
-              </div>
-              <button
-                onClick={() => dismiss(req.id)}
-                disabled={dismissing === req.id}
+          {requests.map((req) => {
+            const title = req.spotify_track_name ?? req.song_text
+            const subtitle = req.spotify_artist_name ?? null
+
+            return (
+              <div
+                key={req.id}
                 style={{
-                  fontFamily: 'var(--font-sans)',
-                  fontSize: '9px',
-                  letterSpacing: '0.1em',
-                  textTransform: 'uppercase',
-                  color: '#D4AF37',
-                  opacity: dismissing === req.id ? 0.3 : 0.7,
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  flexShrink: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '0.75rem',
+                  padding: '0.65rem 0.85rem',
+                  border: '1px solid rgba(212, 175, 55, 0.15)',
+                  backgroundColor: req.spotify_track_uri
+                    ? 'rgba(212, 175, 55, 0.07)'
+                    : 'rgba(212, 175, 55, 0.04)',
                 }}
               >
-                {dismissing === req.id ? '…' : 'Dismiss'}
-              </button>
-            </div>
-          ))}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', overflow: 'hidden', flex: 1 }}>
+                  {req.spotify_album_art ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={req.spotify_album_art}
+                      alt=""
+                      width={36}
+                      height={36}
+                      style={{ objectFit: 'cover', flexShrink: 0 }}
+                    />
+                  ) : (
+                    <div style={{
+                      width: 36,
+                      height: 36,
+                      backgroundColor: 'rgba(212, 175, 55, 0.08)',
+                      flexShrink: 0,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}>
+                      <span style={{ fontSize: '14px', opacity: 0.4 }}>♪</span>
+                    </div>
+                  )}
+                  <div style={{ overflow: 'hidden' }}>
+                    <p style={{
+                      fontFamily: 'var(--font-sans)',
+                      fontSize: '12px',
+                      color: '#F5F0E8',
+                      margin: 0,
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}>
+                      {title}
+                    </p>
+                    <p style={{
+                      fontFamily: 'var(--font-sans)',
+                      fontSize: '10px',
+                      color: '#A8C5DA',
+                      opacity: 0.7,
+                      margin: 0,
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}>
+                      {subtitle ? `${subtitle} · ${guestName(req.guest_id)}` : guestName(req.guest_id)}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => dismiss(req.id)}
+                  disabled={dismissing === req.id}
+                  style={{
+                    fontFamily: 'var(--font-sans)',
+                    fontSize: '9px',
+                    letterSpacing: '0.1em',
+                    textTransform: 'uppercase',
+                    color: '#D4AF37',
+                    opacity: dismissing === req.id ? 0.3 : 0.7,
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    flexShrink: 0,
+                  }}
+                >
+                  {dismissing === req.id ? '…' : 'Dismiss'}
+                </button>
+              </div>
+            )
+          })}
         </div>
       )}
     </div>

@@ -117,6 +117,51 @@ export async function getUserPlaylists(): Promise<SpotifyPlaylist[]> {
   }))
 }
 
+export interface SpotifyTrackResult {
+  uri: string
+  name: string
+  artist: string
+  albumArt: string | null
+}
+
+export async function searchTracks(query: string): Promise<SpotifyTrackResult[]> {
+  const accessToken = await getSpotifyAccessToken()
+  if (!accessToken) return []
+
+  const params = new URLSearchParams({ q: query, type: 'track', limit: '6' })
+  const res = await fetch(`${SPOTIFY_BASE_URL}/search?${params}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  })
+  if (!res.ok) return []
+  const data = await res.json()
+  const items = (data.tracks?.items as {
+    uri: string
+    name: string
+    artists: { name: string }[]
+    album: { images: { url: string }[] }
+  }[]) ?? []
+  return items.map((item) => ({
+    uri: item.uri,
+    name: item.name,
+    artist: item.artists.map((a) => a.name).join(', '),
+    albumArt: item.album?.images?.[0]?.url ?? null,
+  }))
+}
+
+export async function addToQueue(trackUri: string): Promise<boolean> {
+  const accessToken = await getSpotifyAccessToken()
+  if (!accessToken) return false
+
+  const res = await fetch(
+    `${SPOTIFY_BASE_URL}/me/player/queue?uri=${encodeURIComponent(trackUri)}`,
+    {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${accessToken}` },
+    }
+  )
+  return res.ok || res.status === 204
+}
+
 export async function switchPlaylist(playlistId: string): Promise<boolean> {
   const accessToken = await getSpotifyAccessToken()
   if (!accessToken) return false
