@@ -60,9 +60,6 @@ export default function NowPlayingBar({ sessionId, onSongRequest }: Props) {
     return () => clearInterval(interval)
   }, [])
 
-  // If Spotify isn't set up (no SPOTIFY_REFRESH_TOKEN), don't render
-  if (!nowPlaying?.track) return null
-
   return (
     <div style={{
       position: 'fixed',
@@ -75,54 +72,56 @@ export default function NowPlayingBar({ sessionId, onSongRequest }: Props) {
       padding: '0.65rem 1rem',
       display: 'flex',
       alignItems: 'center',
-      justifyContent: 'space-between',
+      justifyContent: nowPlaying?.track ? 'space-between' : 'flex-end',
       gap: '1rem',
     }}>
-      {/* Track info */}
-      <div style={{ overflow: 'hidden', flex: 1 }}>
-        <p style={{
-          fontFamily: 'var(--font-sans)',
-          fontSize: '11px',
-          color: '#F5F0E8',
-          opacity: 0.9,
-          margin: 0,
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-        }}>
-          {nowPlaying.track}
-        </p>
-        {nowPlaying.artist && (
+      {/* Track info — only shown when Spotify is playing */}
+      {nowPlaying?.track && (
+        <div style={{ overflow: 'hidden', flex: 1 }}>
           <p style={{
             fontFamily: 'var(--font-sans)',
-            fontSize: '10px',
-            color: '#A8C5DA',
-            opacity: 0.7,
+            fontSize: '11px',
+            color: '#F5F0E8',
+            opacity: 0.9,
             margin: 0,
             whiteSpace: 'nowrap',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
           }}>
-            {nowPlaying.artist}
+            {nowPlaying.track}
           </p>
-        )}
-        {playlistName && (
-          <p style={{
-            fontFamily: 'var(--font-sans)',
-            fontSize: '9px',
-            color: '#D4AF37',
-            opacity: 0.5,
-            margin: 0,
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-          }}>
-            {playlistName}
-          </p>
-        )}
-      </div>
+          {nowPlaying.artist && (
+            <p style={{
+              fontFamily: 'var(--font-sans)',
+              fontSize: '10px',
+              color: '#A8C5DA',
+              opacity: 0.7,
+              margin: 0,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}>
+              {nowPlaying.artist}
+            </p>
+          )}
+          {playlistName && (
+            <p style={{
+              fontFamily: 'var(--font-sans)',
+              fontSize: '9px',
+              color: '#D4AF37',
+              opacity: 0.5,
+              margin: 0,
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}>
+              {playlistName}
+            </p>
+          )}
+        </div>
+      )}
 
-      {/* Request button */}
+      {/* Request button — always visible for checked-in guests */}
       <button
         onClick={onSongRequest}
         style={{
@@ -139,7 +138,7 @@ export default function NowPlayingBar({ sessionId, onSongRequest }: Props) {
           flexShrink: 0,
         }}
       >
-        Request
+        Request a Song
       </button>
     </div>
   )
