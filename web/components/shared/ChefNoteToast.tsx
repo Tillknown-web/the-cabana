@@ -53,7 +53,9 @@ export default function ChefNoteToast({ sessionId }: Props) {
       width: '90vw',
     }}>
       <div style={{
-        backgroundColor: 'rgba(26, 26, 46, 0.97)',
+        backgroundColor: 'rgba(10, 10, 15, 0.97)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
         border: '1px solid rgba(212, 175, 55, 0.35)',
         padding: '0.85rem 1.25rem',
         textAlign: 'center',

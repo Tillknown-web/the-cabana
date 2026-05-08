@@ -37,15 +37,16 @@ export default function LandingPage() {
   // Subtle parallax: hero content drifts slightly on scroll
   const heroY = useTransform(scrollY, [0, 600], [0, 60])
 
-  // Mouse-reactive spotlight
-  const [mouse, setMouse] = useState({ x: 50, y: 50 })
+  // Mouse-reactive spotlight — direct DOM update to avoid re-renders
+  const spotlightRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const onMove = (e: MouseEvent) => {
-      setMouse({
-        x: (e.clientX / window.innerWidth) * 100,
-        y: (e.clientY / window.innerHeight) * 100,
-      })
+      if (!spotlightRef.current) return
+      const x = (e.clientX / window.innerWidth) * 100
+      const y = (e.clientY / window.innerHeight) * 100
+      spotlightRef.current.style.background =
+        `radial-gradient(600px circle at ${x}% ${y}%, rgba(77,217,192,0.04) 0%, transparent 60%)`
     }
     window.addEventListener('mousemove', onMove, { passive: true })
     return () => window.removeEventListener('mousemove', onMove)
@@ -116,13 +117,12 @@ export default function LandingPage() {
 
         {/* Mouse-reactive spotlight */}
         <div
+          ref={spotlightRef}
           aria-hidden="true"
           style={{
             position: 'absolute',
             inset: 0,
             pointerEvents: 'none',
-            background: `radial-gradient(600px circle at ${mouse.x}% ${mouse.y}%, rgba(77,217,192,0.04) 0%, transparent 60%)`,
-            transition: 'background 0.15s ease',
           }}
         />
 

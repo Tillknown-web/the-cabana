@@ -10,16 +10,45 @@ export default function CustomCursor() {
   // Ring position lags behind dot for smooth follow
   const ring = useRef({ x: -100, y: -100 })
   const dot  = useRef({ x: -100, y: -100 })
+  const isAnimating = useRef(false)
   const [isMagnetic, setIsMagnetic] = useState(false)
 
   useEffect(() => {
     // Only show on pointer: fine (mouse) devices
     if (window.matchMedia('(pointer: coarse)').matches) return
 
+    const lerp = (a: number, b: number, t: number) => a + (b - a) * t
+    const IDLE_THRESHOLD = 0.1
+
+    const animate = () => {
+      const nx = lerp(ring.current.x, dot.current.x, 0.12)
+      const ny = lerp(ring.current.y, dot.current.y, 0.12)
+      ring.current.x = nx
+      ring.current.y = ny
+      if (ringRef.current) {
+        ringRef.current.style.transform = `translate(${nx}px, ${ny}px) translate(-50%, -50%)`
+      }
+
+      // Stop scheduling frames once the ring has caught up
+      if (Math.abs(nx - dot.current.x) < IDLE_THRESHOLD && Math.abs(ny - dot.current.y) < IDLE_THRESHOLD) {
+        ring.current.x = dot.current.x
+        ring.current.y = dot.current.y
+        isAnimating.current = false
+        return
+      }
+
+      rafRef.current = requestAnimationFrame(animate)
+    }
+
     const onMove = (e: MouseEvent) => {
       dot.current = { x: e.clientX, y: e.clientY }
       if (dotRef.current) {
         dotRef.current.style.transform = `translate(${e.clientX}px, ${e.clientY}px) translate(-50%, -50%)`
+      }
+      // Restart rAF loop only if it's not already running
+      if (!isAnimating.current) {
+        isAnimating.current = true
+        rafRef.current = requestAnimationFrame(animate)
       }
     }
 
@@ -36,18 +65,6 @@ export default function CustomCursor() {
         setIsMagnetic(false)
       }
     }
-
-    // Lerp ring towards dot
-    const lerp = (a: number, b: number, t: number) => a + (b - a) * t
-    const animate = () => {
-      ring.current.x = lerp(ring.current.x, dot.current.x, 0.12)
-      ring.current.y = lerp(ring.current.y, dot.current.y, 0.12)
-      if (ringRef.current) {
-        ringRef.current.style.transform = `translate(${ring.current.x}px, ${ring.current.y}px) translate(-50%, -50%)`
-      }
-      rafRef.current = requestAnimationFrame(animate)
-    }
-    rafRef.current = requestAnimationFrame(animate)
 
     window.addEventListener('mousemove', onMove)
     window.addEventListener('mouseover', onOver)

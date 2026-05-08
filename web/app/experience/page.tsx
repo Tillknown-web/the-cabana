@@ -147,7 +147,7 @@ export default function ExperiencePage() {
   if (!guest) return <CheckIn sessionId={SESSION_ID} onCheckedIn={handleCheckedIn} />
 
   return (
-    <main style={{ minHeight: '100dvh', backgroundColor: '#2D1B47', position: 'relative', paddingBottom: '4rem' }}>
+    <main style={{ minHeight: '100dvh', backgroundColor: '#0A0A0F', position: 'relative', paddingBottom: '4rem' }}>
       <ProgressBar currentCard={currentCard} />
       {renderCard()}
       <ChefNoteToast sessionId={SESSION_ID} />
@@ -167,7 +167,7 @@ function LoadingScreen() {
   return (
     <main style={{
       minHeight: '100dvh',
-      backgroundColor: '#2D1B47',
+      backgroundColor: '#0A0A0F',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',

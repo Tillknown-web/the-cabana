@@ -143,14 +143,14 @@ export default function PhotoBoothButton({ sessionId, eventDate = 'July 12, 2026
           width: '44px',
           height: '44px',
           borderRadius: '50%',
-          backgroundColor: 'rgba(26, 26, 46, 0.85)',
+          backgroundColor: 'rgba(10, 10, 15, 0.85)',
           border: '1px solid rgba(212, 175, 55, 0.35)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           cursor: 'pointer',
           fontSize: '1.1rem',
-          backdropFilter: 'blur(4px)',
+          backdropFilter: 'blur(12px)',
         }}
       >
         📷
@@ -163,7 +163,9 @@ export default function PhotoBoothButton({ sessionId, eventDate = 'July 12, 2026
             position: 'fixed',
             inset: 0,
             zIndex: 200,
-            backgroundColor: 'rgba(26, 26, 46, 0.96)',
+            backgroundColor: 'rgba(10, 10, 15, 0.96)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -202,7 +204,7 @@ export default function PhotoBoothButton({ sessionId, eventDate = 'July 12, 2026
             {state.stage === 'preview' && (
               <button
                 onClick={handleUpload}
-                style={{ ...actionBtnStyle, backgroundColor: '#D4AF37', color: '#1A1A2E', flex: 1 }}
+                style={{ ...actionBtnStyle, backgroundColor: '#D4AF37', color: '#0A0A0F', flex: 1 }}
               >
                 Save to Gallery
               </button>
@@ -211,7 +213,7 @@ export default function PhotoBoothButton({ sessionId, eventDate = 'July 12, 2026
             {state.stage === 'done' && (
               <button
                 onClick={handleDownload}
-                style={{ ...actionBtnStyle, backgroundColor: '#D4AF37', color: '#1A1A2E', flex: 1 }}
+                style={{ ...actionBtnStyle, backgroundColor: '#D4AF37', color: '#0A0A0F', flex: 1 }}
               >
                 Download
               </button>
@@ -240,7 +242,9 @@ export default function PhotoBoothButton({ sessionId, eventDate = 'July 12, 2026
           position: 'fixed',
           inset: 0,
           zIndex: 200,
-          backgroundColor: 'rgba(26, 26, 46, 0.96)',
+          backgroundColor: 'rgba(10, 10, 15, 0.96)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
@@ -277,14 +281,14 @@ async function applyBrandingOverlay(file: File, eventDate: string): Promise<Blob
       ctx.drawImage(img, 0, 0, w, h)
       URL.revokeObjectURL(url)
 
-      // Aubergine border frame (inset 10px, 3px stroke)
-      ctx.strokeStyle = 'rgba(45, 27, 71, 0.7)'
+      // Border frame (inset 10px, 3px stroke)
+      ctx.strokeStyle = 'rgba(10, 10, 15, 0.7)'
       ctx.lineWidth = 3
       ctx.strokeRect(10, 10, w - 20, h - 20)
 
       // Bottom label band
       const bandH = 36
-      ctx.fillStyle = 'rgba(45, 27, 71, 0.82)'
+      ctx.fillStyle = 'rgba(10, 10, 15, 0.82)'
       ctx.fillRect(0, h - bandH, w, bandH)
 
       // Gold hairline above band

@@ -62,7 +62,7 @@ export default function TableSidePrompt({ sessionId, currentCard: _currentCard }
         position: 'fixed',
         inset: 0,
         zIndex: 300,
-        backgroundColor: '#1A1A2E',
+        backgroundColor: '#0A0A0F',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -107,7 +107,7 @@ function ButterPourOverlay({ visible, onDismiss }: { visible: boolean; onDismiss
         style={{
           position: 'absolute',
           inset: 0,
-          backgroundColor: '#1A1A2E',
+          backgroundColor: '#0A0A0F',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',

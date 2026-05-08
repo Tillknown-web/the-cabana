@@ -12,7 +12,7 @@ interface Particle {
   color: string
 }
 
-const PARTICLE_COUNT = 22
+const PARTICLE_COUNT = 12
 
 export default function ParticleField() {
   const particles = useMemo<Particle[]>(() => {
@@ -45,6 +45,7 @@ export default function ParticleField() {
         inset: 0,
         pointerEvents: 'none',
         overflow: 'hidden',
+        willChange: 'transform, opacity',
       }}
     >
       {particles.map(p => (
@@ -60,7 +61,6 @@ export default function ParticleField() {
             background: p.color,
             boxShadow: `0 0 ${p.size * 4}px ${p.color}`,
             animation: `float-up ${p.duration}s ease-in-out ${p.delay}s infinite`,
-            willChange: 'transform, opacity',
           }}
         />
       ))}

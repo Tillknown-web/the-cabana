@@ -230,7 +230,7 @@ const snapBtnStyle: React.CSSProperties = {
   width: '100%',
   padding: '1rem',
   backgroundColor: '#D4AF37',
-  color: '#2D1B47',
+  color: '#0A0A0F',
   border: 'none',
   cursor: 'pointer',
 }

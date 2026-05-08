@@ -54,7 +54,7 @@ export default function CheckIn({ sessionId, onCheckedIn }: Props) {
   return (
     <main style={{
       minHeight: '100dvh',
-      backgroundColor: '#2D1B47',
+      backgroundColor: '#0A0A0F',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
@@ -113,7 +113,7 @@ export default function CheckIn({ sessionId, onCheckedIn }: Props) {
             width: '100%',
             padding: '0.85rem 1rem',
             backgroundColor: loading || !name.trim() ? 'rgba(212, 175, 55, 0.3)' : '#D4AF37',
-            color: '#2D1B47',
+            color: '#0A0A0F',
             fontFamily: 'var(--font-sans)',
             fontSize: '11px',
             fontWeight: 600,

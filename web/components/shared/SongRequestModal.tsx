@@ -113,7 +113,9 @@ export default function SongRequestModal({ sessionId, onClose }: Props) {
         position: 'fixed',
         inset: 0,
         zIndex: 200,
-        backgroundColor: 'rgba(26, 26, 46, 0.92)',
+        backgroundColor: 'rgba(10, 10, 15, 0.92)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -125,7 +127,7 @@ export default function SongRequestModal({ sessionId, onClose }: Props) {
         style={{
           width: '100%',
           maxWidth: '340px',
-          backgroundColor: '#1A1A2E',
+          backgroundColor: '#16161F',
           border: '1px solid rgba(212, 175, 55, 0.3)',
           padding: '2rem',
         }}
@@ -276,7 +278,7 @@ export default function SongRequestModal({ sessionId, onClose }: Props) {
                   width: '100%',
                   padding: '0.75rem',
                   backgroundColor: loading || !query.trim() ? 'rgba(212, 175, 55, 0.3)' : '#D4AF37',
-                  color: '#1A1A2E',
+                  color: '#0A0A0F',
                   fontFamily: 'var(--font-sans)',
                   fontSize: '11px',
                   fontWeight: 600,
