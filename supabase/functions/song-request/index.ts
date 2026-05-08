@@ -107,9 +107,9 @@ Deno.serve(async (req) => {
 
   if (error) return errorResponse(error.message)
 
-  // Best-effort queue add — fire-and-forget, does not block the response.
+  // Best-effort queue add — awaited so the Deno runtime doesn't kill it on return.
   if (spotifyTrackUri) {
-    addToQueue(spotifyTrackUri).catch(() => { /* non-fatal */ })
+    await addToQueue(spotifyTrackUri).catch(() => { /* non-fatal */ })
   }
 
   return jsonResponse({ request })
