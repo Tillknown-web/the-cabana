@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 
 interface SpotifyTrack {
@@ -18,50 +18,41 @@ interface Props {
 export default function SongRequestModal({ sessionId, onClose }: Props) {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<SpotifyTrack[]>([])
-  const [searching, setSearching] = useState(false)
   const [selected, setSelected] = useState<SpotifyTrack | null>(null)
+  const [searching, setSearching] = useState(false)
   const [loading, setLoading] = useState(false)
   const [sent, setSent] = useState(false)
   const [error, setError] = useState<string | null>(null)
-
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
+  // Debounced Spotify search
   useEffect(() => {
-    const trimmed = query.trim()
-
-    if (selected) {
-      // Don't search while a track is selected
-      return
-    }
-
-    if (trimmed.length < 2) {
-      setResults([])
-      return
-    }
-
+    if (selected) return // don't re-search once a track is chosen
     if (debounceRef.current) clearTimeout(debounceRef.current)
+    const trimmed = query.trim()
+    if (trimmed.length < 2) { setResults([]); return }
+
     debounceRef.current = setTimeout(async () => {
       setSearching(true)
       try {
         const res = await fetch(`/api/spotify/search?q=${encodeURIComponent(trimmed)}`)
-        if (res.ok) {
-          const data = await res.json()
-          setResults(data.tracks ?? [])
-        }
+        if (!res.ok) { setResults([]); return }
+        const data = await res.json()
+        setResults(data.tracks ?? [])
+      } catch {
+        setResults([])
       } finally {
         setSearching(false)
       }
-    }, 400)
+    }, 450)
 
-    return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current)
-    }
+    return () => { if (debounceRef.current) clearTimeout(debounceRef.current) }
   }, [query, selected])
 
-  function selectTrack(track: SpotifyTrack) {
+  function pickTrack(track: SpotifyTrack) {
     setSelected(track)
+    setQuery(track.name)
     setResults([])
-    setError(null)
   }
 
   function clearSelection() {
@@ -72,8 +63,8 @@ export default function SongRequestModal({ sessionId, onClose }: Props) {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    const songText = selected ? `${selected.name} — ${selected.artist}` : query.trim()
-    if (!songText) return
+    const trimmed = query.trim()
+    if (!trimmed) return
 
     setLoading(true)
     setError(null)
@@ -83,7 +74,7 @@ export default function SongRequestModal({ sessionId, onClose }: Props) {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) throw new Error('Not signed in')
 
-      const body: Record<string, string> = { sessionId, songText }
+      const body: Record<string, string> = { sessionId, songText: trimmed }
       if (selected) {
         body.spotifyTrackUri = selected.uri
         body.spotifyTrackName = selected.name
@@ -140,112 +131,151 @@ export default function SongRequestModal({ sessionId, onClose }: Props) {
         }}
       >
         {sent ? (
-          <p style={sentStyle}>Added to queue ✓</p>
+          <p style={sentStyle}>
+            {selected ? '♫ Added to queue' : 'Sent ✓'}
+          </p>
         ) : (
           <>
             <p style={labelStyle}>Song Request</p>
             <p style={subStyle}>Search for a song to add to the queue.</p>
 
             <form onSubmit={handleSubmit} style={{ marginTop: '1.5rem' }}>
-              {/* Selected track pill */}
+              {/* Search input or selected track */}
               {selected ? (
-                <div style={selectedRowStyle}>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.65rem',
+                  padding: '0.6rem 0.75rem',
+                  border: '1px solid rgba(212, 175, 55, 0.5)',
+                  backgroundColor: 'rgba(212, 175, 55, 0.06)',
+                  marginBottom: '0.75rem',
+                }}>
                   {selected.albumArt && (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={selected.albumArt}
-                      alt=""
-                      width={36}
-                      height={36}
-                      style={{ objectFit: 'cover', flexShrink: 0 }}
-                    />
+                    <img src={selected.albumArt} alt="" style={{ width: 36, height: 36, objectFit: 'cover', flexShrink: 0 }} />
                   )}
                   <div style={{ overflow: 'hidden', flex: 1 }}>
-                    <p style={trackNameStyle}>{selected.name}</p>
-                    <p style={artistStyle}>{selected.artist}</p>
+                    <p style={{ fontFamily: 'var(--font-sans)', fontSize: '12px', color: '#F5F0E8', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {selected.name}
+                    </p>
+                    <p style={{ fontFamily: 'var(--font-sans)', fontSize: '10px', color: '#A8C5DA', margin: 0, opacity: 0.7 }}>
+                      {selected.artist}
+                    </p>
                   </div>
                   <button
                     type="button"
                     onClick={clearSelection}
-                    style={clearBtnStyle}
-                    aria-label="Clear selection"
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: 'rgba(245,240,232,0.3)',
+                      cursor: 'pointer',
+                      fontSize: '16px',
+                      lineHeight: 1,
+                      flexShrink: 0,
+                      padding: '0 2px',
+                    }}
                   >
-                    ✕
+                    ×
                   </button>
                 </div>
               ) : (
-                <>
+                <div style={{ position: 'relative', marginBottom: results.length > 0 ? 0 : '0.75rem' }}>
                   <input
                     type="text"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder="Search song or artist…"
-                    maxLength={100}
+                    maxLength={200}
                     autoFocus
-                    style={inputStyle}
+                    style={{
+                      width: '100%',
+                      padding: '0.75rem 0.85rem',
+                      backgroundColor: 'rgba(245, 240, 232, 0.05)',
+                      border: '1px solid rgba(212, 175, 55, 0.3)',
+                      color: '#F5F0E8',
+                      fontFamily: 'var(--font-sans)',
+                      fontSize: '13px',
+                      outline: 'none',
+                      boxSizing: 'border-box',
+                    }}
                   />
-
-                  {/* Search results */}
-                  {(results.length > 0 || searching) && (
-                    <div style={resultsContainerStyle}>
-                      {searching && results.length === 0 && (
-                        <p style={searchingStyle}>Searching…</p>
-                      )}
-                      {results.map((track) => (
-                        <button
-                          key={track.uri}
-                          type="button"
-                          onClick={() => selectTrack(track)}
-                          style={resultRowStyle}
-                          onMouseEnter={(e) => {
-                            ;(e.currentTarget as HTMLButtonElement).style.backgroundColor =
-                              'rgba(212, 175, 55, 0.1)'
-                          }}
-                          onMouseLeave={(e) => {
-                            ;(e.currentTarget as HTMLButtonElement).style.backgroundColor =
-                              'transparent'
-                          }}
-                        >
-                          {track.albumArt ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img
-                              src={track.albumArt}
-                              alt=""
-                              width={32}
-                              height={32}
-                              style={{ objectFit: 'cover', flexShrink: 0 }}
-                            />
-                          ) : (
-                            <div style={albumPlaceholderStyle} />
-                          )}
-                          <div style={{ overflow: 'hidden', textAlign: 'left' }}>
-                            <p style={trackNameStyle}>{track.name}</p>
-                            <p style={artistStyle}>{track.artist}</p>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
+                  {searching && (
+                    <span style={{
+                      position: 'absolute',
+                      right: '0.75rem',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      fontFamily: 'var(--font-sans)',
+                      fontSize: '10px',
+                      color: 'rgba(212,175,55,0.5)',
+                    }}>
+                      …
+                    </span>
                   )}
-                </>
+                </div>
+              )}
+
+              {/* Search results */}
+              {results.length > 0 && (
+                <div style={{
+                  border: '1px solid rgba(212, 175, 55, 0.15)',
+                  borderTop: 'none',
+                  marginBottom: '0.75rem',
+                  maxHeight: '220px',
+                  overflowY: 'auto',
+                }}>
+                  {results.map((track) => (
+                    <button
+                      key={track.uri}
+                      type="button"
+                      onClick={() => pickTrack(track)}
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.6rem',
+                        padding: '0.55rem 0.75rem',
+                        background: 'none',
+                        border: 'none',
+                        borderBottom: '1px solid rgba(212,175,55,0.08)',
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                      }}
+                    >
+                      {track.albumArt ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={track.albumArt} alt="" style={{ width: 32, height: 32, objectFit: 'cover', flexShrink: 0 }} />
+                      ) : (
+                        <div style={{ width: 32, height: 32, backgroundColor: 'rgba(212,175,55,0.1)', flexShrink: 0 }} />
+                      )}
+                      <div style={{ overflow: 'hidden' }}>
+                        <p style={{ fontFamily: 'var(--font-sans)', fontSize: '12px', color: '#F5F0E8', margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {track.name}
+                        </p>
+                        <p style={{ fontFamily: 'var(--font-sans)', fontSize: '10px', color: '#A8C5DA', opacity: 0.6, margin: 0 }}>
+                          {track.artist}
+                        </p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
               )}
 
               {error && (
-                <p style={{ fontFamily: 'var(--font-sans)', fontSize: '11px', color: '#A8C5DA', marginTop: '0.5rem' }}>
+                <p style={{ fontFamily: 'var(--font-sans)', fontSize: '11px', color: '#A8C5DA', marginBottom: '0.5rem' }}>
                   {error}
                 </p>
               )}
 
               <button
                 type="submit"
-                disabled={loading || (!selected && !query.trim())}
+                disabled={loading || !query.trim()}
                 style={{
-                  marginTop: '1rem',
                   width: '100%',
                   padding: '0.75rem',
-                  backgroundColor:
-                    loading || (!selected && !query.trim())
-                      ? 'rgba(212, 175, 55, 0.3)'
-                      : '#D4AF37',
+                  backgroundColor: loading || !query.trim() ? 'rgba(212, 175, 55, 0.3)' : '#D4AF37',
                   color: '#1A1A2E',
                   fontFamily: 'var(--font-sans)',
                   fontSize: '11px',
@@ -253,7 +283,7 @@ export default function SongRequestModal({ sessionId, onClose }: Props) {
                   letterSpacing: '0.2em',
                   textTransform: 'uppercase',
                   border: 'none',
-                  cursor: loading || (!selected && !query.trim()) ? 'default' : 'pointer',
+                  cursor: loading || !query.trim() ? 'default' : 'pointer',
                 }}
               >
                 {loading ? 'Sending…' : selected ? 'Add to Queue' : 'Send Request'}
@@ -264,6 +294,7 @@ export default function SongRequestModal({ sessionId, onClose }: Props) {
                 onClick={onClose}
                 style={{
                   marginTop: '0.75rem',
+                  width: '100%',
                   background: 'none',
                   border: 'none',
                   fontFamily: 'var(--font-sans)',
@@ -272,7 +303,6 @@ export default function SongRequestModal({ sessionId, onClose }: Props) {
                   opacity: 0.35,
                   cursor: 'pointer',
                   letterSpacing: '0.1em',
-                  width: '100%',
                 }}
               >
                 Cancel
@@ -305,100 +335,9 @@ const subStyle: React.CSSProperties = {
 
 const sentStyle: React.CSSProperties = {
   fontFamily: 'var(--font-serif)',
-  fontSize: '1.5rem',
+  fontSize: '1.4rem',
   color: '#D4AF37',
   margin: 0,
   padding: '1rem 0',
   textAlign: 'center',
-}
-
-const inputStyle: React.CSSProperties = {
-  width: '100%',
-  padding: '0.75rem 0.85rem',
-  backgroundColor: 'rgba(245, 240, 232, 0.05)',
-  border: '1px solid rgba(212, 175, 55, 0.3)',
-  color: '#F5F0E8',
-  fontFamily: 'var(--font-sans)',
-  fontSize: '13px',
-  outline: 'none',
-  boxSizing: 'border-box',
-}
-
-const resultsContainerStyle: React.CSSProperties = {
-  marginTop: '0.25rem',
-  border: '1px solid rgba(212, 175, 55, 0.2)',
-  backgroundColor: '#12122A',
-  maxHeight: '220px',
-  overflowY: 'auto',
-}
-
-const resultRowStyle: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: '0.6rem',
-  width: '100%',
-  padding: '0.5rem 0.65rem',
-  background: 'transparent',
-  border: 'none',
-  borderBottom: '1px solid rgba(212, 175, 55, 0.08)',
-  cursor: 'pointer',
-  transition: 'background-color 0.15s',
-}
-
-const selectedRowStyle: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: '0.6rem',
-  padding: '0.5rem 0.65rem',
-  border: '1px solid rgba(212, 175, 55, 0.3)',
-  backgroundColor: 'rgba(212, 175, 55, 0.06)',
-}
-
-const trackNameStyle: React.CSSProperties = {
-  fontFamily: 'var(--font-sans)',
-  fontSize: '12px',
-  color: '#F5F0E8',
-  margin: 0,
-  whiteSpace: 'nowrap',
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-}
-
-const artistStyle: React.CSSProperties = {
-  fontFamily: 'var(--font-sans)',
-  fontSize: '10px',
-  color: '#A8C5DA',
-  margin: 0,
-  opacity: 0.7,
-  whiteSpace: 'nowrap',
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-}
-
-const searchingStyle: React.CSSProperties = {
-  fontFamily: 'var(--font-sans)',
-  fontSize: '11px',
-  color: '#F5F0E8',
-  opacity: 0.35,
-  margin: 0,
-  padding: '0.75rem',
-  textAlign: 'center',
-}
-
-const clearBtnStyle: React.CSSProperties = {
-  background: 'none',
-  border: 'none',
-  color: '#F5F0E8',
-  opacity: 0.4,
-  cursor: 'pointer',
-  fontSize: '12px',
-  padding: '0 0.25rem',
-  flexShrink: 0,
-}
-
-const albumPlaceholderStyle: React.CSSProperties = {
-  width: 32,
-  height: 32,
-  backgroundColor: 'rgba(212, 175, 55, 0.08)',
-  flexShrink: 0,
 }

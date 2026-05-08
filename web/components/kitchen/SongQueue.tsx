@@ -30,6 +30,8 @@ export default function SongQueue({ sessionId, accessToken }: Props) {
   const [requests, setRequests] = useState<SongRequest[]>([])
   const [guests, setGuests] = useState<GuestRow[]>([])
   const [dismissing, setDismissing] = useState<string | null>(null)
+  const [queuing, setQueuing] = useState<string | null>(null)
+  const [queuedIds, setQueuedIds] = useState<Set<string>>(new Set())
 
   const supabase = createClient()
 
@@ -77,6 +79,30 @@ export default function SongQueue({ sessionId, accessToken }: Props) {
       setRequests((prev) => prev.filter((r) => r.id !== id))
     } catch { /* silent */ } finally {
       setDismissing(null)
+    }
+  }
+
+  async function queueTrack(req: SongRequest) {
+    setQueuing(req.id)
+    try {
+      const body = req.spotify_track_uri
+        ? { trackUri: req.spotify_track_uri }
+        : { songText: req.song_text }
+
+      const res = await fetch('/api/kitchen/spotify/queue', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(body),
+      })
+
+      if (res.ok) {
+        setQueuedIds((prev) => new Set([...prev, req.id]))
+      }
+    } catch { /* silent */ } finally {
+      setQueuing(null)
     }
   }
 
@@ -160,24 +186,43 @@ export default function SongQueue({ sessionId, accessToken }: Props) {
                     </p>
                   </div>
                 </div>
-                <button
-                  onClick={() => dismiss(req.id)}
-                  disabled={dismissing === req.id}
-                  style={{
-                    fontFamily: 'var(--font-sans)',
-                    fontSize: '9px',
-                    letterSpacing: '0.1em',
-                    textTransform: 'uppercase',
-                    color: '#D4AF37',
-                    opacity: dismissing === req.id ? 0.3 : 0.7,
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    flexShrink: 0,
-                  }}
-                >
-                  {dismissing === req.id ? '…' : 'Dismiss'}
-                </button>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem', flexShrink: 0, alignItems: 'flex-end' }}>
+                  <button
+                    onClick={() => queueTrack(req)}
+                    disabled={queuing === req.id || queuedIds.has(req.id)}
+                    style={{
+                      fontFamily: 'var(--font-sans)',
+                      fontSize: '9px',
+                      letterSpacing: '0.1em',
+                      textTransform: 'uppercase',
+                      color: queuedIds.has(req.id) ? 'rgba(212,175,55,0.4)' : '#D4AF37',
+                      background: 'none',
+                      border: `1px solid ${queuedIds.has(req.id) ? 'rgba(212,175,55,0.15)' : 'rgba(212,175,55,0.4)'}`,
+                      padding: '0.25rem 0.5rem',
+                      cursor: queuing === req.id || queuedIds.has(req.id) ? 'default' : 'pointer',
+                      opacity: queuing === req.id ? 0.4 : 1,
+                    }}
+                  >
+                    {queuing === req.id ? '…' : queuedIds.has(req.id) ? 'Queued ✓' : 'Queue'}
+                  </button>
+                  <button
+                    onClick={() => dismiss(req.id)}
+                    disabled={dismissing === req.id}
+                    style={{
+                      fontFamily: 'var(--font-sans)',
+                      fontSize: '9px',
+                      letterSpacing: '0.1em',
+                      textTransform: 'uppercase',
+                      color: '#F5F0E8',
+                      opacity: dismissing === req.id ? 0.2 : 0.3,
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {dismissing === req.id ? '…' : 'Dismiss'}
+                  </button>
+                </div>
               </div>
             )
           })}
