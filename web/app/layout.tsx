@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { Cormorant_Garamond, Inter } from 'next/font/google'
 import './globals.css'
+import LoadingScreen from '@/components/landing/LoadingScreen'
+import CustomCursor from '@/components/landing/CustomCursor'
 
 const cormorant = Cormorant_Garamond({
   variable: '--font-cormorant',
@@ -32,7 +34,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${cormorant.variable} ${inter.variable} h-full`}>
-      <body className="min-h-full" suppressHydrationWarning>{children}</body>
+      <body className="min-h-full" suppressHydrationWarning>
+        {/* Film grain overlay — fixed, covers entire viewport */}
+        <div className="grain-overlay" aria-hidden="true" />
+
+        {/* Cinematic loading screen */}
+        <LoadingScreen />
+
+        {/* Custom glow cursor */}
+        <CustomCursor />
+
+        {children}
+      </body>
     </html>
   )
 }

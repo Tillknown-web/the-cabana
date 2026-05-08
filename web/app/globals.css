@@ -1,15 +1,24 @@
 @import "tailwindcss";
 
 /* ============================================================
-   Brand theme — The Cabana
+   Brand theme — The Cabana (Dark Luxury Edition)
    ============================================================ */
 @theme inline {
-  /* Colors */
-  --color-aubergine:  #2D1B47;
-  --color-pool-blue:  #A8C5DA;
-  --color-gold:       #D4AF37;
-  --color-cream:      #F5F0E8;
-  --color-near-black: #1A1A2E;
+  /* Dark luxury palette */
+  --color-void:         #0A0A0F;
+  --color-charcoal:     #111118;
+  --color-surface:      #16161F;
+  --color-teal-glow:    #4DD9C0;
+  --color-purple-glow:  #8B5CF6;
+  --color-rose-accent:  #E0607E;
+  --color-gold:         #D4AF37;
+  --color-mist:         rgba(255, 255, 255, 0.06);
+
+  /* Legacy (kept for cross-app compatibility) */
+  --color-aubergine:    #2D1B47;
+  --color-pool-blue:    #A8C5DA;
+  --color-cream:        #F5F0E8;
+  --color-near-black:   #1A1A2E;
 
   /* Fonts */
   --font-serif: var(--font-cormorant), Georgia, serif;
@@ -29,16 +38,156 @@ html {
   height: 100%;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
 }
 
 body {
   min-height: 100%;
-  background-color: #F5F0E8;
-  color: #2D1B47;
+  background-color: #0A0A0F;
+  color: rgba(255, 255, 255, 0.85);
   font-family: var(--font-sans);
 }
 
-/* Prevent horizontal scroll on mobile */
 body, html {
   overflow-x: hidden;
+}
+
+/* Hide default cursor globally (custom cursor handles it) */
+* {
+  cursor: none;
+}
+
+/* Restore cursor on touch devices */
+@media (pointer: coarse) {
+  * { cursor: auto; }
+}
+
+/* ============================================================
+   SVG noise filter (film grain)
+   ============================================================ */
+.grain-svg {
+  position: fixed;
+  top: 0; left: 0;
+  width: 0; height: 0;
+  pointer-events: none;
+}
+
+/* ============================================================
+   Keyframes
+   ============================================================ */
+
+/* Ambient blob drift */
+@keyframes blob-drift-a {
+  0%   { transform: translate(0, 0) scale(1); }
+  33%  { transform: translate(40px, -60px) scale(1.08); }
+  66%  { transform: translate(-30px, 40px) scale(0.95); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+
+@keyframes blob-drift-b {
+  0%   { transform: translate(0, 0) scale(1); }
+  33%  { transform: translate(-50px, 30px) scale(1.05); }
+  66%  { transform: translate(35px, -45px) scale(0.97); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+
+/* Particles floating upward */
+@keyframes float-up {
+  0%   { transform: translateY(0) translateX(0); opacity: 0; }
+  10%  { opacity: 1; }
+  80%  { opacity: 0.4; }
+  100% { transform: translateY(-120px) translateX(20px); opacity: 0; }
+}
+
+/* Glow pulse for accents */
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.6; }
+  50%       { opacity: 1; }
+}
+
+/* Subtle grain flicker */
+@keyframes grain-flicker {
+  0%, 100% { opacity: 0.035; }
+  25%       { opacity: 0.045; }
+  50%       { opacity: 0.03; }
+  75%       { opacity: 0.04; }
+}
+
+/* Section fade reveal */
+@keyframes fade-reveal {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Loading logo breathe */
+@keyframes breathe {
+  0%, 100% { opacity: 0.9; transform: scale(1); }
+  50%       { opacity: 1; transform: scale(1.015); }
+}
+
+/* Scroll indicator bounce */
+@keyframes scroll-bounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50%       { transform: translateX(-50%) translateY(6px); }
+}
+
+/* Cursor ring pulse on magnetic hover */
+@keyframes cursor-expand {
+  from { transform: translate(-50%, -50%) scale(1); }
+  to   { transform: translate(-50%, -50%) scale(1.5); }
+}
+
+/* ============================================================
+   Utility classes
+   ============================================================ */
+
+/* Glassmorphism surface */
+.glass {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+/* Film grain overlay */
+.grain-overlay {
+  position: fixed;
+  inset: -200%;
+  width: 400%;
+  height: 400%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+  background-size: 256px 256px;
+  pointer-events: none;
+  opacity: 0.038;
+  animation: grain-flicker 0.15s steps(1) infinite;
+  z-index: 9999;
+  mix-blend-mode: overlay;
+}
+
+/* Teal glow text */
+.glow-teal {
+  color: #4DD9C0;
+  text-shadow: 0 0 20px rgba(77, 217, 192, 0.5);
+}
+
+/* Purple glow text */
+.glow-purple {
+  color: #8B5CF6;
+  text-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+}
+
+/* Section reveal animation utility */
+.reveal {
+  animation: fade-reveal 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ============================================================
+   Reduced motion — disable all animations
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

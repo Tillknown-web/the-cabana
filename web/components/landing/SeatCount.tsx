@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 
 /**
- * Tiny client component — the only JS on the landing page.
+ * Tiny client component — the only data-fetching piece on the landing page.
  * Shows "X of 2 seats filled" or "2 of 2 — house full".
  * Reads from Supabase and subscribes to live updates.
  */
@@ -15,14 +15,12 @@ export default function SeatCount({ sessionId }: { sessionId: string }) {
   useEffect(() => {
     const supabase = createClient()
 
-    // Initial fetch
     supabase
       .from('guests')
       .select('id', { count: 'exact', head: true })
       .eq('session_id', sessionId)
       .then(({ count }) => setCount(count ?? 0))
 
-    // Subscribe to new check-ins
     const channel = supabase
       .channel(`seat-count-${sessionId}`)
       .on(
@@ -49,9 +47,8 @@ export default function SeatCount({ sessionId }: { sessionId: string }) {
     <p style={{
       fontFamily: 'var(--font-sans)',
       fontSize: '11px',
-      color: '#2D1B47',
-      letterSpacing: '0.1em',
-      opacity: 0.4,
+      letterSpacing: '0.12em',
+      color: isFull ? 'rgba(224,96,126,0.75)' : 'rgba(255,255,255,0.3)',
       marginBottom: '0.75rem',
     }}>
       {isFull
