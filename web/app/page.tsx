@@ -5,6 +5,7 @@ import { motion, useScroll, useTransform } from 'framer-motion'
 import GlassNav from '@/components/landing/GlassNav'
 import ParticleField from '@/components/landing/ParticleField'
 import SeatCount from '@/components/landing/SeatCount'
+import { ArrowRightIcon } from '@/lib/icons'
 
 // ─── Scroll-reveal wrapper ────────────────────────────────────────────────────
 function Reveal({
@@ -270,7 +271,7 @@ export default function LandingPage() {
             }}
           >
             Enter The Cabana
-            <span style={{ fontSize: '14px', letterSpacing: 0 }}>→</span>
+            <ArrowRightIcon size={14} />
           </motion.a>
         </motion.div>
 
@@ -342,43 +343,33 @@ export default function LandingPage() {
           pointerEvents: 'none',
         }} />
 
-        <div style={{ maxWidth: '520px', margin: '0 auto', textAlign: 'center', position: 'relative' }}>
-          <Reveal>
+        <div style={{ maxWidth: '860px', margin: '0 auto', position: 'relative' }}>
+          <Reveal style={{ textAlign: 'center' }}>
             <p style={sectionLabel}>tonight&apos;s menu</p>
           </Reveal>
 
-          <div style={{ marginTop: '3.5rem', display: 'flex', flexDirection: 'column', gap: 0 }}>
+          {/* Decorative horizontal rule under label */}
+          <Reveal delay={0.05} style={{ display: 'flex', justifyContent: 'center', margin: '1.5rem 0 3rem' }}>
+            <div style={{
+              width: '120px',
+              height: '1px',
+              background: 'linear-gradient(90deg, transparent, rgba(212,175,55,0.4), transparent)',
+            }} />
+          </Reveal>
+
+          {/* 2-col grid on desktop, 1-col on mobile */}
+          <div className="menu-grid">
             <Reveal delay={0.1}>
-              <CourseItem
-                label="the pour"
-                dish="Sunset Spritz"
-                ingredients="mango · pineapple · tajín"
-              />
+              <CourseItem courseNum="01" label="the pour" dish="Sunset Spritz" ingredients="mango · pineapple · tajín" />
             </Reveal>
-            <Reveal delay={0.15}><GoldDivider /></Reveal>
-            <Reveal delay={0.2}>
-              <CourseItem
-                label="the bite"
-                dish="Slider Trio"
-                ingredients="three sauces · slaw · brioche"
-              />
+            <Reveal delay={0.18}>
+              <CourseItem courseNum="02" label="the bite" dish="Slider Trio" ingredients="three sauces · slaw · brioche" />
             </Reveal>
-            <Reveal delay={0.25}><GoldDivider /></Reveal>
-            <Reveal delay={0.3}>
-              <CourseItem
-                label="the cut"
-                dish="Steak, tableside"
-                ingredients="compound butter · truffle fries"
-              />
+            <Reveal delay={0.26}>
+              <CourseItem courseNum="03" label="the cut" dish="Steak, tableside" ingredients="compound butter · truffle fries" />
             </Reveal>
-            <Reveal delay={0.35}><GoldDivider /></Reveal>
-            <Reveal delay={0.4}>
-              <CourseItem
-                label="the finish"
-                dish="???"
-                ingredients="revealed at the table"
-                isHidden
-              />
+            <Reveal delay={0.34}>
+              <CourseItem courseNum="04" label="the finish" dish="???" ingredients="revealed at the table" isHidden />
             </Reveal>
           </div>
         </div>
@@ -395,20 +386,50 @@ export default function LandingPage() {
           overflow: 'hidden',
         }}
       >
-        <div style={{ maxWidth: '520px', margin: '0 auto', textAlign: 'center', position: 'relative' }}>
+        {/* Background halo */}
+        <div aria-hidden="true" style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: '70vw',
+          height: '70vw',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(212,175,55,0.04) 0%, transparent 60%)',
+          pointerEvents: 'none',
+          animation: 'blob-drift-b 25s ease-in-out infinite',
+        }} />
+
+        <div style={{ maxWidth: '680px', margin: '0 auto', textAlign: 'center', position: 'relative' }}>
           <Reveal>
             <p style={sectionLabel}>your chefs tonight</p>
           </Reveal>
-          <Reveal delay={0.15}>
+
+          {/* Quote block */}
+          <Reveal delay={0.1}>
+            <p style={{
+              fontFamily: 'var(--font-serif)',
+              fontSize: 'clamp(1rem, 2.5vw, 1.15rem)',
+              fontStyle: 'italic',
+              color: 'rgba(255,255,255,0.28)',
+              marginTop: '1.5rem',
+              letterSpacing: '0.02em',
+              lineHeight: 1.6,
+            }}>
+              &ldquo;tonight, the kitchen belongs to two&rdquo;
+            </p>
+          </Reveal>
+
+          <Reveal delay={0.2}>
             <div style={{
               display: 'flex',
               justifyContent: 'center',
-              gap: 'clamp(2rem, 8vw, 4rem)',
-              marginTop: '3rem',
+              gap: 'clamp(3rem, 10vw, 6rem)',
+              marginTop: '3.5rem',
               flexWrap: 'wrap',
             }}>
-              <ChefAvatar initials="K" name="King" />
-              <ChefAvatar initials="?" name="Guest Chef" />
+              <ChefAvatar initials="Al" name="Aloire" descriptor="flavour architect" />
+              <ChefAvatar initials="Év" name="Évoire" descriptor="creative director" />
             </div>
           </Reveal>
         </div>
@@ -469,13 +490,25 @@ export default function LandingPage() {
             minHeight: '44px',
           }}
         >
-          Enter The Cabana →
+          Enter The Cabana
+          <ArrowRightIcon size={13} />
         </a>
       </div>
 
       <style>{`
         @media (max-width: 767px) {
           .mobile-cta { display: block !important; }
+        }
+        .menu-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 1.25rem;
+        }
+        @media (max-width: 639px) {
+          .menu-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+          }
         }
       `}</style>
     </>
@@ -495,24 +528,14 @@ const sectionLabel: React.CSSProperties = {
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-function GoldDivider() {
-  return (
-    <div style={{ display: 'flex', justifyContent: 'center', margin: '2.25rem 0' }}>
-      <div style={{
-        width: '36px',
-        height: '1px',
-        background: 'linear-gradient(90deg, transparent, rgba(212,175,55,0.5), transparent)',
-      }} />
-    </div>
-  )
-}
-
 function CourseItem({
+  courseNum,
   label,
   dish,
   ingredients,
   isHidden = false,
 }: {
+  courseNum: string
   label: string
   dish: string
   ingredients: string
@@ -522,49 +545,89 @@ function CourseItem({
 
   return (
     <motion.div
-      whileHover={{ scale: 1.01 }}
-      transition={{ duration: 0.25 }}
+      whileHover={{ scale: 1.015, y: -3 }}
+      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
       onHoverStart={() => setHovered(true)}
       onHoverEnd={() => setHovered(false)}
       style={{
-        textAlign: 'center',
-        padding: '1.75rem 2rem',
-        background: 'rgba(255,255,255,0.025)',
-        border: `1px solid ${hovered ? 'rgba(77,217,192,0.22)' : 'rgba(77,217,192,0.08)'}`,
+        position: 'relative',
+        padding: '2.25rem 2rem 2rem',
+        background: hovered ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.02)',
+        border: `1px solid ${hovered ? 'rgba(77,217,192,0.25)' : 'rgba(77,217,192,0.08)'}`,
+        borderLeft: `2px solid ${hovered ? 'rgba(212,175,55,0.45)' : 'rgba(212,175,55,0.15)'}`,
         backdropFilter: 'blur(12px)',
         WebkitBackdropFilter: 'blur(12px)',
-        position: 'relative',
         overflow: 'hidden',
-        boxShadow: hovered ? '0 0 30px rgba(77,217,192,0.07)' : 'none',
-        transition: 'border-color 0.3s, box-shadow 0.3s',
+        boxShadow: hovered ? '0 8px 40px rgba(77,217,192,0.08), 0 0 0 1px rgba(77,217,192,0.06)' : 'none',
+        transition: 'border-color 0.3s, box-shadow 0.3s, background 0.3s',
+        height: '100%',
+        boxSizing: 'border-box',
       }}
     >
+      {/* Decorative course number — large muted overlay */}
+      <span style={{
+        position: 'absolute',
+        top: '0.75rem',
+        right: '1rem',
+        fontFamily: 'var(--font-serif)',
+        fontSize: '4rem',
+        fontWeight: 400,
+        color: 'rgba(212,175,55,0.06)',
+        lineHeight: 1,
+        userSelect: 'none',
+        pointerEvents: 'none',
+        letterSpacing: '-0.02em',
+      }}>
+        {courseNum}
+      </span>
+
+      {/* Shimmer sweep on hidden card */}
+      {isHidden && (
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'linear-gradient(105deg, transparent 40%, rgba(212,175,55,0.06) 50%, transparent 60%)',
+          animation: 'cabana-scan 3s ease-in-out infinite',
+          pointerEvents: 'none',
+        }} />
+      )}
+
       <p style={{
         fontFamily: 'var(--font-sans)',
-        fontSize: '10px',
-        letterSpacing: '0.35em',
+        fontSize: '9px',
+        letterSpacing: '0.4em',
         textTransform: 'uppercase',
         color: '#D4AF37',
-        marginBottom: '0.6rem',
-        opacity: 0.75,
+        marginBottom: '0.75rem',
+        opacity: 0.7,
       }}>
         {label}
       </p>
       <h2 style={{
         fontFamily: 'var(--font-serif)',
-        fontSize: 'clamp(1.6rem, 4vw, 2rem)',
+        fontSize: 'clamp(1.5rem, 3.5vw, 2rem)',
         fontWeight: 400,
-        color: 'rgba(255,255,255,0.9)',
-        marginBottom: '0.5rem',
+        color: isHidden ? 'rgba(255,255,255,0.45)' : 'rgba(255,255,255,0.92)',
+        marginBottom: '0.65rem',
         letterSpacing: '0.02em',
+        lineHeight: 1.15,
       }}>
         {dish}
       </h2>
+      <div style={{
+        width: '24px',
+        height: '1px',
+        background: 'rgba(212,175,55,0.4)',
+        marginBottom: '0.65rem',
+        transition: 'width 0.3s',
+        ...(hovered ? { width: '48px' } : {}),
+      }} />
       <p style={{
         fontFamily: 'var(--font-sans)',
-        fontSize: '13px',
+        fontSize: '12px',
         fontStyle: 'italic',
-        color: isHidden ? 'rgba(77,217,192,0.5)' : 'rgba(168,197,218,0.7)',
+        color: isHidden ? 'rgba(77,217,192,0.45)' : 'rgba(168,197,218,0.65)',
+        letterSpacing: '0.01em',
       }}>
         {ingredients}
       </p>
@@ -572,47 +635,77 @@ function CourseItem({
   )
 }
 
-function ChefAvatar({ initials, name }: { initials: string; name: string }) {
+function ChefAvatar({ initials, name, descriptor }: { initials: string; name: string; descriptor?: string }) {
   return (
     <motion.div
-      whileHover={{ y: -4 }}
-      transition={{ duration: 0.3 }}
+      whileHover={{ y: -6 }}
+      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
       style={{
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        gap: '0.875rem',
+        gap: '1rem',
       }}
     >
-      <div style={{
-        width: '80px',
-        height: '80px',
-        borderRadius: '50%',
-        border: '1px solid rgba(77,217,192,0.3)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: 'rgba(77,217,192,0.05)',
-        boxShadow: '0 0 24px rgba(77,217,192,0.12)',
-        animation: 'glow-pulse 3s ease-in-out infinite',
-      }}>
-        <span style={{
-          fontFamily: 'var(--font-serif)',
-          fontSize: '1.6rem',
-          color: '#4DD9C0',
-          fontWeight: 400,
+      {/* Outer decorative halo ring */}
+      <div style={{ position: 'relative' }}>
+        <div style={{
+          position: 'absolute',
+          inset: '-12px',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(77,217,192,0.08) 0%, transparent 70%)',
+          animation: 'glow-pulse 4s ease-in-out infinite',
+          pointerEvents: 'none',
+        }} />
+        <div style={{
+          width: '110px',
+          height: '110px',
+          borderRadius: '50%',
+          border: '1px solid rgba(77,217,192,0.35)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: 'radial-gradient(circle at 40% 35%, rgba(77,217,192,0.08) 0%, rgba(10,10,15,0.6) 60%)',
+          boxShadow: '0 0 32px rgba(77,217,192,0.14), inset 0 0 20px rgba(77,217,192,0.04)',
+          animation: 'glow-pulse 3s ease-in-out infinite',
+          position: 'relative',
         }}>
-          {initials}
-        </span>
+          <span style={{
+            fontFamily: 'var(--font-serif)',
+            fontSize: '2rem',
+            color: '#4DD9C0',
+            fontWeight: 400,
+            letterSpacing: '-0.01em',
+          }}>
+            {initials}
+          </span>
+        </div>
       </div>
-      <p style={{
-        fontFamily: 'var(--font-sans)',
-        fontSize: '13px',
-        color: 'rgba(255,255,255,0.6)',
-        letterSpacing: '0.08em',
-      }}>
-        {name}
-      </p>
+
+      <div style={{ textAlign: 'center' }}>
+        <p style={{
+          fontFamily: 'var(--font-serif)',
+          fontSize: '1.2rem',
+          color: 'rgba(255,255,255,0.85)',
+          letterSpacing: '0.04em',
+          margin: 0,
+          marginBottom: '0.3rem',
+        }}>
+          {name}
+        </p>
+        {descriptor && (
+          <p style={{
+            fontFamily: 'var(--font-sans)',
+            fontSize: '10px',
+            letterSpacing: '0.22em',
+            textTransform: 'uppercase',
+            color: 'rgba(212,175,55,0.55)',
+            margin: 0,
+          }}>
+            {descriptor}
+          </p>
+        )}
+      </div>
     </motion.div>
   )
 }

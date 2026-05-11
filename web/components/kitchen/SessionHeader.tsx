@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import type { SessionState } from '@/app/kitchen/page'
 
 interface Props {
@@ -22,12 +22,30 @@ const CARD_LABELS: Record<string, string> = {
   gallery: 'Gallery',
 }
 
+const LA_FMT = new Intl.DateTimeFormat('en-US', {
+  timeZone: 'America/Los_Angeles',
+  hour: '2-digit',
+  minute: '2-digit',
+  second: '2-digit',
+  hour12: false,
+})
+
+function getLATime() {
+  return LA_FMT.format(new Date())
+}
+
 export default function SessionHeader({ sessionState, sessionId, accessToken, onReset }: Props) {
   const currentCard = sessionState?.current_card ?? '—'
   const releasedCount = sessionState?.released_cards?.length ?? 0
   const [confirming, setConfirming] = useState(false)
   const [resetting, setResetting] = useState(false)
   const [resetError, setResetError] = useState<string | null>(null)
+  const [laTime, setLaTime] = useState(getLATime)
+
+  useEffect(() => {
+    const id = setInterval(() => setLaTime(getLATime()), 1000)
+    return () => clearInterval(id)
+  }, [])
 
   async function handleReset() {
     if (!confirming) { setConfirming(true); return }
@@ -52,31 +70,68 @@ export default function SessionHeader({ sessionState, sessionId, accessToken, on
     }
   }
 
+  // Split HH:MM:SS into parts so we can style the colons separately
+  const [hh, mm, ss] = laTime.split(':')
+
   return (
     <header style={{
-      backgroundColor: '#1A1A2E',
-      borderBottom: '1px solid rgba(212, 175, 55, 0.2)',
-      padding: '1rem 1.5rem',
+      backgroundColor: '#0D0D14',
+      borderBottom: '1px solid rgba(212, 175, 55, 0.18)',
+      padding: '0.75rem 1.5rem 0.6rem',
       position: 'sticky',
       top: 0,
       zIndex: 50,
     }}>
       <div style={{
-        maxWidth: '640px',
+        maxWidth: '900px',
         margin: '0 auto',
-        display: 'flex',
+        display: 'grid',
+        gridTemplateColumns: '1fr auto 1fr',
         alignItems: 'center',
-        justifyContent: 'space-between',
         gap: '1rem',
       }}>
-        {/* Wordmark */}
+        {/* Left: Wordmark */}
         <div>
           <p style={wordmarkStyle}>The Cabana</p>
           <p style={sessionStyle}>/ kitchen · {sessionId}</p>
         </div>
 
-        {/* Right side: current card + reset */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        {/* Centre: BIG LA Clock */}
+        <div style={{ textAlign: 'center' }}>
+          <div style={{
+            fontFamily: 'var(--font-serif)',
+            fontSize: 'clamp(1.8rem, 4vw, 2.6rem)',
+            fontWeight: 400,
+            color: '#D4AF37',
+            lineHeight: 1,
+            letterSpacing: '0.04em',
+            animation: 'glow-pulse 3s ease-in-out infinite',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 0,
+          }}>
+            <span>{hh}</span>
+            <ColonSep />
+            <span>{mm}</span>
+            <ColonSep />
+            <span>{ss}</span>
+          </div>
+          <p style={{
+            fontFamily: 'var(--font-sans)',
+            fontSize: '8px',
+            letterSpacing: '0.4em',
+            textTransform: 'uppercase',
+            color: '#D4AF37',
+            opacity: 0.45,
+            marginTop: '0.3rem',
+          }}>
+            Los Angeles
+          </p>
+        </div>
+
+        {/* Right: current card + reset */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '1rem' }}>
           {/* Reset button */}
           {confirming ? (
             <div style={{ display: 'flex', gap: '0.4rem' }}>
@@ -104,7 +159,7 @@ export default function SessionHeader({ sessionState, sessionId, accessToken, on
       {/* Reset error */}
       {resetError && (
         <div style={{
-          maxWidth: '640px',
+          maxWidth: '900px',
           margin: '0.5rem auto 0',
           padding: '0.4rem 0.75rem',
           backgroundColor: 'rgba(168, 197, 218, 0.12)',
@@ -125,7 +180,7 @@ export default function SessionHeader({ sessionState, sessionId, accessToken, on
       {/* Released cards progress */}
       {sessionState && releasedCount > 0 && (
         <div style={{
-          maxWidth: '640px',
+          maxWidth: '900px',
           margin: '0.5rem auto 0',
           display: 'flex',
           flexWrap: 'wrap',
@@ -148,6 +203,21 @@ export default function SessionHeader({ sessionState, sessionId, accessToken, on
         </div>
       )}
     </header>
+  )
+}
+
+// Pulsing colon separator component
+function ColonSep() {
+  return (
+    <span style={{
+      display: 'inline-block',
+      width: '0.55em',
+      textAlign: 'center',
+      animation: 'glow-pulse 1s ease-in-out infinite',
+      opacity: 0.7,
+    }}>
+      :
+    </span>
   )
 }
 
@@ -203,7 +273,7 @@ const confirmBtnStyle: React.CSSProperties = {
   fontSize: '9px',
   letterSpacing: '0.15em',
   textTransform: 'uppercase',
-  color: '#1A1A2E',
+  color: '#0D0D14',
   backgroundColor: '#A8C5DA',
   border: 'none',
   padding: '0.3rem 0.65rem',

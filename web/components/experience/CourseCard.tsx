@@ -1,15 +1,24 @@
 'use client'
 
 import { useState } from 'react'
+import { motion } from 'framer-motion'
 import { COURSE_DATA } from '@/lib/constants'
 import type { Guest } from '@/app/experience/page'
 import PhotoUpload from '@/components/experience/PhotoUpload'
+import { CameraIcon } from '@/lib/icons'
 
 interface Props {
   card: string
   guest: Guest
   sessionId: string
 }
+
+// Staggered child animation helper
+const item = (delay: number) => ({
+  initial: { opacity: 0, y: 18 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.65, delay, ease: [0.16, 1, 0.3, 1] as const },
+})
 
 export default function CourseCard({ card, guest, sessionId }: Props) {
   const [photoUploaded, setPhotoUploaded] = useState(false)
@@ -36,32 +45,64 @@ export default function CourseCard({ card, guest, sessionId }: Props) {
       justifyContent: 'center',
       padding: '2rem',
       textAlign: 'center',
+      position: 'relative',
+      overflow: 'hidden',
     }}>
+      {/* Ambient background glow matching the card */}
+      <div aria-hidden="true" style={{
+        position: 'absolute',
+        top: '30%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: '60vw',
+        height: '60vw',
+        borderRadius: '50%',
+        background: isFinish
+          ? 'radial-gradient(circle, rgba(212,175,55,0.06) 0%, transparent 65%)'
+          : 'radial-gradient(circle, rgba(77,217,192,0.05) 0%, transparent 65%)',
+        pointerEvents: 'none',
+        animation: 'blob-drift-a 20s ease-in-out infinite',
+      }} />
+
       {/* Course label */}
-      <p style={labelStyle}>{course.label}</p>
+      <motion.p {...item(0)} style={labelStyle}>{course.label}</motion.p>
 
       {/* Dish name */}
-      <h1 style={headingStyle}>
+      <motion.h1 {...item(0.08)} style={headingStyle}>
         {isFinish && !photoUploaded ? '???' : course.dish}
-      </h1>
+      </motion.h1>
 
-      {/* Gold divider */}
-      <div style={dividerStyle} />
+      {/* Gold divider with shimmer */}
+      <motion.div
+        initial={{ scaleX: 0, opacity: 0 }}
+        animate={{ scaleX: 1, opacity: 1 }}
+        transition={{ duration: 0.55, delay: 0.18, ease: [0.16, 1, 0.3, 1] }}
+        style={{ ...dividerStyle, transformOrigin: 'center', position: 'relative', overflow: 'hidden' }}
+      >
+        {/* shimmer sweep across the divider */}
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.7), transparent)',
+          animation: 'cabana-scan 2s ease-out forwards',
+        }} />
+      </motion.div>
 
       {/* Ingredients */}
       {(!isFinish || photoUploaded) && (
-        <p style={ingredientsStyle}>{course.ingredients}</p>
+        <motion.p {...item(0.26)} style={ingredientsStyle}>{course.ingredients}</motion.p>
       )}
-
       {isFinish && !photoUploaded && (
-        <p style={ingredientsStyle}>revealed at the table</p>
+        <motion.p {...item(0.26)} style={ingredientsStyle}>revealed at the table</motion.p>
       )}
 
       {/* Photo section */}
-      <div style={{ marginTop: '2.5rem', width: '100%', maxWidth: '280px' }}>
+      <motion.div
+        {...item(0.38)}
+        style={{ marginTop: '2.5rem', width: '100%', maxWidth: '280px' }}
+      >
         {photoUploaded && photoPreviewUrl ? (
           <div>
-            {/* Photo preview */}
             <div style={{
               width: '100%',
               aspectRatio: '1',
@@ -76,11 +117,7 @@ export default function CourseCard({ card, guest, sessionId }: Props) {
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
             </div>
-            {/* Retake option */}
-            <button
-              onClick={() => setShowUpload(true)}
-              style={retakeButtonStyle}
-            >
+            <button onClick={() => setShowUpload(true)} style={retakeButtonStyle}>
               Retake
             </button>
           </div>
@@ -92,11 +129,13 @@ export default function CourseCard({ card, guest, sessionId }: Props) {
             onCancel={() => setShowUpload(false)}
           />
         ) : (
-          <button
+          <motion.button
             onClick={() => setShowUpload(true)}
             style={cameraButtonStyle}
+            whileHover={{ borderColor: 'rgba(212,175,55,0.7)', backgroundColor: 'rgba(212,175,55,0.06)' }}
+            transition={{ duration: 0.2 }}
           >
-            <span style={{ fontSize: '1.5rem' }}>📷</span>
+            <CameraIcon size={22} />
             <span style={{
               fontFamily: 'var(--font-sans)',
               fontSize: '11px',
@@ -106,9 +145,9 @@ export default function CourseCard({ card, guest, sessionId }: Props) {
             }}>
               Take Your Photo
             </span>
-          </button>
+          </motion.button>
         )}
-      </div>
+      </motion.div>
     </div>
   )
 }
@@ -157,6 +196,7 @@ const cameraButtonStyle: React.CSSProperties = {
   backgroundColor: 'transparent',
   color: '#F5F0E8',
   cursor: 'pointer',
+  transition: 'border-color 0.2s, background-color 0.2s',
 }
 
 const retakeButtonStyle: React.CSSProperties = {

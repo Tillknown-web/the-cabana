@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { createClient } from '@/lib/supabase/client'
 import { COURSE_CARDS } from '@/lib/constants'
 import CheckIn from '@/components/experience/CheckIn'
@@ -149,7 +150,20 @@ export default function ExperiencePage() {
   return (
     <main style={{ minHeight: '100dvh', backgroundColor: '#0A0A0F', position: 'relative', paddingBottom: '4rem' }}>
       <ProgressBar currentCard={currentCard} />
-      {renderCard()}
+
+      {/* Animated card transitions — each card key change triggers exit + enter */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={currentCard}
+          initial={{ opacity: 0, scale: 0.97, y: 28 }}
+          animate={{ opacity: 1, scale: 1,    y: 0  }}
+          exit   ={{ opacity: 0, scale: 1.02, y: -24 }}
+          transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+        >
+          {renderCard()}
+        </motion.div>
+      </AnimatePresence>
+
       <ChefNoteToast sessionId={SESSION_ID} />
       <TableSidePrompt sessionId={SESSION_ID} currentCard={currentCard} />
       <NowPlayingBar sessionId={SESSION_ID} onSongRequest={() => setSongModalOpen(true)} />
