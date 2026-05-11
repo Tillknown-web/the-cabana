@@ -14,7 +14,9 @@ export default function TableSideTriggers({ sessionId, currentCard, accessToken 
   const [fired, setFired] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
-  const canButterPour = currentCard === 'cut'
+  const canPourMoment    = currentCard === 'pour'
+  const canBiteMoment    = currentCard === 'bite'
+  const canButterPour    = currentCard === 'cut'
   const canDessertReveal = currentCard === 'finish'
 
   async function fire(triggerType: string) {
@@ -39,6 +41,26 @@ export default function TableSideTriggers({ sessionId, currentCard, accessToken 
       <p style={helpStyle}>Push a fullscreen animation to all guest screens.</p>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+        {/* Pour Moment */}
+        <TriggerButton
+          label="🍹 The Pour"
+          subLabel="Active during The Pour"
+          enabled={canPourMoment}
+          loading={loading === 'pour_moment'}
+          fired={fired === 'pour_moment'}
+          onClick={() => fire('pour_moment')}
+        />
+
+        {/* Bite Moment */}
+        <TriggerButton
+          label="🍔 The Bite"
+          subLabel="Active during The Bite"
+          enabled={canBiteMoment}
+          loading={loading === 'bite_moment'}
+          fired={fired === 'bite_moment'}
+          onClick={() => fire('bite_moment')}
+        />
+
         {/* Butter Pour */}
         <TriggerButton
           label="🧈 Butter Pour"
