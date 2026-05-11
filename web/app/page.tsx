@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { motion, useScroll, useTransform } from 'framer-motion'
+import { motion, useScroll, useTransform, useInView } from 'framer-motion'
 import GlassNav from '@/components/landing/GlassNav'
 import ParticleField from '@/components/landing/ParticleField'
 import SeatCount from '@/components/landing/SeatCount'
@@ -542,9 +542,13 @@ function CourseItem({
   isHidden?: boolean
 }) {
   const [hovered, setHovered] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+  // Trigger once when the card enters the viewport
+  const inView = useInView(ref, { once: true, margin: '-60px' })
 
   return (
     <motion.div
+      ref={ref}
       whileHover={{ scale: 1.015, y: -3 }}
       transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
       onHoverStart={() => setHovered(true)}
@@ -581,56 +585,79 @@ function CourseItem({
         {courseNum}
       </span>
 
-      {/* Shimmer sweep on hidden card */}
-      {isHidden && (
-        <div style={{
+      {/* One-shot shimmer sweep — plays once when card enters viewport */}
+      <motion.div
+        aria-hidden="true"
+        initial={{ x: '-110%' }}
+        animate={inView ? { x: '110%' } : { x: '-110%' }}
+        transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
+        style={{
           position: 'absolute',
           inset: 0,
-          background: 'linear-gradient(105deg, transparent 40%, rgba(212,175,55,0.06) 50%, transparent 60%)',
-          animation: 'cabana-scan 3s ease-in-out infinite',
+          background: 'linear-gradient(105deg, transparent 25%, rgba(212,175,55,0.18) 50%, transparent 75%)',
           pointerEvents: 'none',
-        }} />
+          zIndex: 1,
+        }}
+      />
+
+      {/* Continuous mystery scan on the finish card */}
+      {isHidden && (
+        <motion.div
+          aria-hidden="true"
+          animate={{ x: ['-110%', '110%'] }}
+          transition={{ duration: 3.5, ease: 'easeInOut', repeat: Infinity, repeatDelay: 1.5 }}
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'linear-gradient(105deg, transparent 25%, rgba(212,175,55,0.09) 50%, transparent 75%)',
+            pointerEvents: 'none',
+            zIndex: 1,
+          }}
+        />
       )}
 
-      <p style={{
-        fontFamily: 'var(--font-sans)',
-        fontSize: '9px',
-        letterSpacing: '0.4em',
-        textTransform: 'uppercase',
-        color: '#D4AF37',
-        marginBottom: '0.75rem',
-        opacity: 0.7,
-      }}>
-        {label}
-      </p>
-      <h2 style={{
-        fontFamily: 'var(--font-serif)',
-        fontSize: 'clamp(1.5rem, 3.5vw, 2rem)',
-        fontWeight: 400,
-        color: isHidden ? 'rgba(255,255,255,0.45)' : 'rgba(255,255,255,0.92)',
-        marginBottom: '0.65rem',
-        letterSpacing: '0.02em',
-        lineHeight: 1.15,
-      }}>
-        {dish}
-      </h2>
-      <div style={{
-        width: '24px',
-        height: '1px',
-        background: 'rgba(212,175,55,0.4)',
-        marginBottom: '0.65rem',
-        transition: 'width 0.3s',
-        ...(hovered ? { width: '48px' } : {}),
-      }} />
-      <p style={{
-        fontFamily: 'var(--font-sans)',
-        fontSize: '12px',
-        fontStyle: 'italic',
-        color: isHidden ? 'rgba(77,217,192,0.45)' : 'rgba(168,197,218,0.65)',
-        letterSpacing: '0.01em',
-      }}>
-        {ingredients}
-      </p>
+      {/* Content sits above the shimmer overlays */}
+      <div style={{ position: 'relative', zIndex: 2 }}>
+        <p style={{
+          fontFamily: 'var(--font-sans)',
+          fontSize: '9px',
+          letterSpacing: '0.4em',
+          textTransform: 'uppercase',
+          color: '#D4AF37',
+          marginBottom: '0.75rem',
+          opacity: 0.7,
+        }}>
+          {label}
+        </p>
+        <h2 style={{
+          fontFamily: 'var(--font-serif)',
+          fontSize: 'clamp(1.5rem, 3.5vw, 2rem)',
+          fontWeight: 400,
+          color: isHidden ? 'rgba(255,255,255,0.45)' : 'rgba(255,255,255,0.92)',
+          marginBottom: '0.65rem',
+          letterSpacing: '0.02em',
+          lineHeight: 1.15,
+        }}>
+          {dish}
+        </h2>
+        <div style={{
+          width: '24px',
+          height: '1px',
+          background: 'rgba(212,175,55,0.4)',
+          marginBottom: '0.65rem',
+          transition: 'width 0.3s',
+          ...(hovered ? { width: '48px' } : {}),
+        }} />
+        <p style={{
+          fontFamily: 'var(--font-sans)',
+          fontSize: '12px',
+          fontStyle: 'italic',
+          color: isHidden ? 'rgba(77,217,192,0.45)' : 'rgba(168,197,218,0.65)',
+          letterSpacing: '0.01em',
+        }}>
+          {ingredients}
+        </p>
+      </div>
     </motion.div>
   )
 }
