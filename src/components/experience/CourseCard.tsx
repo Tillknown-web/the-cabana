@@ -22,6 +22,8 @@ interface CourseCardProps {
   tablesideTrigger?: boolean
   tablesidePrompt?: string
   tablesideHighlight?: string
+  revealLabel?: string
+  revealBody?: string
   course: CourseId
   sessionId: string
   guestId: string
@@ -42,6 +44,8 @@ export default function CourseCard({
   tablesideTrigger,
   tablesidePrompt,
   tablesideHighlight,
+  revealLabel,
+  revealBody,
   course,
   sessionId,
   guestId,
@@ -120,6 +124,47 @@ export default function CourseCard({
         >
           {dishName}
         </h2>
+
+        {/* Auto-reveal banner — fires at dish phase, stays through full */}
+        {revealLabel && revealBody && (phase === 'dish' || phase === 'full') && (
+          <div
+            className="animate-fade-in"
+            style={{
+              width: '100%',
+              maxWidth: 320,
+              marginTop: 20,
+              marginBottom: phase === 'full' ? 0 : 0,
+              padding: '14px 20px',
+              border: '1px solid rgba(212,175,55,0.5)',
+              borderRadius: 4,
+              textAlign: 'center',
+              background: 'rgba(212,175,55,0.07)',
+            }}
+          >
+            <p
+              style={{
+                fontFamily: "'Inter', sans-serif",
+                fontSize: 10,
+                fontWeight: 600,
+                textTransform: 'uppercase',
+                letterSpacing: '0.3em',
+                marginBottom: 6,
+              }}
+            >
+              <span className="shimmer-gold">{revealLabel}</span>
+            </p>
+            <p
+              style={{
+                fontFamily: "'Cormorant Garamond', Georgia, serif",
+                fontSize: 15,
+                fontStyle: 'italic',
+                color: 'rgba(245,240,232,0.75)',
+              }}
+            >
+              {revealBody}
+            </p>
+          </div>
+        )}
 
         {/* Rest of card — revealed in 'full' phase */}
         {(phase === 'dish' || phase === 'full') && (

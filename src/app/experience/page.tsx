@@ -265,6 +265,8 @@ export default function ExperiencePage() {
           guestId={guestId}
           onComplete={handleCourseComplete}
           otherGuestPhoto={otherGuestPhotos['pour'] ?? null}
+          revealLabel="Now arriving"
+          revealBody="Your drink is being prepared."
         />
       )
     }
@@ -316,6 +318,8 @@ export default function ExperiencePage() {
           guestId={guestId}
           onComplete={handleCourseComplete}
           otherGuestPhoto={otherGuestPhotos['bite'] ?? null}
+          revealLabel="Now arriving"
+          revealBody="Sliders on their way."
         />
       )
     }
@@ -334,6 +338,8 @@ export default function ExperiencePage() {
           tablesideTrigger={!!tablesideTrigger && tablesideTrigger.trigger === 'butter_pour'}
           tablesidePrompt="Watch the chef"
           tablesideHighlight="Butter poured hot."
+          revealLabel="Now arriving"
+          revealBody="Ribeye coming to the table."
         />
       )
     }
