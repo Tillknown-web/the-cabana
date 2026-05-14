@@ -72,6 +72,19 @@ export default function GalleryView({ guest, sessionId }: Props) {
     <div style={{ padding: '3rem 1.5rem 6rem', maxWidth: '480px', margin: '0 auto' }}>
       {/* Header */}
       <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+        {/* Brand wordmark */}
+        <p style={{
+          fontFamily: 'var(--font-serif)',
+          fontSize: 'clamp(3rem, 16vw, 6rem)',
+          fontWeight: 400,
+          color: '#D4AF37',
+          letterSpacing: '0.06em',
+          margin: '0 0 1.5rem',
+          lineHeight: 1,
+          opacity: 0.92,
+        }}>
+          The Cabana
+        </p>
         <p style={labelStyle}>The Evening</p>
         <h1 style={headingStyle}>Your Gallery</h1>
         <div style={dividerStyle} />

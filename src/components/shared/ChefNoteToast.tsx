@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { FlameIcon } from '@/lib/icons'
 
 interface ChefNoteToastProps {
   message: string | null
@@ -62,7 +63,9 @@ export default function ChefNoteToast({ message, sentAt }: ChefNoteToastProps) {
           gap: 10,
         }}
       >
-        <span style={{ fontSize: 16, flexShrink: 0 }}>🔥</span>
+        <span style={{ flexShrink: 0, color: '#D4AF37', display: 'flex', alignItems: 'center' }}>
+          <FlameIcon size={16} />
+        </span>
         <p
           style={{
             fontFamily: "'Inter', sans-serif",

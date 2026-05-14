@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { callEdgeFn } from '@/lib/edge-fn'
-import { DropletIcon, SparklesIcon, CheckIcon } from '@/lib/icons'
+import { DropletIcon, SparklesIcon, CheckIcon, GlassIcon, UtensilsIcon } from '@/lib/icons'
 
 interface Props {
   sessionId: string
@@ -44,7 +44,8 @@ export default function TableSideTriggers({ sessionId, currentCard, accessToken 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
         {/* Pour Moment */}
         <TriggerButton
-          label="🍹 The Pour"
+          label="The Pour"
+          icon={<GlassIcon size={14} />}
           subLabel="Active during The Pour"
           enabled={canPourMoment}
           loading={loading === 'pour_moment'}
@@ -54,7 +55,8 @@ export default function TableSideTriggers({ sessionId, currentCard, accessToken 
 
         {/* Bite Moment */}
         <TriggerButton
-          label="🍔 The Bite"
+          label="The Bite"
+          icon={<UtensilsIcon size={14} />}
           subLabel="Active during The Bite"
           enabled={canBiteMoment}
           loading={loading === 'bite_moment'}

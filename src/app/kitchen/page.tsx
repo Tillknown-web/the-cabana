@@ -6,6 +6,7 @@ import { useState, useEffect, useCallback } from 'react'
 import type { CardId, SpotifyNowPlayingFull, SpotifyPlaylist } from '@/types'
 import { CARD_SEQUENCE, CARD_LABELS, INTERMISSION_CARDS, COURSE_CARDS } from '@/types'
 import { formatTime, formatElapsed, formatDuration } from '@/lib/utils'
+import { CameraIcon, FlameIcon, SparklesIcon, CheckIcon } from '@/lib/icons'
 
 const SESSION_ID = process.env.NEXT_PUBLIC_ACTIVE_SESSION_ID ?? ''
 
@@ -215,7 +216,7 @@ export default function KitchenPage() {
         <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.7)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
           <div style={{ backgroundColor: '#1a1a24', border: '1px solid #333', borderRadius: 8, padding: 28, maxWidth: 340, width: '100%', textAlign: 'center' }}>
             <p style={{ fontSize: 15, marginBottom: 20 }}>
-              Fire <strong>{tablesideConfirm === 'butter_pour' ? '🔥 Butter pour reveal' : '✨ Dessert gold reveal'}</strong>?
+              Fire <strong>{tablesideConfirm === 'butter_pour' ? 'Butter pour reveal' : 'Dessert gold reveal'}</strong>?
             </p>
             <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
               <button onClick={() => setTablesideConfirm(null)} style={{ padding: '10px 20px', backgroundColor: '#333', border: 'none', borderRadius: 4, color: '#ccc', cursor: 'pointer' }}>Cancel</button>
@@ -268,9 +269,13 @@ export default function KitchenPage() {
                     <div style={{ textAlign: 'right' }}>
                       <p style={{ fontSize: 11, color: '#555' }}>{formatElapsed(g.checked_in_at)}</p>
                       {pendingCourses.length > 0 ? (
-                        <p style={{ fontSize: 12, color: '#f97316' }}>📷 {pendingCourses.length} pending</p>
+                        <p style={{ fontSize: 12, color: '#f97316', display: 'flex', alignItems: 'center', gap: 4 }}>
+                          <CameraIcon size={12} /> {pendingCourses.length} pending
+                        </p>
                       ) : (
-                        <p style={{ fontSize: 12, color: '#4ade80' }}>📷 up to date</p>
+                        <p style={{ fontSize: 12, color: '#4ade80', display: 'flex', alignItems: 'center', gap: 4 }}>
+                          <CameraIcon size={12} /> up to date
+                        </p>
                       )}
                     </div>
                   </div>
@@ -344,13 +349,15 @@ export default function KitchenPage() {
           <KitchenButton
             disabled={!cutIsLive}
             onClick={() => setTablesideConfirm('butter_pour')}
-            label="🔥 Butter pour reveal"
+            icon={<FlameIcon size={15} />}
+            label="Butter pour reveal"
             subLabel={cutIsLive ? undefined : 'only active when the cut is live'}
           />
           <KitchenButton
             disabled={!finishIsLive}
             onClick={() => setTablesideConfirm('dessert_reveal')}
-            label="✨ Dessert gold reveal"
+            icon={<SparklesIcon size={15} />}
+            label="Dessert gold reveal"
             subLabel={finishIsLive ? undefined : 'only active when the finish is live'}
             style={{ marginTop: 8 }}
           />
@@ -593,9 +600,9 @@ export default function KitchenPage() {
                 {!r.seen && (
                   <button
                     onClick={() => handleDismissRequest(r.id)}
-                    style={{ padding: '6px 12px', backgroundColor: '#1e1e2e', border: '1px solid #333', borderRadius: 4, color: '#888', fontSize: 12, cursor: 'pointer', flexShrink: 0 }}
+                    style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '6px 12px', backgroundColor: '#1e1e2e', border: '1px solid #333', borderRadius: 4, color: '#888', fontSize: 12, cursor: 'pointer', flexShrink: 0 }}
                   >
-                    ✓ seen
+                    <CheckIcon size={10} /> seen
                   </button>
                 )}
               </div>
@@ -622,12 +629,14 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 function KitchenButton({
   disabled,
   onClick,
+  icon,
   label,
   subLabel,
   style: extraStyle,
 }: {
   disabled: boolean
   onClick: () => void
+  icon?: React.ReactNode
   label: string
   subLabel?: string
   style?: React.CSSProperties
@@ -648,7 +657,9 @@ function KitchenButton({
         ...extraStyle,
       }}
     >
-      <p style={{ fontSize: 14, color: '#e0e0e0', marginBottom: subLabel ? 4 : 0 }}>{label}</p>
+      <p style={{ fontSize: 14, color: '#e0e0e0', marginBottom: subLabel ? 4 : 0, display: 'flex', alignItems: 'center', gap: 6 }}>
+        {icon}{label}
+      </p>
       {subLabel && <p style={{ fontSize: 12, color: '#555', fontStyle: 'italic' }}>{subLabel}</p>}
     </button>
   )

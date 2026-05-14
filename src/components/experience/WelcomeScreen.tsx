@@ -4,6 +4,7 @@ import { useState, useRef } from 'react'
 import GoldButton from '@/components/shared/GoldButton'
 import GoldDivider from '@/components/shared/GoldDivider'
 import { resizeImage } from '@/lib/utils'
+import { CameraIcon } from '@/lib/icons'
 
 const CHEFS = [
   { initial: 'É', name: 'Évoire', photo: '/chef-evoire.png' },
@@ -109,7 +110,7 @@ export default function WelcomeScreen({ guestName, guestId, sessionId, onComplet
         />
 
         <GoldButton onClick={handleConfirmPhoto} loading={uploading} fullWidth size="lg">
-          Looks good ✓
+          Looks good
         </GoldButton>
 
         <button
@@ -387,7 +388,7 @@ export default function WelcomeScreen({ guestName, guestId, sessionId, onComplet
             size="lg"
             fullWidth
           >
-            📷 Snap your guest
+            <CameraIcon size={16} /> Snap your guest
           </GoldButton>
         </div>
       </div>

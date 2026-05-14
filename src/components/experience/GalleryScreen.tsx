@@ -1,16 +1,17 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import type { CourseId, ReactionType } from '@/types'
 import { COURSE_TO_LABEL } from '@/types'
 import GoldDivider from '@/components/shared/GoldDivider'
+import { FlameIcon, HeartIcon, StarIcon, DownloadIcon, ShareIcon, LinkIcon } from '@/lib/icons'
 
 const COURSES: CourseId[] = ['guest', 'pour', 'bite', 'cut', 'finish', 'booth']
 
-const REACTION_EMOJI: Record<ReactionType, string> = {
-  fire: '🔥',
-  heart: '❤️',
-  chefs_kiss: '🤌',
+const REACTION_ICON: Record<ReactionType, React.ReactNode> = {
+  fire:       <FlameIcon size={14} />,
+  heart:      <HeartIcon size={14} />,
+  chefs_kiss: <StarIcon  size={14} />,
 }
 
 interface GalleryPhoto {
@@ -316,9 +317,11 @@ export default function GalleryScreen({ sessionId, guestId, guestName }: Gallery
                       {photo.guest_name}
                     </p>
                     {photo.reactions?.length > 0 && (
-                      <p style={{ fontSize: 14, marginTop: 4 }}>
-                        {photo.reactions.map((r) => REACTION_EMOJI[r]).join(' ')}
-                      </p>
+                      <div style={{ display: 'flex', gap: 4, marginTop: 4, color: '#D4AF37' }}>
+                        {photo.reactions.map((r) => (
+                          <span key={r}>{REACTION_ICON[r]}</span>
+                        ))}
+                      </div>
                     )}
                   </div>
                 </div>
@@ -381,6 +384,7 @@ export default function GalleryScreen({ sessionId, guestId, guestName }: Gallery
           <button
             onClick={downloadReceipt}
             style={{
+              display: 'flex', alignItems: 'center', gap: 6,
               padding: '12px 20px',
               backgroundColor: 'transparent',
               border: '1px solid rgba(212,175,55,0.5)',
@@ -394,11 +398,12 @@ export default function GalleryScreen({ sessionId, guestId, guestName }: Gallery
               cursor: 'pointer',
             }}
           >
-            📥 Download
+            <DownloadIcon size={14} /> Download
           </button>
           <button
             onClick={shareReceipt}
             style={{
+              display: 'flex', alignItems: 'center', gap: 6,
               padding: '12px 20px',
               backgroundColor: '#D4AF37',
               border: 'none',
@@ -412,7 +417,7 @@ export default function GalleryScreen({ sessionId, guestId, guestName }: Gallery
               cursor: 'pointer',
             }}
           >
-            📤 Share
+            <ShareIcon size={14} /> Share
           </button>
         </div>
       </div>
@@ -437,7 +442,7 @@ export default function GalleryScreen({ sessionId, guestId, guestName }: Gallery
             marginBottom: 12,
           }}
         >
-          🔗 Share the gallery
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}><LinkIcon size={12} /> Share the gallery</span>
         </p>
         <p
           style={{

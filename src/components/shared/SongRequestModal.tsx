@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import GoldButton from './GoldButton'
+import { CheckIcon } from '@/lib/icons'
 
 interface SongRequestModalProps {
   sessionId: string
@@ -77,8 +78,8 @@ export default function SongRequestModal({ sessionId, guestId, onClose }: SongRe
 
         {sent ? (
           <div style={{ padding: '20px 0' }}>
-            <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, color: '#A8C5DA', fontStyle: 'italic' }}>
-              Request sent to the kitchen ✓
+            <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 14, color: '#A8C5DA', fontStyle: 'italic', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+              Request sent to the kitchen <CheckIcon size={13} />
             </p>
           </div>
         ) : (

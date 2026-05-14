@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import type { SessionState } from '@/app/kitchen/page'
+import { WarningIcon } from '@/lib/icons'
 
 interface Props {
   sessionState: SessionState | null
@@ -171,8 +172,11 @@ export default function SessionHeader({ sessionState, sessionId, accessToken, on
             letterSpacing: '0.05em',
             color: '#A8C5DA',
             margin: 0,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.3rem',
           }}>
-            ⚠ {resetError}
+            <WarningIcon size={12} /> {resetError}
           </p>
         </div>
       )}

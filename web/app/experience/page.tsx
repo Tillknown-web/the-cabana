@@ -12,9 +12,8 @@ import GalleryView from '@/components/experience/GalleryView'
 import ProgressBar from '@/components/shared/ProgressBar'
 import ChefNoteToast from '@/components/shared/ChefNoteToast'
 import TableSidePrompt from '@/components/shared/TableSidePrompt'
-import NowPlayingBar from '@/components/shared/NowPlayingBar'
 import SongRequestModal from '@/components/shared/SongRequestModal'
-import PhotoBoothButton from '@/components/shared/PhotoBoothButton'
+import ExperienceNavBar from '@/components/shared/ExperienceNavBar'
 
 export type Guest = {
   id: string
@@ -148,7 +147,7 @@ export default function ExperiencePage() {
   if (!guest) return <CheckIn sessionId={SESSION_ID} onCheckedIn={handleCheckedIn} />
 
   return (
-    <main style={{ minHeight: '100dvh', backgroundColor: '#0A0A0F', position: 'relative', paddingBottom: '4rem' }}>
+    <main style={{ minHeight: '100dvh', backgroundColor: '#0A0A0F', position: 'relative', paddingBottom: '72px' }}>
       <ProgressBar currentCard={currentCard} />
 
       {/* Animated card transitions — each card key change triggers exit + enter */}
@@ -166,10 +165,11 @@ export default function ExperiencePage() {
 
       <ChefNoteToast sessionId={SESSION_ID} />
       <TableSidePrompt sessionId={SESSION_ID} currentCard={currentCard} />
-      <NowPlayingBar sessionId={SESSION_ID} onSongRequest={() => setSongModalOpen(true)} />
-      {(COURSE_CARDS.has(currentCard) || currentCard.startsWith('intermission')) && (
-        <PhotoBoothButton sessionId={SESSION_ID} />
-      )}
+      <ExperienceNavBar
+        sessionId={SESSION_ID}
+        currentCard={currentCard}
+        onSongRequest={() => setSongModalOpen(true)}
+      />
       {songModalOpen && (
         <SongRequestModal sessionId={SESSION_ID} onClose={() => setSongModalOpen(false)} />
       )}

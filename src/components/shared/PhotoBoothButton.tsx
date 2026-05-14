@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react'
 import { resizeImage, drawBrandedOverlay } from '@/lib/utils'
+import { CameraIcon, DownloadIcon, ShareIcon } from '@/lib/icons'
 
 interface PhotoBoothButtonProps {
   sessionId: string
@@ -107,14 +108,14 @@ export default function PhotoBoothButton({ sessionId, guestId }: PhotoBoothButto
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontSize: 18,
           cursor: 'pointer',
           zIndex: 45,
           boxShadow: '0 2px 12px rgba(0,0,0,0.3)',
           WebkitTapHighlightColor: 'transparent',
+          color: '#D4AF37',
         }}
       >
-        📷
+        <CameraIcon size={20} />
       </button>
 
       <input
@@ -159,6 +160,8 @@ export default function PhotoBoothButton({ sessionId, guestId }: PhotoBoothButto
             <button
               onClick={handleDownload}
               style={{
+                display: 'flex',
+                alignItems: 'center',
                 padding: '12px 20px',
                 backgroundColor: 'transparent',
                 border: '1px solid rgba(212,175,55,0.5)',
@@ -172,11 +175,14 @@ export default function PhotoBoothButton({ sessionId, guestId }: PhotoBoothButto
                 cursor: 'pointer',
               }}
             >
-              📥 Download
+              <DownloadIcon size={14} />
+              <span style={{ marginLeft: 6 }}>Download</span>
             </button>
             <button
               onClick={handleShare}
               style={{
+                display: 'flex',
+                alignItems: 'center',
                 padding: '12px 20px',
                 backgroundColor: 'transparent',
                 border: '1px solid rgba(212,175,55,0.5)',
@@ -190,7 +196,8 @@ export default function PhotoBoothButton({ sessionId, guestId }: PhotoBoothButto
                 cursor: 'pointer',
               }}
             >
-              📤 Share
+              <ShareIcon size={14} />
+              <span style={{ marginLeft: 6 }}>Share</span>
             </button>
             <button
               onClick={handleUpload}

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import type { CardId, CourseId } from '@/types'
 import GoldDivider from '@/components/shared/GoldDivider'
 import PhotoGate from './PhotoGate'
+import { EyeIcon } from '@/lib/icons'
 
 interface SauceCard {
   name: string
@@ -245,8 +246,8 @@ export default function CourseCard({
                   overflow: 'hidden',
                 }}
               >
-                <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, fontWeight: 600, color: '#F5F0E8', marginBottom: 4 }}>
-                  👀 {tablesidePrompt}
+                <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, fontWeight: 600, color: '#F5F0E8', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <EyeIcon size={13} /> {tablesidePrompt}
                 </p>
                 {tablesideHighlight && (
                   <p

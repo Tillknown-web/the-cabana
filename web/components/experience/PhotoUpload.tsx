@@ -98,21 +98,24 @@ export default function PhotoUpload({ course, sessionId, onUploaded, onCancel }:
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-          <button
-            onClick={() => cameraInputRef.current?.click()}
-            style={primaryBtnStyle}
-          >
-            <CameraIcon size={20} />
-            <span style={btnLabelStyle}>Take Photo</span>
-          </button>
+          {/* Take Photo + Choose from Library side by side */}
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <button
+              onClick={() => cameraInputRef.current?.click()}
+              style={{ ...primaryBtnStyle, flex: 1, padding: '0.85rem 0.5rem' }}
+            >
+              <CameraIcon size={18} />
+              <span style={{ ...btnLabelStyle, fontSize: '10px' }}>Take Photo</span>
+            </button>
 
-          <button
-            onClick={() => galleryInputRef.current?.click()}
-            style={secondaryBtnStyle}
-          >
-            <ImageIcon size={20} />
-            <span style={btnLabelStyle}>Choose from Library</span>
-          </button>
+            <button
+              onClick={() => galleryInputRef.current?.click()}
+              style={{ ...secondaryBtnStyle, flex: 1, padding: '0.85rem 0.5rem' }}
+            >
+              <ImageIcon size={18} />
+              <span style={{ ...btnLabelStyle, fontSize: '10px' }}>Library</span>
+            </button>
+          </div>
 
           {error && (
             <p style={errorStyle}>{error}</p>

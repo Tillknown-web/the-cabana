@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import React, { useState, useRef } from 'react'
 import type { CourseId, ReactionType } from '@/types'
 import GoldButton from '@/components/shared/GoldButton'
 import { resizeImage } from '@/lib/utils'
 import { playReactionSound } from '@/lib/sounds'
+import { CameraIcon, FlameIcon, HeartIcon, StarIcon } from '@/lib/icons'
 
 const COURSE_LABELS: Record<CourseId, string> = {
   guest: 'guest',
@@ -15,10 +16,10 @@ const COURSE_LABELS: Record<CourseId, string> = {
   booth: 'booth',
 }
 
-const REACTIONS: { type: ReactionType; emoji: string; label: string }[] = [
-  { type: 'fire', emoji: '🔥', label: 'Fire' },
-  { type: 'heart', emoji: '❤️', label: 'Heart' },
-  { type: 'chefs_kiss', emoji: '🤌', label: "Chef's Kiss" },
+const REACTIONS: { type: ReactionType; icon: React.ReactNode; label: string }[] = [
+  { type: 'fire',       icon: <FlameIcon size={36} />, label: 'Fire'        },
+  { type: 'heart',      icon: <HeartIcon size={36} />, label: 'Heart'       },
+  { type: 'chefs_kiss', icon: <StarIcon  size={36} />, label: "Chef's Kiss" },
 ]
 
 interface OtherGuestPhoto {
@@ -149,7 +150,7 @@ export default function PhotoGate({ course, sessionId, guestId, onComplete, othe
                 WebkitTapHighlightColor: 'transparent',
               }}
             >
-              {r.emoji}
+              {r.icon}
             </button>
           ))}
         </div>
@@ -240,7 +241,7 @@ export default function PhotoGate({ course, sessionId, guestId, onComplete, othe
           }}
         />
         <GoldButton onClick={handleUpload} loading={uploading} fullWidth size="lg" style={{ maxWidth: 320 }}>
-          Looks good ✓
+          Looks good
         </GoldButton>
         <button
           onClick={() => {
@@ -281,7 +282,7 @@ export default function PhotoGate({ course, sessionId, guestId, onComplete, othe
         size="lg"
         style={{ maxWidth: 320 }}
       >
-        📷 Snap your {COURSE_LABELS[course]}
+        <CameraIcon size={16} /> Snap your {COURSE_LABELS[course]}
       </GoldButton>
     </>
   )

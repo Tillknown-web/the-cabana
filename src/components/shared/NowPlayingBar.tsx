@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import type { SpotifyNowPlayingFull } from '@/types'
+import { MusicNoteIcon } from '@/lib/icons'
 
 interface NowPlayingBarProps {
   sessionId: string
@@ -55,7 +56,9 @@ export default function NowPlayingBar({ sessionId, onRequestSong }: NowPlayingBa
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, overflow: 'hidden', flex: 1 }}>
         {/* Music icon */}
-        <span style={{ fontSize: 14, flexShrink: 0, opacity: 0.7 }}>♫</span>
+        <span style={{ flexShrink: 0, opacity: 0.7, display: 'flex', alignItems: 'center' }}>
+          <MusicNoteIcon size={14} />
+        </span>
 
         <div style={{ overflow: 'hidden' }}>
           {track ? (

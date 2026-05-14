@@ -1,16 +1,17 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import type { CourseId, ReactionType } from '@/types'
 import { COURSE_TO_LABEL } from '@/types'
 import GoldDivider from '@/components/shared/GoldDivider'
+import { FlameIcon, HeartIcon, StarIcon } from '@/lib/icons'
 
 const COURSES: CourseId[] = ['guest', 'pour', 'bite', 'cut', 'finish', 'booth']
 
-const REACTION_EMOJI: Record<ReactionType, string> = {
-  fire: '🔥',
-  heart: '❤️',
-  chefs_kiss: '🤌',
+const REACTION_ICON: Record<ReactionType, React.ReactNode> = {
+  fire:       <FlameIcon size={13} />,
+  heart:      <HeartIcon size={13} />,
+  chefs_kiss: <StarIcon  size={13} />,
 }
 
 interface GalleryPhoto {
@@ -101,7 +102,9 @@ export default function GalleryView({ sessionId }: { sessionId: string }) {
                       <div style={{ padding: '8px 10px', backgroundColor: 'rgba(0,0,0,0.25)' }}>
                         <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 11, color: 'rgba(245,240,232,0.55)' }}>{photo.guest_name}</p>
                         {photo.reactions?.length > 0 && (
-                          <p style={{ fontSize: 13, marginTop: 3 }}>{photo.reactions.map((r) => REACTION_EMOJI[r]).join(' ')}</p>
+                          <div style={{ display: 'flex', gap: 3, marginTop: 3, color: '#D4AF37' }}>
+                            {photo.reactions.map((r) => <span key={r}>{REACTION_ICON[r]}</span>)}
+                          </div>
                         )}
                       </div>
                     </div>
