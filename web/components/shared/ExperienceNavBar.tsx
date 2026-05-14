@@ -115,7 +115,6 @@ export default function ExperienceNavBar({ sessionId, currentCard, guestId, onSo
       .from('photos')
       .select('id')
       .eq('session_id', sessionId)
-      .eq('course', currentCard)
       .neq('guest_id', guestId)
       .order('created_at', { ascending: false })
       .limit(1)
