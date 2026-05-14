@@ -428,8 +428,8 @@ export default function LandingPage() {
               marginTop: '3.5rem',
               flexWrap: 'wrap',
             }}>
-              <ChefAvatar initials="Al" name="Aloire" descriptor="flavour architect" />
-              <ChefAvatar initials="Év" name="Évoire" descriptor="creative director" />
+              <ChefAvatar initials="Al" name="Aloire" descriptor="flavour architect" photo="/chef-aloire.png" />
+              <ChefAvatar initials="Év" name="Évoire" descriptor="creative director" photo="/chef-evoire.png" />
             </div>
           </Reveal>
         </div>
@@ -662,7 +662,7 @@ function CourseItem({
   )
 }
 
-function ChefAvatar({ initials, name, descriptor }: { initials: string; name: string; descriptor?: string }) {
+function ChefAvatar({ initials, name, descriptor, photo }: { initials: string; name: string; descriptor?: string; photo?: string }) {
   return (
     <motion.div
       whileHover={{ y: -6 }}
@@ -696,16 +696,25 @@ function ChefAvatar({ initials, name, descriptor }: { initials: string; name: st
           boxShadow: '0 0 32px rgba(77,217,192,0.14), inset 0 0 20px rgba(77,217,192,0.04)',
           animation: 'glow-pulse 3s ease-in-out infinite',
           position: 'relative',
+          overflow: 'hidden',
         }}>
-          <span style={{
-            fontFamily: 'var(--font-serif)',
-            fontSize: '2rem',
-            color: '#4DD9C0',
-            fontWeight: 400,
-            letterSpacing: '-0.01em',
-          }}>
-            {initials}
-          </span>
+          {photo ? (
+            <img
+              src={photo}
+              alt={name}
+              style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }}
+            />
+          ) : (
+            <span style={{
+              fontFamily: 'var(--font-serif)',
+              fontSize: '2rem',
+              color: '#4DD9C0',
+              fontWeight: 400,
+              letterSpacing: '-0.01em',
+            }}>
+              {initials}
+            </span>
+          )}
         </div>
       </div>
 
