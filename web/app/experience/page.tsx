@@ -168,6 +168,7 @@ export default function ExperiencePage() {
       <ExperienceNavBar
         sessionId={SESSION_ID}
         currentCard={currentCard}
+        guestId={guest.id}
         onSongRequest={() => setSongModalOpen(true)}
       />
       {songModalOpen && (

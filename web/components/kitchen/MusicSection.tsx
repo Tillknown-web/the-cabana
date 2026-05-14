@@ -12,6 +12,7 @@ export default function MusicSection({ accessToken }: Props) {
   const [playlists, setPlaylists] = useState<SpotifyPlaylist[]>([])
   const [showPlaylists, setShowPlaylists] = useState(false)
   const [switchingId, setSwitchingId] = useState<string | null>(null)
+  const [switchError, setSwitchError] = useState<string | null>(null)
 
   useEffect(() => {
     async function fetchContext() {
@@ -44,8 +45,9 @@ export default function MusicSection({ accessToken }: Props) {
 
   async function handleSwitch(playlistId: string) {
     setSwitchingId(playlistId)
+    setSwitchError(null)
     try {
-      await fetch('/api/kitchen/spotify/switch', {
+      const res = await fetch('/api/kitchen/spotify/switch', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -53,9 +55,16 @@ export default function MusicSection({ accessToken }: Props) {
         },
         body: JSON.stringify({ playlistId }),
       })
+      if (!res.ok) {
+        const json = await res.json().catch(() => ({}))
+        setSwitchError(json.error ?? `Error ${res.status}`)
+        return
+      }
       setTimeout(() => {
         fetch('/api/spotify/context').then(r => r.json()).then(setContext).catch(() => null)
       }, 1500)
+    } catch {
+      setSwitchError('Network error — check your connection.')
     } finally {
       setSwitchingId(null)
     }
@@ -124,6 +133,18 @@ export default function MusicSection({ accessToken }: Props) {
       ) : (
         <p style={{ fontFamily: 'var(--font-sans)', fontSize: '11px', color: 'rgba(245,240,232,0.3)', marginBottom: '1rem' }}>
           No playlist context detected.
+        </p>
+      )}
+
+      {switchError && (
+        <p style={{
+          fontFamily: 'var(--font-sans)',
+          fontSize: '11px',
+          color: '#A8C5DA',
+          opacity: 0.85,
+          marginBottom: '0.75rem',
+        }}>
+          {switchError}
         </p>
       )}
 

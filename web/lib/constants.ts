@@ -19,7 +19,7 @@ export const COURSE_DATA: Record<string, { label: string; dish: string; ingredie
   pour: { label: 'The Pour', dish: 'Sunset Spritz', ingredients: 'mango · pineapple · tajín' },
   bite: { label: 'The Bite', dish: 'Slider Trio', ingredients: 'three sauces · slaw · brioche' },
   cut: { label: 'The Cut', dish: 'Steak, tableside', ingredients: 'compound butter · truffle fries' },
-  finish: { label: 'The Finish', dish: '???', ingredients: 'something sweet' },
+  finish: { label: 'The Finish', dish: 'Caramel Brownies', ingredients: 'salted caramel · dark chocolate · sea salt' },
 }
 
 export const COURSE_COURSE_LABELS: Record<string, string> = {

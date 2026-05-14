@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { COURSE_DATA } from '@/lib/constants'
 
 interface TriggerRow {
   trigger_type: 'butter_pour' | 'dessert_reveal' | 'pour_moment' | 'bite_moment'
@@ -780,10 +781,10 @@ function DessertUnboxingContent() {
       >
         <p style={triggerLabelStyle}>The Dessert</p>
         <h2 style={{ ...triggerHeadingStyle, fontSize: 'clamp(3rem, 14vw, 5.5rem)' }}>
-          The Finish
+          {COURSE_DATA.finish.dish}
         </h2>
         <div style={triggerDividerStyle} />
-        <p style={triggerSubStyle}>something sweet awaits.</p>
+        <p style={triggerSubStyle}>{COURSE_DATA.finish.ingredients}</p>
       </div>
 
       <style>{`

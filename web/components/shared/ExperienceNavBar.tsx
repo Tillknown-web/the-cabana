@@ -13,6 +13,7 @@ interface SpotifyRow {
 interface Props {
   sessionId: string
   currentCard: string
+  guestId: string
   onSongRequest: () => void
 }
 
@@ -24,12 +25,14 @@ const REACTIONS: Array<{ type: ReactionType; icon: React.ReactNode; label: strin
   { type: 'chefs_kiss', icon: <StarIcon  size={26} />, label: "Chef's Kiss" },
 ]
 
-export default function ExperienceNavBar({ sessionId, currentCard, onSongRequest }: Props) {
-  const [nowPlaying, setNowPlaying]         = useState<SpotifyRow | null>(null)
+export default function ExperienceNavBar({ sessionId, currentCard, guestId, onSongRequest }: Props) {
+  const [nowPlaying, setNowPlaying]           = useState<SpotifyRow | null>(null)
   const [songPopoverOpen, setSongPopoverOpen] = useState(false)
-  const [reactionOpen, setReactionOpen]     = useState(false)
+  const [reactionOpen, setReactionOpen]       = useState(false)
   const [reactionSending, setReactionSending] = useState(false)
-  const [reactionSent, setReactionSent]     = useState<ReactionType | null>(null)
+  const [reactionSent, setReactionSent]       = useState<ReactionType | null>(null)
+  const [toPhotoId, setToPhotoId]             = useState<string | null>(null)
+  const [photoLookupDone, setPhotoLookupDone] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const supabase = createClient()
@@ -102,8 +105,28 @@ export default function ExperienceNavBar({ sessionId, currentCard, onSongRequest
     } catch { /* silent — camera captures are best-effort */ }
   }
 
+  async function openReactionSheet() {
+    setSongPopoverOpen(false)
+    setToPhotoId(null)
+    setPhotoLookupDone(false)
+    setReactionOpen(true)
+
+    const { data } = await supabase
+      .from('photos')
+      .select('id')
+      .eq('session_id', sessionId)
+      .eq('course', currentCard)
+      .neq('guest_id', guestId)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single()
+
+    setToPhotoId(data?.id ?? null)
+    setPhotoLookupDone(true)
+  }
+
   async function sendReaction(reactionType: ReactionType) {
-    if (reactionSending) return
+    if (reactionSending || !toPhotoId) return
     setReactionSending(true)
     try {
       const sc = createUploadClient()
@@ -115,7 +138,7 @@ export default function ExperienceNavBar({ sessionId, currentCard, onSongRequest
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
-          body: JSON.stringify({ sessionId, reactionType }),
+          body: JSON.stringify({ sessionId, toPhotoId, reactionType }),
         }
       )
       setReactionSent(reactionType)
@@ -138,7 +161,7 @@ export default function ExperienceNavBar({ sessionId, currentCard, onSongRequest
       />
 
       {/* Now-playing popover */}
-      {songPopoverOpen && nowPlaying?.track && (
+      {songPopoverOpen && (
         <div style={{
           position: 'fixed',
           bottom: '65px',
@@ -155,9 +178,15 @@ export default function ExperienceNavBar({ sessionId, currentCard, onSongRequest
           textAlign: 'center',
         }}>
           <p style={popoverLabelStyle}>Now Playing</p>
-          <p style={popoverTrackStyle}>{nowPlaying.track}</p>
-          {nowPlaying.artist && (
-            <p style={popoverArtistStyle}>{nowPlaying.artist}</p>
+          {nowPlaying?.track ? (
+            <>
+              <p style={popoverTrackStyle}>{nowPlaying.track}</p>
+              {nowPlaying.artist && (
+                <p style={popoverArtistStyle}>{nowPlaying.artist}</p>
+              )}
+            </>
+          ) : (
+            <p style={{ ...popoverArtistStyle, opacity: 0.45 }}>Nothing playing right now.</p>
           )}
         </div>
       )}
@@ -179,39 +208,46 @@ export default function ExperienceNavBar({ sessionId, currentCard, onSongRequest
           flexDirection: 'column',
           alignItems: 'center',
           gap: '0.75rem',
+          minWidth: '220px',
         }}>
           <p style={popoverLabelStyle}>Add Reaction</p>
-          <div style={{ display: 'flex', gap: '1.25rem' }}>
-            {REACTIONS.map(({ type, icon, label }) => (
-              <button
-                key={type}
-                onClick={() => sendReaction(type)}
-                disabled={reactionSending}
-                title={label}
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: '0.3rem',
-                  background: 'none',
-                  border: reactionSent === type
-                    ? '1px solid rgba(212, 175, 55, 0.6)'
-                    : '1px solid transparent',
-                  borderRadius: '6px',
-                  padding: '0.5rem 0.65rem',
-                  cursor: reactionSending ? 'default' : 'pointer',
-                  color: reactionSent === type ? '#D4AF37' : '#F5F0E8',
-                  opacity: reactionSending && reactionSent !== type ? 0.4 : 1,
-                  transition: 'color 0.2s, border-color 0.2s',
-                }}
-              >
-                {icon}
-                <span style={{ fontFamily: 'var(--font-sans)', fontSize: '9px', letterSpacing: '0.1em', textTransform: 'uppercase', opacity: 0.6 }}>
-                  {label}
-                </span>
-              </button>
-            ))}
-          </div>
+          {!photoLookupDone ? (
+            <p style={{ ...popoverArtistStyle, opacity: 0.45 }}>Loading…</p>
+          ) : !toPhotoId ? (
+            <p style={{ ...popoverArtistStyle, opacity: 0.45 }}>No photos to react to yet.</p>
+          ) : (
+            <div style={{ display: 'flex', gap: '1.25rem' }}>
+              {REACTIONS.map(({ type, icon, label }) => (
+                <button
+                  key={type}
+                  onClick={() => sendReaction(type)}
+                  disabled={reactionSending}
+                  title={label}
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '0.3rem',
+                    background: 'none',
+                    border: reactionSent === type
+                      ? '1px solid rgba(212, 175, 55, 0.6)'
+                      : '1px solid transparent',
+                    borderRadius: '6px',
+                    padding: '0.5rem 0.65rem',
+                    cursor: reactionSending ? 'default' : 'pointer',
+                    color: reactionSent === type ? '#D4AF37' : '#F5F0E8',
+                    opacity: reactionSending && reactionSent !== type ? 0.4 : 1,
+                    transition: 'color 0.2s, border-color 0.2s',
+                  }}
+                >
+                  {icon}
+                  <span style={{ fontFamily: 'var(--font-sans)', fontSize: '9px', letterSpacing: '0.1em', textTransform: 'uppercase', opacity: 0.6 }}>
+                    {label}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
@@ -250,7 +286,7 @@ export default function ExperienceNavBar({ sessionId, currentCard, onSongRequest
           icon={<SmileIcon size={20} />}
           label="Add Reaction"
           active={reactionOpen}
-          onClick={() => { setSongPopoverOpen(false); setReactionOpen((v) => !v) }}
+          onClick={() => reactionOpen ? setReactionOpen(false) : openReactionSheet()}
         />
 
         {/* Main Flow — center accent button */}
@@ -266,7 +302,6 @@ export default function ExperienceNavBar({ sessionId, currentCard, onSongRequest
           label="Current Song"
           active={songPopoverOpen}
           onClick={() => { setReactionOpen(false); setSongPopoverOpen((v) => !v) }}
-          dim={!nowPlaying?.track}
         />
 
         {/* Request Song */}
