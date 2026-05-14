@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { callEdgeFn } from '@/lib/edge-fn'
+import { MusicNoteIcon, CheckIcon } from '@/lib/icons'
 
 interface SongRequest {
   id: string
@@ -157,7 +158,7 @@ export default function SongQueue({ sessionId, accessToken }: Props) {
                       alignItems: 'center',
                       justifyContent: 'center',
                     }}>
-                      <span style={{ fontSize: '14px', opacity: 0.4 }}>♪</span>
+                      <MusicNoteIcon size={14} />
                     </div>
                   )}
                   <div style={{ overflow: 'hidden' }}>
@@ -203,7 +204,7 @@ export default function SongQueue({ sessionId, accessToken }: Props) {
                       opacity: queuing === req.id ? 0.4 : 1,
                     }}
                   >
-                    {queuing === req.id ? '…' : queuedIds.has(req.id) ? 'Queued ✓' : 'Queue'}
+                    {queuing === req.id ? '…' : queuedIds.has(req.id) ? <span style={{ display: 'flex', alignItems: 'center', gap: '0.2rem' }}>Queued <CheckIcon size={9} /></span> : 'Queue'}
                   </button>
                   <button
                     onClick={() => dismiss(req.id)}

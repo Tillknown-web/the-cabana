@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { callEdgeFn } from '@/lib/edge-fn'
 import { createClient } from '@/lib/supabase/client'
+import { ArrowRightIcon } from '@/lib/icons'
 
 const VALID_MINUTES = [5, 10, 15, 20] as const
 
@@ -105,7 +106,7 @@ export default function CountdownSetter({ sessionId, currentCard, accessToken }:
               : 'Active'}
           </p>
           <p style={{ fontFamily: 'var(--font-sans)', fontSize: '10px', color: '#F5F0E8', opacity: 0.4, margin: '0.25rem 0 0' }}>
-            → {activeCountdown.target_card}
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}><ArrowRightIcon size={11} />{activeCountdown.target_card}</span>
           </p>
           <button onClick={cancel} disabled={loading} style={{ ...cancelBtnStyle, marginTop: '0.75rem' }}>
             {loading ? 'Cancelling…' : 'Cancel Countdown'}

@@ -9,6 +9,11 @@ const DISH_NAME = 'Cheesecake Brownie'
 const INGREDIENTS = 'gold leaf · raspberry coulis'
 const DESCRIPTION = 'Dense, rich, finished with edible gold.'
 
+const RINGS = [
+  { size: 480, duration: '6s', delay: '0s' },
+  { size: 320, duration: '8s', delay: '1.5s' },
+]
+
 interface FinishCardProps {
   sessionId: string
   guestId: string
@@ -24,7 +29,11 @@ export default function FinishCard({ sessionId, guestId, onComplete, otherGuestP
     const t1 = setTimeout(() => setPhase('label'), 800)
     const t2 = setTimeout(() => setPhase('dish'), 2200)
     const t3 = setTimeout(() => setPhase('full'), 3400)
-    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3) }
+    return () => {
+      clearTimeout(t1)
+      clearTimeout(t2)
+      clearTimeout(t3)
+    }
   }, [])
 
   return (
@@ -33,15 +42,41 @@ export default function FinishCard({ sessionId, guestId, onComplete, otherGuestP
       style={{
         position: 'fixed',
         inset: 0,
-        backgroundColor: '#1A1A2E',
+        background: phase === 'dark'
+          ? '#0D0D1A'
+          : 'linear-gradient(160deg, #0D0D1A 0%, #1A1A2E 55%, #120D28 100%)',
         display: 'flex',
         flexDirection: 'column',
         overflowY: phase === 'full' ? 'auto' : 'hidden',
         paddingTop: 56,
         paddingBottom: 72,
-        transition: 'background-color 1s ease',
+        transition: 'background 1.2s ease',
+        overflow: 'hidden',
       }}
     >
+      {/* Ambient rings — only visible in later phases */}
+      {phase !== 'dark' && RINGS.map((ring, i) => (
+        <div
+          key={i}
+          style={{
+            position: 'fixed',
+            top: '42%',
+            left: '50%',
+            width: ring.size,
+            height: ring.size,
+            marginLeft: -(ring.size / 2),
+            marginTop: -(ring.size / 2),
+            borderRadius: '50%',
+            border: '1px solid #D4AF37',
+            animation: `ring-breathe ${ring.duration} ease-in-out infinite`,
+            animationDelay: ring.delay,
+            pointerEvents: 'none',
+            opacity: phase === 'label' ? 0.5 : 1,
+            transition: 'opacity 1s ease',
+          }}
+        />
+      ))}
+
       <div
         style={{
           flex: 1,
@@ -54,20 +89,21 @@ export default function FinishCard({ sessionId, guestId, onComplete, otherGuestP
           maxWidth: 480,
           margin: '0 auto',
           width: '100%',
-          gap: 0,
+          position: 'relative',
+          zIndex: 1,
         }}
       >
         {/* Gold shimmer label reveal */}
         <p
           style={{
             fontFamily: "'Inter', sans-serif",
-            fontSize: 11,
-            fontWeight: 500,
+            fontSize: 10,
+            fontWeight: 600,
             textTransform: 'uppercase',
-            letterSpacing: '0.3em',
+            letterSpacing: '0.35em',
             marginBottom: 20,
             opacity: phase !== 'dark' ? 1 : 0,
-            transition: 'opacity 0.6s ease',
+            transition: 'opacity 0.8s ease',
           }}
         >
           <span className="shimmer-gold">{LABEL}</span>
@@ -77,45 +113,47 @@ export default function FinishCard({ sessionId, guestId, onComplete, otherGuestP
         <h2
           style={{
             fontFamily: "'Cormorant Garamond', Georgia, serif",
-            fontSize: 'clamp(28px, 7vw, 36px)',
+            fontSize: 'clamp(30px, 8vw, 44px)',
             fontWeight: 400,
             color: '#F5F0E8',
-            lineHeight: 1.15,
-            marginBottom: 12,
+            lineHeight: 1.1,
+            marginBottom: 14,
+            letterSpacing: '-0.01em',
             opacity: phase === 'dish' || phase === 'full' ? 1 : 0,
-            transition: 'opacity 0.8s ease',
+            transition: 'opacity 0.9s ease',
           }}
         >
           {DISH_NAME}
         </h2>
 
-        {/* Rest of card */}
         {(phase === 'dish' || phase === 'full') && (
           <>
             <p
               style={{
-                fontFamily: "'Inter', sans-serif",
-                fontSize: 13,
+                fontFamily: "'Cormorant Garamond', Georgia, serif",
+                fontSize: 15,
                 fontStyle: 'italic',
+                fontWeight: 300,
                 color: '#A8C5DA',
-                marginBottom: 24,
+                marginBottom: 28,
+                letterSpacing: '0.03em',
               }}
             >
               {INGREDIENTS}
             </p>
 
-            <GoldDivider style={{ marginBottom: 24 }} />
+            <GoldDivider width={48} style={{ marginBottom: 28 }} />
 
             <p
               style={{
                 fontFamily: "'Inter', sans-serif",
                 fontSize: 14,
-                color: 'rgba(245,240,232,0.8)',
-                lineHeight: 1.7,
-                marginBottom: dessertRevealed ? 20 : 32,
-                maxWidth: 320,
+                color: 'rgba(245,240,232,0.78)',
+                lineHeight: 1.75,
+                marginBottom: dessertRevealed ? 20 : 36,
+                maxWidth: 300,
                 opacity: phase === 'full' ? 1 : 0,
-                transition: 'opacity 0.6s ease 0.2s',
+                transition: 'opacity 0.7s ease 0.2s',
               }}
             >
               {DESCRIPTION}
@@ -128,9 +166,9 @@ export default function FinishCard({ sessionId, guestId, onComplete, otherGuestP
                 style={{
                   width: '100%',
                   maxWidth: 320,
-                  marginBottom: 28,
-                  padding: '14px 20px',
-                  border: '1px solid rgba(212,175,55,0.5)',
+                  marginBottom: 32,
+                  padding: '16px 20px',
+                  border: '1px solid rgba(212,175,55,0.45)',
                   borderRadius: 4,
                   textAlign: 'center',
                   background: 'rgba(212,175,55,0.07)',
@@ -143,7 +181,7 @@ export default function FinishCard({ sessionId, guestId, onComplete, otherGuestP
                     fontWeight: 600,
                     textTransform: 'uppercase',
                     letterSpacing: '0.3em',
-                    marginBottom: 6,
+                    marginBottom: 8,
                   }}
                 >
                   <span className="shimmer-gold">The reveal</span>
@@ -151,8 +189,9 @@ export default function FinishCard({ sessionId, guestId, onComplete, otherGuestP
                 <p
                   style={{
                     fontFamily: "'Cormorant Garamond', Georgia, serif",
-                    fontSize: 15,
+                    fontSize: 16,
                     fontStyle: 'italic',
+                    fontWeight: 300,
                     color: 'rgba(245,240,232,0.75)',
                   }}
                 >

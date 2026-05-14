@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import type { Guest } from '@/app/experience/page'
 import PhotoUpload from '@/components/experience/PhotoUpload'
+import { CameraIcon } from '@/lib/icons'
 
 const WAITING_MESSAGES = [
   'The chef is preparing something special.',
@@ -147,7 +148,7 @@ export default function WelcomeCard({ guest, sessionId }: Props) {
             onClick={() => setShowUpload(true)}
             style={snapBtnStyle}
           >
-            <span style={{ fontSize: '1.25rem' }}>📷</span>
+            <CameraIcon size={20} />
             <span style={{ marginLeft: '0.5rem', fontFamily: 'var(--font-sans)', fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase' as const }}>
               Snap your guest
             </span>

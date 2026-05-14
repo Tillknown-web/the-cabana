@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { MusicNoteIcon, CheckIcon } from '@/lib/icons'
 
 interface SpotifyTrack {
   uri: string
@@ -133,8 +134,11 @@ export default function SongRequestModal({ sessionId, onClose }: Props) {
         }}
       >
         {sent ? (
-          <p style={sentStyle}>
-            {selected ? '♫ Added to queue' : 'Sent ✓'}
+          <p style={{ ...sentStyle, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}>
+            {selected
+              ? <><MusicNoteIcon size={12} /><span>Added to queue</span></>
+              : <><span>Sent</span><CheckIcon size={10} /></>
+            }
           </p>
         ) : (
           <>

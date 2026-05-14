@@ -150,3 +150,15 @@ button,
   color: #e0e0e0;
   font-family: 'Inter', sans-serif;
 }
+
+/* ── Experience ambient animations ── */
+@keyframes ring-breathe {
+  0%, 100% { opacity: 0.08; }
+  50% { opacity: 0.22; }
+}
+
+@keyframes orb-drift {
+  0%, 100% { opacity: 0.18; transform: scale(1); }
+  40% { opacity: 0.3; transform: scale(1.08); }
+  70% { opacity: 0.14; transform: scale(0.94); }
+}

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import type { Guest } from '@/app/experience/page'
 import ReactionPicker from '@/components/experience/ReactionPicker'
 import { COURSE_COURSE_LABELS } from '@/lib/constants'
+import { FlameIcon, HeartIcon, StarIcon } from '@/lib/icons'
 
 interface PhotoEntry {
   id: string
@@ -136,11 +137,11 @@ export default function GalleryView({ guest, sessionId }: Props) {
 
                       {/* Show reaction received on my photo */}
                       {isMyPhoto && photo.reaction && (
-                        <p style={{ textAlign: 'center', fontSize: '1.25rem', marginTop: '0.25rem' }}>
-                          {photo.reaction.reaction_type === 'fire' ? '🔥'
-                            : photo.reaction.reaction_type === 'heart' ? '❤️'
-                            : '🤌'}
-                        </p>
+                        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '0.25rem', color: '#D4AF37' }}>
+                          {photo.reaction.reaction_type === 'fire' ? <FlameIcon size={20} />
+                            : photo.reaction.reaction_type === 'heart' ? <HeartIcon size={20} />
+                            : <StarIcon size={20} />}
+                        </div>
                       )}
                     </div>
                   ) : (

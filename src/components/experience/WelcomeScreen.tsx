@@ -6,8 +6,19 @@ import GoldDivider from '@/components/shared/GoldDivider'
 import { resizeImage } from '@/lib/utils'
 
 const CHEFS = [
-  { initial: 'K', name: 'King' },
-  { initial: 'A', name: 'Aloire' },
+  { initial: 'É', name: 'Évoire', photo: '/chef-evoire.png' },
+  { initial: 'A', name: 'Aloire', photo: '/chef-aloire.png' },
+]
+
+const STEPS = [
+  { num: '01', text: 'Each course is revealed on your phone as it arrives.' },
+  { num: '02', text: 'Snap a photo of your dish after each course.' },
+  { num: '03', text: 'At the end, you vote for your favorite chef.' },
+]
+
+const RINGS = [
+  { size: 500, duration: '6s', delay: '0s' },
+  { size: 360, duration: '8s', delay: '1.5s' },
 ]
 
 interface WelcomeScreenProps {
@@ -62,7 +73,7 @@ export default function WelcomeScreen({ guestName, guestId, sessionId, onComplet
         style={{
           position: 'fixed',
           inset: 0,
-          backgroundColor: '#2D1B47',
+          background: 'linear-gradient(160deg, #1A1128 0%, #2D1B47 55%, #221440 100%)',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
@@ -71,20 +82,36 @@ export default function WelcomeScreen({ guestName, guestId, sessionId, onComplet
           gap: 24,
         }}
       >
+        <p
+          style={{
+            fontFamily: "'Inter', sans-serif",
+            fontSize: 10,
+            fontWeight: 600,
+            textTransform: 'uppercase',
+            letterSpacing: '0.35em',
+            color: '#D4AF37',
+            opacity: 0.8,
+          }}
+        >
+          your guest photo
+        </p>
+
         <img
           src={preview}
           alt="Your guest photo"
           style={{
             maxWidth: '100%',
-            maxHeight: '60vh',
+            maxHeight: '55vh',
             borderRadius: 4,
-            border: '1px solid rgba(212,175,55,0.4)',
+            border: '1px solid rgba(212,175,55,0.35)',
             objectFit: 'contain',
           }}
         />
+
         <GoldButton onClick={handleConfirmPhoto} loading={uploading} fullWidth size="lg">
           Looks good ✓
         </GoldButton>
+
         <button
           onClick={() => {
             setPreview(null)
@@ -99,6 +126,7 @@ export default function WelcomeScreen({ guestName, guestId, sessionId, onComplet
             fontFamily: "'Inter', sans-serif",
             fontSize: 13,
             padding: 8,
+            letterSpacing: '0.05em',
           }}
         >
           Retake
@@ -113,134 +141,256 @@ export default function WelcomeScreen({ guestName, guestId, sessionId, onComplet
       style={{
         position: 'fixed',
         inset: 0,
-        backgroundColor: '#2D1B47',
+        background: 'linear-gradient(160deg, #1A1128 0%, #2D1B47 55%, #221440 100%)',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'flex-start',
         overflowY: 'auto',
-        padding: '60px 28px 100px',
-        gap: 0,
+        padding: '64px 28px 100px',
         textAlign: 'center',
+        overflow: 'hidden auto',
       }}
     >
-      <p
-        style={{
-          fontFamily: "'Inter', sans-serif",
-          fontSize: 11,
-          color: 'rgba(245,240,232,0.6)',
-          marginBottom: 8,
-          textTransform: 'uppercase',
-          letterSpacing: '0.15em',
-        }}
-      >
-        welcome to
-      </p>
-      <h1
-        style={{
-          fontFamily: "'Cormorant Garamond', Georgia, serif",
-          fontSize: 'clamp(40px, 10vw, 52px)',
-          fontWeight: 400,
-          color: '#F5F0E8',
-          lineHeight: 1.1,
-          marginBottom: 20,
-        }}
-      >
-        The Cabana
-      </h1>
+      {/* Ambient rings */}
+      {RINGS.map((ring, i) => (
+        <div
+          key={i}
+          style={{
+            position: 'fixed',
+            top: '30%',
+            left: '50%',
+            width: ring.size,
+            height: ring.size,
+            marginLeft: -(ring.size / 2),
+            marginTop: -(ring.size / 2),
+            borderRadius: '50%',
+            border: '1px solid #D4AF37',
+            animation: `ring-breathe ${ring.duration} ease-in-out infinite`,
+            animationDelay: ring.delay,
+            pointerEvents: 'none',
+          }}
+        />
+      ))}
 
-      <GoldDivider style={{ marginBottom: 28 }} />
+      {/* Content */}
+      <div style={{ position: 'relative', zIndex: 1, width: '100%', maxWidth: 360, margin: '0 auto' }}>
+        <p
+          style={{
+            fontFamily: "'Inter', sans-serif",
+            fontSize: 10,
+            color: 'rgba(245,240,232,0.5)',
+            marginBottom: 6,
+            textTransform: 'uppercase',
+            letterSpacing: '0.2em',
+          }}
+        >
+          welcome to
+        </p>
 
-      <p
-        style={{
-          fontFamily: "'Inter', sans-serif",
-          fontSize: 14,
-          color: 'rgba(245,240,232,0.75)',
-          lineHeight: 1.7,
-          maxWidth: 320,
-          marginBottom: 28,
-        }}
-      >
-        Tonight is a 3-course journey served poolside. Each course will be revealed on your phone as it&apos;s served.
-      </p>
+        <h1
+          style={{
+            fontFamily: "'Cormorant Garamond', Georgia, serif",
+            fontSize: 'clamp(40px, 10vw, 52px)',
+            fontWeight: 300,
+            color: '#F5F0E8',
+            lineHeight: 1.05,
+            marginBottom: 16,
+            letterSpacing: '-0.01em',
+          }}
+        >
+          The Cabana
+        </h1>
 
-      <p
-        style={{
-          fontFamily: "'Inter', sans-serif",
-          fontSize: 12,
-          color: 'rgba(245,240,232,0.5)',
-          marginBottom: 12,
-          textTransform: 'uppercase',
-          letterSpacing: '0.1em',
-        }}
-      >
-        Your chefs tonight:
-      </p>
+        <GoldDivider style={{ marginBottom: 20 }} />
 
-      <div style={{ display: 'flex', justifyContent: 'center', gap: 32, marginBottom: 36 }}>
-        {CHEFS.map((chef) => (
-          <div key={chef.name} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+        <p
+          style={{
+            fontFamily: "'Cormorant Garamond', Georgia, serif",
+            fontSize: 20,
+            fontStyle: 'italic',
+            fontWeight: 300,
+            color: 'rgba(245,240,232,0.65)',
+            marginBottom: 40,
+            lineHeight: 1.4,
+          }}
+        >
+          Good evening, {guestName}.
+        </p>
+
+        {/* Chefs */}
+        <p
+          style={{
+            fontFamily: "'Inter', sans-serif",
+            fontSize: 10,
+            fontWeight: 600,
+            textTransform: 'uppercase',
+            letterSpacing: '0.25em',
+            color: 'rgba(245,240,232,0.4)',
+            marginBottom: 16,
+          }}
+        >
+          your chefs tonight
+        </p>
+
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 28, marginBottom: 44 }}>
+          {CHEFS.map((chef) => (
             <div
-              style={{
-                width: 48,
-                height: 48,
-                borderRadius: '50%',
-                border: '1.5px solid #D4AF37',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontFamily: "'Cormorant Garamond', Georgia, serif",
-                fontSize: 20,
-                color: '#D4AF37',
-              }}
+              key={chef.name}
+              style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}
             >
-              {chef.initial}
+              {/* Outer gold ring */}
+              <div
+                style={{
+                  width: 68,
+                  height: 68,
+                  borderRadius: '50%',
+                  border: '1px solid rgba(212,175,55,0.5)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  position: 'relative',
+                }}
+              >
+                {/* Inner avatar circle */}
+                <div
+                  style={{
+                    width: 56,
+                    height: 56,
+                    borderRadius: '50%',
+                    border: '1px solid rgba(212,175,55,0.25)',
+                    backgroundColor: 'rgba(61,40,96,0.6)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    overflow: 'hidden',
+                  }}
+                >
+                  {chef.photo ? (
+                    <img
+                      src={chef.photo}
+                      alt={chef.name}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }}
+                    />
+                  ) : (
+                    <span
+                      style={{
+                        fontFamily: "'Cormorant Garamond', Georgia, serif",
+                        fontSize: 24,
+                        fontWeight: 300,
+                        color: '#D4AF37',
+                      }}
+                    >
+                      {chef.initial}
+                    </span>
+                  )}
+                </div>
+              </div>
+              <p
+                style={{
+                  fontFamily: "'Cormorant Garamond', Georgia, serif",
+                  fontSize: 16,
+                  fontWeight: 400,
+                  color: '#F5F0E8',
+                  letterSpacing: '0.04em',
+                }}
+              >
+                {chef.name}
+              </p>
             </div>
-            <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 12, color: '#F5F0E8' }}>{chef.name}</p>
+          ))}
+        </div>
+
+        {/* How tonight works */}
+        <div
+          style={{
+            borderTop: '1px solid rgba(212,175,55,0.15)',
+            paddingTop: 32,
+            marginBottom: 36,
+            textAlign: 'left',
+          }}
+        >
+          <p
+            style={{
+              fontFamily: "'Inter', sans-serif",
+              fontSize: 10,
+              fontWeight: 600,
+              textTransform: 'uppercase',
+              letterSpacing: '0.25em',
+              color: 'rgba(245,240,232,0.4)',
+              marginBottom: 20,
+              textAlign: 'center',
+            }}
+          >
+            how tonight works
+          </p>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {STEPS.map((s) => (
+              <div
+                key={s.num}
+                style={{ display: 'flex', alignItems: 'flex-start', gap: 16 }}
+              >
+                <span
+                  style={{
+                    fontFamily: "'Cormorant Garamond', Georgia, serif",
+                    fontSize: 26,
+                    fontWeight: 300,
+                    color: '#D4AF37',
+                    opacity: 0.6,
+                    lineHeight: 1,
+                    flexShrink: 0,
+                    marginTop: 1,
+                    width: 28,
+                  }}
+                >
+                  {s.num}
+                </span>
+                <p
+                  style={{
+                    fontFamily: "'Inter', sans-serif",
+                    fontSize: 13,
+                    color: 'rgba(245,240,232,0.65)',
+                    lineHeight: 1.65,
+                  }}
+                >
+                  {s.text}
+                </p>
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
+
+        {/* Photo CTA */}
+        <div
+          style={{
+            borderTop: '1px solid rgba(212,175,55,0.15)',
+            paddingTop: 32,
+          }}
+        >
+          <p
+            style={{
+              fontFamily: "'Cormorant Garamond', Georgia, serif",
+              fontSize: 17,
+              fontStyle: 'italic',
+              fontWeight: 300,
+              color: '#A8C5DA',
+              marginBottom: 24,
+              lineHeight: 1.55,
+            }}
+          >
+            But first — snap a photo of who you&apos;re with tonight.
+          </p>
+
+          <GoldButton
+            onClick={() => inputRef.current?.click()}
+            size="lg"
+            fullWidth
+          >
+            📷 Snap your guest
+          </GoldButton>
+        </div>
       </div>
-
-      {/* How it works card */}
-      <div
-        style={{
-          border: '1px solid rgba(212,175,55,0.3)',
-          borderRadius: 6,
-          padding: '20px 24px',
-          maxWidth: 340,
-          marginBottom: 32,
-          textAlign: 'left',
-        }}
-      >
-        <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 12, marginBottom: 12, color: '#D4AF37', fontWeight: 600 }}>
-          📷 how tonight works
-        </p>
-        <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, color: 'rgba(245,240,232,0.7)', lineHeight: 1.6 }}>
-          After each course, you&apos;ll be asked to snap a photo of your dish. At the end of the night, everyone&apos;s photos come together in a shared gallery — same plates, different eyes.
-        </p>
-      </div>
-
-      <p
-        style={{
-          fontFamily: "'Inter', sans-serif",
-          fontSize: 14,
-          fontStyle: 'italic',
-          color: '#A8C5DA',
-          marginBottom: 28,
-          maxWidth: 280,
-        }}
-      >
-        But first — snap a photo of who you&apos;re with tonight.
-      </p>
-
-      <GoldButton
-        onClick={() => inputRef.current?.click()}
-        size="lg"
-        fullWidth
-        style={{ maxWidth: 320 }}
-      >
-        📷 Snap your guest
-      </GoldButton>
 
       <input
         ref={inputRef}
@@ -249,7 +399,9 @@ export default function WelcomeScreen({ guestName, guestId, sessionId, onComplet
         capture="environment"
         style={{ display: 'none' }}
         onChange={handleCapture}
-        onClick={(e) => { (e.target as HTMLInputElement).value = '' }}
+        onClick={(e) => {
+          ;(e.target as HTMLInputElement).value = ''
+        }}
       />
     </div>
   )

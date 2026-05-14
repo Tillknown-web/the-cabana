@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { callEdgeFn } from '@/lib/edge-fn'
 import type { SessionState } from '@/app/kitchen/page'
+import { ArrowRightIcon } from '@/lib/icons'
 
 const CARD_SEQUENCE = [
   'welcome',
@@ -121,7 +122,7 @@ export default function CardControls({ sessionState, sessionId, accessToken, onS
               disabled={!!loading}
               style={{ ...primaryBtnStyle, width: '100%' }}
             >
-              Release → {CARD_LABELS[nextCard]}
+              Release <ArrowRightIcon size={12} /> {CARD_LABELS[nextCard]}
             </button>
           )}
 

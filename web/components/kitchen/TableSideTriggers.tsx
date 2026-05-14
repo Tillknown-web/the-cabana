@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { callEdgeFn } from '@/lib/edge-fn'
+import { DropletIcon, SparklesIcon, CheckIcon } from '@/lib/icons'
 
 interface Props {
   sessionId: string
@@ -63,7 +64,8 @@ export default function TableSideTriggers({ sessionId, currentCard, accessToken 
 
         {/* Butter Pour */}
         <TriggerButton
-          label="🧈 Butter Pour"
+          label="Butter Pour"
+          icon={<DropletIcon size={14} />}
           subLabel="Active during The Cut"
           enabled={canButterPour}
           loading={loading === 'butter_pour'}
@@ -73,7 +75,8 @@ export default function TableSideTriggers({ sessionId, currentCard, accessToken 
 
         {/* Dessert Reveal */}
         <TriggerButton
-          label="✨ Dessert Reveal"
+          label="Dessert Reveal"
+          icon={<SparklesIcon size={14} />}
           subLabel="Active during The Finish"
           enabled={canDessertReveal}
           loading={loading === 'dessert_reveal'}
@@ -88,9 +91,10 @@ export default function TableSideTriggers({ sessionId, currentCard, accessToken 
 }
 
 function TriggerButton({
-  label, subLabel, enabled, loading, fired, onClick
+  label, icon, subLabel, enabled, loading, fired, onClick
 }: {
   label: string
+  icon?: React.ReactNode
   subLabel: string
   enabled: boolean
   loading: boolean
@@ -117,8 +121,8 @@ function TriggerButton({
       }}
     >
       <div>
-        <p style={{ fontFamily: 'var(--font-sans)', fontSize: '12px', margin: 0, color: '#F5F0E8' }}>
-          {label}
+        <p style={{ fontFamily: 'var(--font-sans)', fontSize: '12px', margin: 0, color: '#F5F0E8', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+          {icon}{label}
         </p>
         <p style={{ fontFamily: 'var(--font-sans)', fontSize: '10px', margin: 0, color: '#F5F0E8', opacity: 0.4 }}>
           {subLabel}
@@ -132,7 +136,7 @@ function TriggerButton({
         color: '#D4AF37',
         opacity: enabled ? 0.8 : 0.3,
       }}>
-        {fired ? 'Fired ✓' : loading ? '…' : 'Fire'}
+        {fired ? <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>Fired <CheckIcon size={9} /></span> : loading ? '…' : 'Fire'}
       </span>
     </button>
   )

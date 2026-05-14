@@ -2,14 +2,15 @@
 
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { FlameIcon, HeartIcon, StarIcon } from '@/lib/icons'
 
-const REACTIONS = [
-  { type: 'fire', emoji: '🔥', label: 'Fire' },
-  { type: 'heart', emoji: '❤️', label: 'Love' },
-  { type: 'chefs_kiss', emoji: '🤌', label: "Chef's Kiss" },
-] as const
+type ReactionType = 'fire' | 'heart' | 'chefs_kiss'
 
-type ReactionType = (typeof REACTIONS)[number]['type']
+const REACTIONS: Array<{ type: ReactionType; icon: React.ReactNode; label: string }> = [
+  { type: 'fire', icon: <FlameIcon size={24} />, label: 'Fire' },
+  { type: 'heart', icon: <HeartIcon size={24} />, label: 'Love' },
+  { type: 'chefs_kiss', icon: <StarIcon size={24} />, label: "Chef's Kiss" },
+]
 
 interface Props {
   photoId: string
@@ -55,14 +56,16 @@ export default function ReactionPicker({ photoId, sessionId, existingReaction = 
       justifyContent: 'center',
       marginTop: '0.75rem',
     }}>
-      {REACTIONS.map(({ type, emoji, label }) => (
+      {REACTIONS.map(({ type, icon, label }) => (
         <button
           key={type}
           onClick={() => react(type)}
           disabled={loading}
           title={label}
           style={{
-            fontSize: '1.5rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
             background: 'none',
             border: selected === type
               ? '1px solid rgba(212, 175, 55, 0.6)'
@@ -72,10 +75,10 @@ export default function ReactionPicker({ photoId, sessionId, existingReaction = 
             padding: '0.3rem 0.5rem',
             opacity: loading ? 0.5 : 1,
             transition: 'border-color 0.2s, opacity 0.2s',
-            lineHeight: 1,
+            color: selected === type ? '#D4AF37' : '#F5F0E8',
           }}
         >
-          {emoji}
+          {icon}
         </button>
       ))}
     </div>

@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { CameraIcon } from '@/lib/icons'
 
 interface Props {
   sessionId: string
@@ -149,11 +150,11 @@ export default function PhotoBoothButton({ sessionId, eventDate = 'July 12, 2026
           alignItems: 'center',
           justifyContent: 'center',
           cursor: 'pointer',
-          fontSize: '1.1rem',
+          color: '#D4AF37',
           backdropFilter: 'blur(12px)',
         }}
       >
-        📷
+        <CameraIcon size={20} />
       </button>
 
       {/* Preview / done modal */}

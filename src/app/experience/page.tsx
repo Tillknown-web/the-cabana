@@ -272,36 +272,101 @@ export default function ExperiencePage() {
     }
 
     if (currentCard === 'intermission1' || currentCard === 'intermission2' || currentCard === 'intermission3') {
-      // Intermissions auto-advance after a moment (content TBD)
+      const IMISSION_RINGS = [
+        { size: 500, duration: '5.5s', delay: '0s' },
+        { size: 350, duration: '7s', delay: '1.2s' },
+        { size: 210, duration: '4.8s', delay: '0.6s' },
+      ]
       return (
         <div
           className="screen-enter"
           style={{
             position: 'fixed',
             inset: 0,
-            backgroundColor: '#352256',
+            background: 'linear-gradient(160deg, #1A1128 0%, #2D1B47 55%, #221440 100%)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             flexDirection: 'column',
-            gap: 16,
             textAlign: 'center',
-            padding: 40,
-            paddingBottom: 72,
+            padding: '40px 40px 80px',
+            overflow: 'hidden',
           }}
         >
+          {/* Ambient rings */}
+          {IMISSION_RINGS.map((ring, i) => (
+            <div
+              key={i}
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                width: ring.size,
+                height: ring.size,
+                marginLeft: -(ring.size / 2),
+                marginTop: -(ring.size / 2),
+                borderRadius: '50%',
+                border: '1px solid #D4AF37',
+                animation: `ring-breathe ${ring.duration} ease-in-out infinite`,
+                animationDelay: ring.delay,
+                pointerEvents: 'none',
+              }}
+            />
+          ))}
+
+          {/* Decorative dot + lines */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 14,
+              marginBottom: 28,
+              position: 'relative',
+              zIndex: 1,
+            }}
+          >
+            <div style={{ height: 1, width: 36, backgroundColor: '#D4AF37', opacity: 0.22 }} />
+            <div
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: '50%',
+                backgroundColor: '#D4AF37',
+                opacity: 0.55,
+              }}
+            />
+            <div style={{ height: 1, width: 36, backgroundColor: '#D4AF37', opacity: 0.22 }} />
+          </div>
+
           <p
             style={{
               fontFamily: "'Cormorant Garamond', Georgia, serif",
-              fontSize: 24,
-              color: 'rgba(245,240,232,0.7)',
+              fontSize: 'clamp(22px, 6vw, 28px)',
+              fontWeight: 300,
               fontStyle: 'italic',
+              color: 'rgba(245,240,232,0.82)',
+              lineHeight: 1.5,
+              maxWidth: 300,
+              marginBottom: 20,
+              position: 'relative',
+              zIndex: 1,
             }}
           >
             A moment between courses.
           </p>
-          <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 12, color: 'rgba(245,240,232,0.35)', fontStyle: 'italic' }}>
-            Your next course is on its way.
+
+          <p
+            style={{
+              fontFamily: "'Inter', sans-serif",
+              fontSize: 11,
+              textTransform: 'uppercase',
+              letterSpacing: '0.2em',
+              color: 'rgba(245,240,232,0.28)',
+              position: 'relative',
+              zIndex: 1,
+            }}
+          >
+            your next course is on its way
           </p>
         </div>
       )

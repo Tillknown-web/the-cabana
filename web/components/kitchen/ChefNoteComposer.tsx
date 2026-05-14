@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { callEdgeFn } from '@/lib/edge-fn'
+import { CheckIcon } from '@/lib/icons'
 
 interface Props {
   sessionId: string
@@ -89,7 +90,7 @@ export default function ChefNoteComposer({ sessionId, accessToken }: Props) {
             transition: 'all 0.2s',
           }}
         >
-          {sent ? 'Sent ✓' : loading ? 'Sending…' : 'Send'}
+          {sent ? <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>Sent <CheckIcon size={10} /></span> : loading ? 'Sending…' : 'Send'}
         </button>
       </div>
 

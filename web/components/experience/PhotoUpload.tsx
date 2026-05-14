@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { CameraIcon, ImageIcon } from '@/lib/icons'
 
 interface Props {
   course: string
@@ -101,7 +102,7 @@ export default function PhotoUpload({ course, sessionId, onUploaded, onCancel }:
             onClick={() => cameraInputRef.current?.click()}
             style={primaryBtnStyle}
           >
-            <span style={{ fontSize: '1.3rem' }}>📷</span>
+            <CameraIcon size={20} />
             <span style={btnLabelStyle}>Take Photo</span>
           </button>
 
@@ -109,7 +110,7 @@ export default function PhotoUpload({ course, sessionId, onUploaded, onCancel }:
             onClick={() => galleryInputRef.current?.click()}
             style={secondaryBtnStyle}
           >
-            <span style={{ fontSize: '1.3rem' }}>🖼️</span>
+            <ImageIcon size={20} />
             <span style={btnLabelStyle}>Choose from Library</span>
           </button>
 

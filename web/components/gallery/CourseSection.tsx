@@ -1,4 +1,5 @@
 import { COURSE_COURSE_LABELS } from '@/lib/constants'
+import { FlameIcon, HeartIcon, StarIcon } from '@/lib/icons'
 
 interface PhotoEntry {
   id: string
@@ -14,10 +15,10 @@ interface Props {
   guests: { id: string; name: string }[]
 }
 
-const REACTION_EMOJI: Record<string, string> = {
-  fire: '🔥',
-  heart: '❤️',
-  chefs_kiss: '🤌',
+function ReactionIcon({ type }: { type: string }) {
+  if (type === 'fire') return <FlameIcon size={16} />
+  if (type === 'heart') return <HeartIcon size={16} />
+  return <StarIcon size={16} />
 }
 
 export default function CourseSection({ sectionKey, photos, guests }: Props) {
@@ -55,13 +56,12 @@ export default function CourseSection({ sectionKey, photos, guests }: Props) {
 
                 {/* Reaction badge */}
                 {photo.reaction && (
-                  <p style={reactionStyle}>
-                    {REACTION_EMOJI[photo.reaction.reaction_type] ?? ''}
-                    &nbsp;
-                    <span style={{ fontSize: '10px', opacity: 0.5 }}>
+                  <div style={{ ...reactionStyle, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem', color: '#D4AF37' }}>
+                    <ReactionIcon type={photo.reaction.reaction_type} />
+                    <span style={{ fontSize: '10px', opacity: 0.5, color: '#F5F0E8' }}>
                       from {guests.find((g) => g.id === photo.reaction!.from_guest_id)?.name ?? 'Guest'}
                     </span>
-                  </p>
+                  </div>
                 )}
               </div>
             ) : (
