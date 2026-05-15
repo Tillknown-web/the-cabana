@@ -75,8 +75,10 @@ export default function LoadingScreen() {
               src="/logo-main.png"
               alt="The Cabana"
               style={{
-                width: 'clamp(200px, 50vw, 280px)',
-                height: 'auto',
+                width: 'clamp(260px, 55vw, 360px)',
+                height: 'clamp(72px, 15vw, 100px)',
+                objectFit: 'cover',
+                objectPosition: 'center center',
                 mixBlendMode: 'screen',
               }}
             />

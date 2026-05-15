@@ -171,8 +171,10 @@ export default function LandingPage() {
               animate={{ y: '0%', opacity: 1 }}
               transition={{ duration: 1.0, delay: 2.7, ease: [0.16, 1, 0.3, 1] }}
               style={{
-                width: 'clamp(280px, 55vw, 520px)',
-                height: 'auto',
+                width: 'clamp(300px, 58vw, 540px)',
+                height: 'clamp(82px, 16vw, 148px)',
+                objectFit: 'cover',
+                objectPosition: 'center center',
                 mixBlendMode: 'screen',
                 display: 'block',
               }}
@@ -559,7 +561,14 @@ export default function LandingPage() {
         <img
           src="/logo-main.png"
           alt="The Cabana"
-          style={{ width: '180px', height: 'auto', mixBlendMode: 'screen', opacity: 0.7 }}
+          style={{
+            width: '220px',
+            height: '60px',
+            objectFit: 'cover',
+            objectPosition: 'center center',
+            mixBlendMode: 'screen',
+            opacity: 0.75,
+          }}
         />
         <p style={{
           fontFamily: 'var(--font-serif)',
