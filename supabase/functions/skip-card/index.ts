@@ -8,15 +8,18 @@ const CARD_SEQUENCE = [
   'intermission-1',
   'bite',
   'intermission-2',
-  'cut',
+  'cleanse',
+  'agua',
   'intermission-3',
+  'cut',
+  'intermission-4',
   'finish',
   'gallery',
 ] as const
 
 type Card = (typeof CARD_SEQUENCE)[number]
 
-const INTERMISSION_CARDS = new Set<Card>(['intermission-1', 'intermission-2', 'intermission-3'])
+const INTERMISSION_CARDS = new Set<Card>(['intermission-1', 'intermission-2', 'intermission-3', 'intermission-4'])
 
 /**
  * POST /functions/v1/skip-card

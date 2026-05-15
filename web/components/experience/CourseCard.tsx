@@ -297,13 +297,13 @@ export default function CourseCard({ card, guest, sessionId, dessertRevealed = f
         }} />
       )}
 
-      {/* Course label */}
-      <motion.p {...item(0)} style={labelStyle}>{course.label}</motion.p>
-
       {/* Dish name */}
       <motion.h1 {...headingAnim} style={headingStyle}>
         {isFinish && !dessertRevealed ? '???' : course.dish}
       </motion.h1>
+
+      {/* Course label */}
+      <motion.p {...item(0)} style={labelStyle}>{course.label}</motion.p>
 
       {/* Gold divider with shimmer */}
       <motion.div
