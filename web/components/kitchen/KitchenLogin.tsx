@@ -53,7 +53,7 @@ export default function KitchenLogin({ onLoggedIn }: Props) {
       justifyContent: 'center',
       padding: '2rem',
     }}>
-      <img src="/logo-main.png" alt="The Cabana" style={{ width: '180px', height: 'auto', marginBottom: '0.5rem' }} />
+      <img src="/logo-main.png" alt="The Cabana" style={{ width: '180px', height: 'auto', display: 'block', margin: '0 auto 0.5rem' }} />
       <h1 style={headingStyle}>Kitchen</h1>
       <div style={dividerStyle} />
 
