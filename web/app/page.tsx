@@ -163,21 +163,19 @@ export default function LandingPage() {
 
           {/* Wordmark */}
           <div style={{ overflow: 'hidden', marginBottom: '1.5rem' }}>
-            <motion.h1
+            <motion.img
+              src="/logo-main.png"
+              alt="The Cabana"
               initial={{ y: '100%', opacity: 0 }}
               animate={{ y: '0%', opacity: 1 }}
               transition={{ duration: 1.0, delay: 2.7, ease: [0.16, 1, 0.3, 1] }}
               style={{
-                fontFamily: 'var(--font-serif)',
-                fontSize: 'clamp(5rem, 18vw, 10rem)',
-                fontWeight: 400,
-                color: 'rgba(255,255,255,0.95)',
-                lineHeight: 0.88,
-                letterSpacing: '-0.02em',
+                width: 'clamp(280px, 55vw, 520px)',
+                height: 'auto',
+                mixBlendMode: 'screen',
+                display: 'block',
               }}
-            >
-              The<br />Cabana
-            </motion.h1>
+            />
           </div>
 
           {/* Gold divider */}
@@ -480,8 +478,8 @@ export default function LandingPage() {
           </Reveal>
 
           <div className="client-grid">
-            <Reveal delay={0.08}><ClientCard initials="Jae" name="Jae" note="the youngest & most distinguished guest" tier="founding" photo="/jae.png" /></Reveal>
-            <Reveal delay={0.16}><ClientCard initials="?" name="???" note="seat reserved · to be announced" tier="elite" pending /></Reveal>
+            <Reveal delay={0.08}><ClientCard initials="Jae" name="Jae" note="the most distinguished guest" tier="founding" photo="/jae.png" /></Reveal>
+            <Reveal delay={0.16}><ClientCard initials="Alee" name="Alee" note="the youngest & most distinguished guest" tier="founding" photo="/alee.png" /></Reveal>
           </div>
         </div>
       </section>
