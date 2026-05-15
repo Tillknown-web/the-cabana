@@ -538,12 +538,10 @@ export default function LandingPage() {
           </Reveal>
 
           <div className="famous-grid">
-            <Reveal delay={0.12}><FamousGuestCard name="The Mayor" occasion="private dinner · spring '25" /></Reveal>
-            <Reveal delay={0.18}><FamousGuestCard name="Maëlle Voss" occasion="celebrated here post-debut" /></Reveal>
-            <Reveal delay={0.24}><FamousGuestCard name="DJ Soleil" occasion="after the rooftop set" /></Reveal>
-            <Reveal delay={0.30}><FamousGuestCard name="Coach Reyes" occasion="championship eve dinner" /></Reveal>
-            <Reveal delay={0.36}><FamousGuestCard name="Ines Laurent" occasion="fashion week wind-down" /></Reveal>
-            <Reveal delay={0.42}><FamousGuestCard name="The Architect" occasion="unnamed · preferred it that way" redacted /></Reveal>
+            <Reveal delay={0.12}><GuestPhoto src="/guest-1.png" /></Reveal>
+            <Reveal delay={0.20}><GuestPhoto src="/guest-2.png" /></Reveal>
+            <Reveal delay={0.28}><GuestPhoto src="/guest-3.png" /></Reveal>
+            <Reveal delay={0.36}><GuestPhoto src="/guest-4.png" /></Reveal>
           </div>
         </div>
       </section>
@@ -638,12 +636,14 @@ export default function LandingPage() {
         .famous-grid {
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 1rem;
-          text-align: left;
+          gap: 0.75rem;
+          max-width: 720px;
+          margin: 0 auto;
         }
         @media (max-width: 639px) {
           .famous-grid {
-            grid-template-columns: 1fr;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
           }
         }
       `}</style>
@@ -908,50 +908,41 @@ function ClientCard({ initials, name, note, tier, photo, pending = false }: { in
   )
 }
 
-function FamousGuestCard({ name, occasion, redacted = false }: { name: string; occasion: string; redacted?: boolean }) {
-  const [hovered, setHovered] = useState(false)
+function GuestPhoto({ src }: { src: string }) {
   return (
     <motion.div
-      whileHover={{ scale: 1.015, y: -3 }}
-      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-      onHoverStart={() => setHovered(true)}
-      onHoverEnd={() => setHovered(false)}
+      whileHover={{ scale: 1.03, y: -4 }}
+      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
       style={{
-        padding: '1.75rem 1.5rem',
-        background: hovered ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.02)',
-        border: `1px solid ${hovered ? 'rgba(139,92,246,0.35)' : 'rgba(139,92,246,0.1)'}`,
-        borderLeft: `2px solid ${hovered ? 'rgba(139,92,246,0.6)' : 'rgba(139,92,246,0.2)'}`,
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
-        transition: 'border-color 0.3s, box-shadow 0.3s, background 0.3s',
-        boxShadow: hovered ? '0 8px 32px rgba(139,92,246,0.08)' : 'none',
-        textAlign: 'left',
+        position: 'relative',
+        aspectRatio: '4 / 5',
+        overflow: 'hidden',
+        border: '1px solid rgba(139,92,246,0.15)',
       }}
     >
-      <p style={{
-        fontFamily: 'var(--font-serif)',
-        fontSize: '1.05rem',
-        color: redacted ? 'rgba(255,255,255,0.35)' : 'rgba(255,255,255,0.88)',
-        margin: 0,
-        marginBottom: '0.4rem',
-        letterSpacing: '0.02em',
-        fontStyle: redacted ? 'italic' : 'normal',
-      }}>{name}</p>
-      <div style={{
-        width: hovered ? '36px' : '18px',
-        height: '1px',
-        background: 'rgba(139,92,246,0.4)',
-        marginBottom: '0.5rem',
-        transition: 'width 0.3s',
-      }} />
-      <p style={{
-        fontFamily: 'var(--font-sans)',
-        fontSize: '11px',
-        fontStyle: 'italic',
-        color: 'rgba(168,197,218,0.45)',
-        margin: 0,
-        letterSpacing: '0.01em',
-      }}>{occasion}</p>
+      <img
+        src={src}
+        alt=""
+        style={{
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          objectPosition: 'center top',
+          display: 'block',
+        }}
+      />
+      {/* Subtle purple vignette on hover */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        whileHover={{ opacity: 1 }}
+        transition={{ duration: 0.3 }}
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'linear-gradient(to top, rgba(139,92,246,0.25) 0%, transparent 50%)',
+          pointerEvents: 'none',
+        }}
+      />
     </motion.div>
   )
 }
