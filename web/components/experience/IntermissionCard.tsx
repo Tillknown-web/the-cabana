@@ -149,12 +149,6 @@ function AnimatedLine() {
         opacity: 0.4,
         animation: 'cabana-scan 2s ease-in-out infinite',
       }} />
-      <style>{`
-        @keyframes cabana-scan {
-          0%, 100% { opacity: 0.2; transform: scaleX(0.3); }
-          50% { opacity: 0.6; transform: scaleX(1); }
-        }
-      `}</style>
     </div>
   )
 }

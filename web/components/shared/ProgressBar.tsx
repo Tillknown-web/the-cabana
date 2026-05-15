@@ -1,22 +1,27 @@
 'use client'
 
 const COURSE_STEPS = [
-  { card: 'pour', label: 'Pour' },
-  { card: 'bite', label: 'Bite' },
-  { card: 'cut', label: 'Cut' },
-  { card: 'finish', label: 'Finish' },
+  { card: 'pour',    label: 'Pour'    },
+  { card: 'bite',    label: 'Bite'    },
+  { card: 'cleanse', label: 'Cleanse' },
+  { card: 'agua',    label: 'Refresh' },
+  { card: 'cut',     label: 'Cut'     },
+  { card: 'finish',  label: 'Finish'  },
 ]
 
 const CARD_TO_STEP_INDEX: Record<string, number> = {
-  welcome: -1,
-  pour: 0,
-  'intermission-1': 0,
-  bite: 1,
-  'intermission-2': 1,
-  cut: 2,
-  'intermission-3': 2,
-  finish: 3,
-  gallery: 4,
+  welcome:          -1,
+  pour:              0,
+  'intermission-1':  0,
+  bite:              1,
+  'intermission-2':  1,
+  cleanse:           2,
+  agua:              3,
+  'intermission-3':  3,
+  cut:               4,
+  'intermission-4':  4,
+  finish:            5,
+  gallery:           6,
 }
 
 interface Props {

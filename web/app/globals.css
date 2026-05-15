@@ -137,6 +137,12 @@ body, html {
   to   { transform: translate(-50%, -50%) scale(1.5); }
 }
 
+/* Gold divider shimmer — used by CourseCard and IntermissionCard */
+@keyframes cabana-scan {
+  0%, 100% { opacity: 0.2; transform: scaleX(0.3); }
+  50%       { opacity: 0.6; transform: scaleX(1); }
+}
+
 /* ============================================================
    Utility classes
    ============================================================ */
