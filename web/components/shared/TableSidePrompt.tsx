@@ -78,7 +78,7 @@ export default function TableSidePrompt({ sessionId, currentCard: _currentCard }
       }}
     >
       <DessertUnboxingContent />
-      <p style={{ ...tapToDismissStyle, animation: 'dr-content-rise 400ms ease 1800ms both' }}>Tap to dismiss</p>
+      <p style={{ ...tapToDismissStyle, position: 'absolute', bottom: '2rem', animation: 'dr-content-rise 400ms ease 1800ms both' }}>Tap to dismiss</p>
     </div>
   )
 }
@@ -99,6 +99,7 @@ function PourMomentOverlay({ visible, onDismiss }: { visible: boolean; onDismiss
         position: 'fixed',
         inset: 0,
         zIndex: 300,
+        backgroundColor: '#0A0A0F',
         cursor: 'pointer',
         opacity: visible ? 1 : 0,
         transition: 'opacity 0.8s ease',
@@ -240,20 +241,20 @@ function PourMomentOverlay({ visible, onDismiss }: { visible: boolean; onDismiss
 
         /* Stream pours in from upper area, widens into a pool at center */
         @keyframes pm-stream {
-          0%   { d: path("M 58 0  L 60 0  L 60 0  L 58 0  Z"); }
-          15%  { d: path("M 56 0  L 62 0  L 62 8  C 60 10, 58 10, 56 8  Z"); }
-          35%  { d: path("M 54 0  L 64 0  L 65 22 C 60 28, 55 28, 52 22 Z"); }
-          55%  { d: path("M 52 0  L 66 0  L 68 40 C 62 48, 54 48, 48 40 Z"); }
-          72%  { d: path("M 50 0  L 68 0  L 72 56 C 64 66, 52 66, 44 56 Z"); }
-          88%  { d: path("M 48 0  L 70 0  L 76 68 C 66 80, 50 80, 40 68 Z"); }
-          100% { d: path("M 46 0  L 72 0  L 80 76 C 68 90, 48 90, 36 76 Z"); }
+          0%   { d: path("M 49 0  L 51 0  L 51 0  L 49 0  Z"); }
+          15%  { d: path("M 47 0  L 53 0  L 53 8  C 51 10, 49 10, 47 8  Z"); }
+          35%  { d: path("M 45 0  L 55 0  L 56 22 C 51 28, 46 28, 43 22 Z"); }
+          55%  { d: path("M 43 0  L 57 0  L 59 40 C 53 48, 45 48, 39 40 Z"); }
+          72%  { d: path("M 41 0  L 59 0  L 63 56 C 55 66, 43 66, 35 56 Z"); }
+          88%  { d: path("M 39 0  L 61 0  L 67 68 C 57 80, 41 80, 31 68 Z"); }
+          100% { d: path("M 37 0  L 63 0  L 71 76 C 59 90, 39 90, 27 76 Z"); }
         }
 
         @keyframes pm-stream-highlight {
-          0%   { d: path("M 58.5 0  L 59.5 0  L 59.5 0  L 58.5 0  Z"); }
-          15%  { d: path("M 57 0   L 60 0   L 60 6   C 59 8,  57.5 8, 57 6  Z"); }
-          55%  { d: path("M 54 0   L 62 0   L 64 38  C 61 44, 56 44, 52 38 Z"); }
-          100% { d: path("M 52 0   L 64 0   L 68 70  C 64 82, 56 82, 50 70 Z"); }
+          0%   { d: path("M 49.5 0  L 50.5 0  L 50.5 0  L 49.5 0  Z"); }
+          15%  { d: path("M 48 0   L 51 0   L 51 6   C 50 8,  48.5 8, 48 6  Z"); }
+          55%  { d: path("M 45 0   L 53 0   L 55 38  C 52 44, 47 44, 43 38 Z"); }
+          100% { d: path("M 43 0   L 55 0   L 59 70  C 55 82, 47 82, 41 70 Z"); }
         }
 
         @keyframes pm-stream-exit {
@@ -380,11 +381,15 @@ function BiteMomentOverlay({ visible, onDismiss }: { visible: boolean; onDismiss
         />
       ))}
 
-      {/* Content */}
+      {/* Content — positioned below the cloche plate */}
       <div
         style={{
-          position: 'relative',
+          position: 'absolute',
+          top: 'calc(50% + min(17vw, 82px) + 1.5rem)',
+          left: '50%',
+          transform: 'translateX(-50%)',
           textAlign: 'center',
+          width: '90%',
           animation: 'bm-content-rise 500ms cubic-bezier(0.34,1.56,0.64,1) 750ms both',
         }}
       >
@@ -770,13 +775,16 @@ function DessertUnboxingContent() {
         />
       ))}
 
-      {/* Title content */}
+      {/* Title content — positioned below the gift box */}
       <div
         style={{
-          position: 'relative',
+          position: 'absolute',
+          top: 'calc(50% + min(23vw, 110px) + 1.5rem)',
+          left: '50%',
+          transform: 'translateX(-50%)',
           textAlign: 'center',
+          width: '90%',
           animation: 'dr-title-rise 600ms cubic-bezier(0.34,1.56,0.64,1) 800ms both',
-          marginTop: '0',
         }}
       >
         <p style={triggerLabelStyle}>The Dessert</p>
