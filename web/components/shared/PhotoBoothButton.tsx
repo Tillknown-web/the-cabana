@@ -3,6 +3,7 @@
 import { useRef, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { CameraIcon } from '@/lib/icons'
+import { getTodayLA } from '@/lib/date'
 
 interface Props {
   sessionId: string
@@ -15,7 +16,7 @@ type BoothState =
   | { stage: 'uploading'; previewUrl: string }
   | { stage: 'done'; previewUrl: string }
 
-export default function PhotoBoothButton({ sessionId, eventDate = 'July 12, 2026' }: Props) {
+export default function PhotoBoothButton({ sessionId, eventDate = getTodayLA() }: Props) {
   const [open, setOpen] = useState(false)
   const [state, setState] = useState<BoothState>({ stage: 'idle' })
   const [error, setError] = useState<string | null>(null)

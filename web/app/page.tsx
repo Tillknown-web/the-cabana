@@ -207,7 +207,7 @@ export default function LandingPage() {
               letterSpacing: '0.03em',
             }}
           >
-            poolside, after dark
+            where the evening belongs to the few
           </motion.p>
 
           {/* Date */}
@@ -569,7 +569,7 @@ export default function LandingPage() {
           letterSpacing: '0.02em',
           margin: 0,
         }}>
-          poolside, after dark
+          where the evening belongs to the few
         </p>
       </footer>
 
