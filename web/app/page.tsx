@@ -478,7 +478,7 @@ export default function LandingPage() {
           </Reveal>
 
           <div className="client-grid">
-            <Reveal delay={0.08}><ClientCard initials="Jae" name="Jae" note="the most distinguished guest" tier="founding" photo="/jae.png" /></Reveal>
+            <Reveal delay={0.08}><ClientCard initials="Jae" name="Jae" note="patron of impeccable taste & the highest refinement" tier="founding" photo="/jae.png" /></Reveal>
             <Reveal delay={0.16}><ClientCard initials="Alee" name="Alee" note="the youngest & most distinguished guest" tier="founding" photo="/alee.png" /></Reveal>
           </div>
         </div>
@@ -550,15 +550,25 @@ export default function LandingPage() {
         borderTop: '1px solid rgba(255,255,255,0.05)',
         padding: '2.5rem 2rem',
         textAlign: 'center',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '0.75rem',
       }}>
+        <img
+          src="/logo-main.png"
+          alt="The Cabana"
+          style={{ width: '180px', height: 'auto', mixBlendMode: 'screen', opacity: 0.7 }}
+        />
         <p style={{
           fontFamily: 'var(--font-serif)',
-          fontSize: '0.95rem',
+          fontSize: '0.85rem',
           fontStyle: 'italic',
-          color: 'rgba(255,255,255,0.25)',
+          color: 'rgba(255,255,255,0.2)',
           letterSpacing: '0.02em',
+          margin: 0,
         }}>
-          The Cabana — poolside, after dark
+          poolside, after dark
         </p>
       </footer>
 
