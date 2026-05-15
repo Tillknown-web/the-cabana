@@ -1,7 +1,7 @@
 import { handleCors, jsonResponse, errorResponse } from '../_shared/cors.ts'
 import { createServiceClient, createUserClient } from '../_shared/supabase-client.ts'
 
-const VALID_COURSES = ['guest', 'pour', 'bite', 'cut', 'finish', 'booth'] as const
+const VALID_COURSES = ['guest', 'pour', 'bite', 'cleanse', 'agua', 'cut', 'finish', 'booth'] as const
 type Course = (typeof VALID_COURSES)[number]
 
 const BUCKET = 'photos'
@@ -14,7 +14,7 @@ const ALLOWED_TYPES = new Set(['image/jpeg', 'image/jpg', 'image/webp'])
  * Body: multipart/form-data
  *   - file: binary image (image/jpeg or image/webp, ≤ 5MB)
  *   - sessionId: string
- *   - course: 'guest' | 'pour' | 'bite' | 'cut' | 'finish' | 'booth'
+ *   - course: 'guest' | 'pour' | 'bite' | 'cleanse' | 'agua' | 'cut' | 'finish' | 'booth'
  *   - upsert: 'true' | 'false' (optional, default 'true')
  *   - filename: optional override for the final path segment
  *     (e.g. "booth_1713561234567.jpg"). If omitted, "{course}.jpg" is used.
@@ -119,6 +119,8 @@ Deno.serve(async (req) => {
     guest: 'welcome',
     pour: 'pour',
     bite: 'bite',
+    cleanse: 'cleanse',
+    agua: 'agua',
     cut: 'cut',
     finish: 'finish',
   }

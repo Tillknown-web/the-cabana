@@ -12,6 +12,7 @@ interface Props {
   guest: Guest
   sessionId: string
   dessertRevealed?: boolean
+  partnerPhoto?: { url: string; guestName: string } | null
 }
 
 // Staggered child animation helper
@@ -235,7 +236,7 @@ function BiteAmbience() {
   )
 }
 
-export default function CourseCard({ card, guest, sessionId, dessertRevealed = false }: Props) {
+export default function CourseCard({ card, guest, sessionId, dessertRevealed = false, partnerPhoto = null }: Props) {
   const [photoUploaded, setPhotoUploaded] = useState(false)
   const [photoPreviewUrl, setPhotoPreviewUrl] = useState<string | null>(null)
   const [showUpload, setShowUpload] = useState(false)
@@ -336,13 +337,8 @@ export default function CourseCard({ card, guest, sessionId, dessertRevealed = f
       >
         {photoUploaded && photoPreviewUrl ? (
           <div>
-            <div style={{
-              width: '100%',
-              aspectRatio: '1',
-              overflow: 'hidden',
-              border: '1px solid rgba(212, 175, 55, 0.3)',
-              marginBottom: '1rem',
-            }}>
+            <p style={partnerCaptionStyle}>Your photo</p>
+            <div style={photoFrameStyle}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={photoPreviewUrl}
@@ -379,6 +375,31 @@ export default function CourseCard({ card, guest, sessionId, dessertRevealed = f
               Take Your Photo
             </span>
           </motion.button>
+        )}
+
+        {/* Partner photo — appears below your own (or above the upload CTA if
+            you haven't taken one yet). Re-animates when a new partner upload
+            for this course arrives. */}
+        {partnerPhoto && (
+          <motion.div
+            key={partnerPhoto.url}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+            style={{ marginTop: '1.5rem' }}
+          >
+            <p style={partnerCaptionStyle}>
+              {partnerPhoto.guestName}&apos;s {course.label.toLowerCase()}
+            </p>
+            <div style={partnerFrameStyle}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={partnerPhoto.url}
+                alt={`${partnerPhoto.guestName}'s photo`}
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+            </div>
+          </motion.div>
         )}
       </motion.div>
     </div>
@@ -442,4 +463,30 @@ const retakeButtonStyle: React.CSSProperties = {
   background: 'none',
   border: 'none',
   cursor: 'pointer',
+}
+
+const photoFrameStyle: React.CSSProperties = {
+  width: '100%',
+  aspectRatio: '1',
+  overflow: 'hidden',
+  border: '1px solid rgba(212, 175, 55, 0.3)',
+  marginBottom: '1rem',
+}
+
+const partnerFrameStyle: React.CSSProperties = {
+  width: '100%',
+  aspectRatio: '1',
+  overflow: 'hidden',
+  border: '1px solid rgba(168, 197, 218, 0.35)',
+}
+
+const partnerCaptionStyle: React.CSSProperties = {
+  fontFamily: 'var(--font-sans)',
+  fontSize: '9px',
+  letterSpacing: '0.3em',
+  textTransform: 'uppercase',
+  color: '#D4AF37',
+  opacity: 0.7,
+  margin: '0 0 0.5rem',
+  textAlign: 'center',
 }

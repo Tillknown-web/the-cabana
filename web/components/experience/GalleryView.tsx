@@ -1,10 +1,11 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Guest } from '@/app/experience/page'
 import ReactionPicker from '@/components/experience/ReactionPicker'
 import { COURSE_COURSE_LABELS } from '@/lib/constants'
 import { FlameIcon, HeartIcon, StarIcon } from '@/lib/icons'
+import { createClient } from '@/lib/supabase/client'
 
 interface PhotoEntry {
   id: string
@@ -31,24 +32,70 @@ export default function GalleryView({ guest, sessionId }: Props) {
   const [data, setData] = useState<GalleryData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const fetchGallery = useCallback(async () => {
+    try {
+      const url = new URL(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/gallery`)
+      url.searchParams.set('sessionId', sessionId)
+      const res = await fetch(url.toString(), { cache: 'no-store' })
+      const json = await res.json()
+      if (!res.ok) throw new Error(json.error ?? 'Failed to load gallery')
+      setData(json as GalleryData)
+      setError(null)
+    } catch (err) {
+      setError((err as Error).message)
+    } finally {
+      setLoading(false)
+    }
+  }, [sessionId])
 
   useEffect(() => {
-    async function fetchGallery() {
-      try {
-        const url = new URL(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/gallery`)
-        url.searchParams.set('sessionId', sessionId)
-        const res = await fetch(url.toString())
-        const json = await res.json()
-        if (!res.ok) throw new Error(json.error ?? 'Failed to load gallery')
-        setData(json as GalleryData)
-      } catch (err) {
-        setError((err as Error).message)
-      } finally {
-        setLoading(false)
-      }
-    }
     fetchGallery()
-  }, [sessionId])
+  }, [fetchGallery])
+
+  // Keep the gallery in sync with realtime photo uploads and reaction
+  // inserts/updates. Both event streams trigger a debounced refetch so a
+  // burst of changes only re-renders once.
+  useEffect(() => {
+    if (!sessionId) return
+    const supabase = createClient()
+
+    function scheduleRefetch() {
+      if (debounceRef.current) clearTimeout(debounceRef.current)
+      debounceRef.current = setTimeout(() => {
+        debounceRef.current = null
+        void fetchGallery()
+      }, 400)
+    }
+
+    const channel = supabase
+      .channel(`exp-gallery-${sessionId}`)
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'photos', filter: `session_id=eq.${sessionId}` },
+        scheduleRefetch
+      )
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'photos', filter: `session_id=eq.${sessionId}` },
+        scheduleRefetch
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'reactions', filter: `session_id=eq.${sessionId}` },
+        scheduleRefetch
+      )
+      .subscribe()
+
+    return () => {
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current)
+        debounceRef.current = null
+      }
+      supabase.removeChannel(channel)
+    }
+  }, [sessionId, fetchGallery])
 
   if (loading) {
     return (

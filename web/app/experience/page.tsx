@@ -14,6 +14,9 @@ import ChefNoteToast from '@/components/shared/ChefNoteToast'
 import TableSidePrompt from '@/components/shared/TableSidePrompt'
 import SongRequestModal from '@/components/shared/SongRequestModal'
 import ExperienceNavBar from '@/components/shared/ExperienceNavBar'
+import ReactionOverlay from '@/components/shared/ReactionOverlay'
+import PartnerPhotoToast from '@/components/shared/PartnerPhotoToast'
+import { usePartnerPhotos } from '@/lib/hooks/usePartnerPhotos'
 
 export type Guest = {
   id: string
@@ -30,6 +33,10 @@ export default function ExperiencePage() {
   const [dessertRevealed, setDessertRevealed] = useState(false)
 
   const supabase = createClient()
+
+  // Watch for partner uploads in this session so we can show their photo
+  // alongside ours on each course card and surface a brief arrival toast.
+  const { partnerPhotos, latestArrival } = usePartnerPhotos(SESSION_ID, guest?.id)
 
   // Restore guest from localStorage + verify Supabase auth session
   useEffect(() => {
@@ -153,7 +160,20 @@ export default function ExperiencePage() {
     if (!guest) return null
     if (currentCard === 'welcome') return <WelcomeCard guest={guest} sessionId={SESSION_ID} />
     if (currentCard === 'gallery') return <GalleryView guest={guest} sessionId={SESSION_ID} />
-    if (COURSE_CARDS.has(currentCard)) return <CourseCard card={currentCard} guest={guest} sessionId={SESSION_ID} dessertRevealed={dessertRevealed} />
+    if (COURSE_CARDS.has(currentCard)) {
+      const partnerPhoto = partnerPhotos[currentCard]
+        ? { url: partnerPhotos[currentCard].url, guestName: partnerPhotos[currentCard].guestName }
+        : null
+      return (
+        <CourseCard
+          card={currentCard}
+          guest={guest}
+          sessionId={SESSION_ID}
+          dessertRevealed={dessertRevealed}
+          partnerPhoto={partnerPhoto}
+        />
+      )
+    }
     if (currentCard.startsWith('intermission')) return <IntermissionCard card={currentCard} sessionId={SESSION_ID} />
     return <WelcomeCard guest={guest} sessionId={SESSION_ID} />
   }
@@ -179,6 +199,8 @@ export default function ExperiencePage() {
       </AnimatePresence>
 
       <ChefNoteToast sessionId={SESSION_ID} />
+      <ReactionOverlay sessionId={SESSION_ID} selfGuestId={guest.id} />
+      <PartnerPhotoToast arrival={latestArrival} />
       <TableSidePrompt
         sessionId={SESSION_ID}
         currentCard={currentCard}
