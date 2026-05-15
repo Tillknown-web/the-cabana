@@ -435,6 +435,117 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ── Most Valued Clients ──────────────────────────────────────────── */}
+      <section
+        id="clients"
+        style={{
+          position: 'relative',
+          background: '#0D0D14',
+          padding: 'clamp(4rem, 8vw, 6rem) 2rem clamp(5rem, 10vw, 8rem)',
+          borderTop: '1px solid rgba(212,175,55,0.08)',
+          overflow: 'hidden',
+        }}
+      >
+        {/* Background halo */}
+        <div aria-hidden="true" style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: '70vw',
+          height: '70vw',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(77,217,192,0.04) 0%, transparent 60%)',
+          pointerEvents: 'none',
+          animation: 'blob-drift-a 30s ease-in-out infinite',
+        }} />
+
+        <div style={{ maxWidth: '860px', margin: '0 auto', position: 'relative' }}>
+          <Reveal style={{ textAlign: 'center' }}>
+            <p style={sectionLabel}>most valued clients</p>
+          </Reveal>
+
+          <Reveal delay={0.05} style={{ display: 'flex', justifyContent: 'center', margin: '1.5rem 0 3rem' }}>
+            <div style={{
+              width: '120px',
+              height: '1px',
+              background: 'linear-gradient(90deg, transparent, rgba(212,175,55,0.4), transparent)',
+            }} />
+          </Reveal>
+
+          <div className="client-grid">
+            <Reveal delay={0.08}><ClientCard initials="MJ" name="Marcus J." note="table 1 · every season" tier="founding" /></Reveal>
+            <Reveal delay={0.14}><ClientCard initials="SA" name="Sofia A." note="always the first reservation" tier="founding" /></Reveal>
+            <Reveal delay={0.20}><ClientCard initials="DL" name="Diana L." note="never misses a menu" tier="elite" /></Reveal>
+            <Reveal delay={0.26}><ClientCard initials="RP" name="René P." note="the reason we added the cleanse" tier="elite" /></Reveal>
+            <Reveal delay={0.32}><ClientCard initials="KW" name="Kai W." note="brought the playlist idea" tier="elite" /></Reveal>
+            <Reveal delay={0.38}><ClientCard initials="YB" name="Yvette B." note="her feedback shapes every season" tier="elite" /></Reveal>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Famous Guests ─────────────────────────────────────────────────── */}
+      <section
+        id="famous-guests"
+        style={{
+          position: 'relative',
+          background: '#0D0D14',
+          padding: 'clamp(4rem, 8vw, 6rem) 2rem clamp(5rem, 10vw, 8rem)',
+          borderTop: '1px solid rgba(139,92,246,0.08)',
+          overflow: 'hidden',
+        }}
+      >
+        {/* Background halo */}
+        <div aria-hidden="true" style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: '65vw',
+          height: '65vw',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(139,92,246,0.06) 0%, transparent 60%)',
+          pointerEvents: 'none',
+          animation: 'blob-drift-b 28s ease-in-out infinite',
+        }} />
+
+        <div style={{ maxWidth: '860px', margin: '0 auto', position: 'relative', textAlign: 'center' }}>
+          <Reveal>
+            <p style={sectionLabel}>famous guests we have served</p>
+          </Reveal>
+
+          <Reveal delay={0.05} style={{ display: 'flex', justifyContent: 'center', margin: '1.5rem 0 0.75rem' }}>
+            <div style={{
+              width: '120px',
+              height: '1px',
+              background: 'linear-gradient(90deg, transparent, rgba(212,175,55,0.4), transparent)',
+            }} />
+          </Reveal>
+
+          <Reveal delay={0.1}>
+            <p style={{
+              fontFamily: 'var(--font-serif)',
+              fontSize: 'clamp(0.9rem, 2vw, 1rem)',
+              fontStyle: 'italic',
+              color: 'rgba(255,255,255,0.22)',
+              marginBottom: '3rem',
+              letterSpacing: '0.02em',
+            }}>
+              &ldquo;every table carries a story — some carry a legacy&rdquo;
+            </p>
+          </Reveal>
+
+          <div className="famous-grid">
+            <Reveal delay={0.12}><FamousGuestCard name="The Mayor" occasion="private dinner · spring '25" /></Reveal>
+            <Reveal delay={0.18}><FamousGuestCard name="Maëlle Voss" occasion="celebrated here post-debut" /></Reveal>
+            <Reveal delay={0.24}><FamousGuestCard name="DJ Soleil" occasion="after the rooftop set" /></Reveal>
+            <Reveal delay={0.30}><FamousGuestCard name="Coach Reyes" occasion="championship eve dinner" /></Reveal>
+            <Reveal delay={0.36}><FamousGuestCard name="Ines Laurent" occasion="fashion week wind-down" /></Reveal>
+            <Reveal delay={0.42}><FamousGuestCard name="The Architect" occasion="unnamed · preferred it that way" redacted /></Reveal>
+          </div>
+        </div>
+      </section>
+
       {/* ── Footer ───────────────────────────────────────────────────────── */}
       <footer style={{
         background: '#0A0A0F',
@@ -508,6 +619,27 @@ export default function LandingPage() {
           .menu-grid {
             grid-template-columns: 1fr;
             gap: 1rem;
+          }
+        }
+        .client-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 1rem;
+        }
+        @media (max-width: 639px) {
+          .client-grid {
+            grid-template-columns: 1fr;
+          }
+        }
+        .famous-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 1rem;
+          text-align: left;
+        }
+        @media (max-width: 639px) {
+          .famous-grid {
+            grid-template-columns: 1fr;
           }
         }
       `}</style>
@@ -658,6 +790,126 @@ function CourseItem({
           {ingredients}
         </p>
       </div>
+    </motion.div>
+  )
+}
+
+function ClientCard({ initials, name, note, tier }: { initials: string; name: string; note: string; tier: 'founding' | 'elite' }) {
+  const [hovered, setHovered] = useState(false)
+  const tierColor = tier === 'founding' ? '#D4AF37' : '#4DD9C0'
+  const tierLabel = tier === 'founding' ? 'founding member' : 'elite guest'
+  return (
+    <motion.div
+      whileHover={{ scale: 1.015, y: -3 }}
+      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+      onHoverStart={() => setHovered(true)}
+      onHoverEnd={() => setHovered(false)}
+      style={{
+        padding: '1.75rem 1.5rem',
+        background: hovered ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.02)',
+        border: `1px solid ${hovered ? `${tierColor}40` : `${tierColor}14`}`,
+        borderLeft: `2px solid ${hovered ? `${tierColor}99` : `${tierColor}33`}`,
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        transition: 'border-color 0.3s, box-shadow 0.3s, background 0.3s',
+        boxShadow: hovered ? `0 8px 32px ${tierColor}12` : 'none',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '1.25rem',
+      }}
+    >
+      <div style={{
+        flexShrink: 0,
+        width: '48px',
+        height: '48px',
+        borderRadius: '50%',
+        border: `1px solid ${tierColor}40`,
+        background: `radial-gradient(circle at 40% 35%, ${tierColor}12 0%, rgba(10,10,15,0.6) 60%)`,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}>
+        <span style={{
+          fontFamily: 'var(--font-serif)',
+          fontSize: '1rem',
+          color: tierColor,
+          fontWeight: 400,
+        }}>{initials}</span>
+      </div>
+      <div>
+        <p style={{
+          fontFamily: 'var(--font-serif)',
+          fontSize: '1rem',
+          color: 'rgba(255,255,255,0.85)',
+          margin: 0,
+          marginBottom: '0.2rem',
+          letterSpacing: '0.02em',
+        }}>{name}</p>
+        <p style={{
+          fontFamily: 'var(--font-sans)',
+          fontSize: '10px',
+          letterSpacing: '0.18em',
+          textTransform: 'uppercase',
+          color: `${tierColor}80`,
+          margin: 0,
+          marginBottom: '0.3rem',
+        }}>{tierLabel}</p>
+        <p style={{
+          fontFamily: 'var(--font-sans)',
+          fontSize: '11px',
+          fontStyle: 'italic',
+          color: 'rgba(255,255,255,0.3)',
+          margin: 0,
+        }}>{note}</p>
+      </div>
+    </motion.div>
+  )
+}
+
+function FamousGuestCard({ name, occasion, redacted = false }: { name: string; occasion: string; redacted?: boolean }) {
+  const [hovered, setHovered] = useState(false)
+  return (
+    <motion.div
+      whileHover={{ scale: 1.015, y: -3 }}
+      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+      onHoverStart={() => setHovered(true)}
+      onHoverEnd={() => setHovered(false)}
+      style={{
+        padding: '1.75rem 1.5rem',
+        background: hovered ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.02)',
+        border: `1px solid ${hovered ? 'rgba(139,92,246,0.35)' : 'rgba(139,92,246,0.1)'}`,
+        borderLeft: `2px solid ${hovered ? 'rgba(139,92,246,0.6)' : 'rgba(139,92,246,0.2)'}`,
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        transition: 'border-color 0.3s, box-shadow 0.3s, background 0.3s',
+        boxShadow: hovered ? '0 8px 32px rgba(139,92,246,0.08)' : 'none',
+        textAlign: 'left',
+      }}
+    >
+      <p style={{
+        fontFamily: 'var(--font-serif)',
+        fontSize: '1.05rem',
+        color: redacted ? 'rgba(255,255,255,0.35)' : 'rgba(255,255,255,0.88)',
+        margin: 0,
+        marginBottom: '0.4rem',
+        letterSpacing: '0.02em',
+        fontStyle: redacted ? 'italic' : 'normal',
+      }}>{name}</p>
+      <div style={{
+        width: hovered ? '36px' : '18px',
+        height: '1px',
+        background: 'rgba(139,92,246,0.4)',
+        marginBottom: '0.5rem',
+        transition: 'width 0.3s',
+      }} />
+      <p style={{
+        fontFamily: 'var(--font-sans)',
+        fontSize: '11px',
+        fontStyle: 'italic',
+        color: 'rgba(168,197,218,0.45)',
+        margin: 0,
+        letterSpacing: '0.01em',
+      }}>{occasion}</p>
     </motion.div>
   )
 }
