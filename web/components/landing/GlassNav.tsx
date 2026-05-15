@@ -68,13 +68,7 @@ export default function GlassNav() {
           <img
             src="/logo-secondary.png"
             alt="The Cabana"
-            style={{
-              width: '160px',
-              height: '44px',
-              objectFit: 'cover',
-              objectPosition: 'center center',
-              mixBlendMode: 'screen',
-            }}
+            style={{ height: '36px', width: 'auto' }}
           />
         </a>
 
@@ -205,13 +199,7 @@ export default function GlassNav() {
               <img
                 src="/logo-secondary.png"
                 alt="The Cabana"
-                style={{
-                  width: '180px',
-                  height: '50px',
-                  objectFit: 'cover',
-                  objectPosition: 'center center',
-                  mixBlendMode: 'screen',
-                }}
+                style={{ height: '44px', width: 'auto' }}
               />
             </motion.div>
 
