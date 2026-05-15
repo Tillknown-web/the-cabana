@@ -5,23 +5,13 @@ import { requireKitchenAuth } from '../_shared/kitchen-auth.ts'
 const VALID_TRIGGERS = ['butter_pour', 'dessert_reveal', 'pour_moment', 'bite_moment', 'cleanse_moment', 'refresh_moment'] as const
 type TriggerType = (typeof VALID_TRIGGERS)[number]
 
-// Which card must be active for each trigger to be valid
-const TRIGGER_REQUIRES_CARD: Record<TriggerType, string> = {
-  butter_pour:     'cut',
-  dessert_reveal:  'finish',
-  pour_moment:     'pour',
-  bite_moment:     'bite',
-  cleanse_moment:  'cleanse',
-  refresh_moment:  'agua',
-}
-
 /**
  * POST /functions/v1/tableside-trigger
  * Auth: Kitchen JWT
  * Body: { sessionId: string, triggerType: TriggerType }
  *
- * Fires a tableside trigger (butter pour shimmer, dessert gold reveal).
- * Only valid when the associated card is currently live.
+ * Fires a tableside trigger (butter pour shimmer, dessert gold reveal, etc.).
+ * Can be fired at any point in the experience.
  * Expires 60 seconds after firing — clients check expires_at before animating.
  * Supabase Realtime broadcasts the INSERT to guest clients.
  */
@@ -49,23 +39,6 @@ Deno.serve(async (req) => {
   }
 
   const serviceClient = createServiceClient()
-
-  // Verify the required card is currently live
-  const { data: state, error: stateError } = await serviceClient
-    .from('session_state')
-    .select('current_card')
-    .eq('session_id', sessionId)
-    .single()
-
-  if (stateError || !state) return errorResponse('Session not found', 404)
-
-  const requiredCard = TRIGGER_REQUIRES_CARD[triggerType as TriggerType]
-  if (state.current_card !== requiredCard) {
-    return errorResponse(
-      `"${triggerType}" can only be fired when the "${requiredCard}" card is live. Current card: "${state.current_card}"`,
-      400
-    )
-  }
 
   const firedAt = new Date()
   const expiresAt = new Date(firedAt.getTime() + 60_000)

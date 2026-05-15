@@ -6,21 +6,13 @@ import { DropletIcon, SparklesIcon, CheckIcon, GlassIcon, UtensilsIcon, Snowflak
 
 interface Props {
   sessionId: string
-  currentCard: string
   accessToken: string
 }
 
-export default function TableSideTriggers({ sessionId, currentCard, accessToken }: Props) {
+export default function TableSideTriggers({ sessionId, accessToken }: Props) {
   const [loading, setLoading] = useState<string | null>(null)
   const [fired, setFired] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
-
-  const canPourMoment    = currentCard === 'pour'
-  const canBiteMoment    = currentCard === 'bite'
-  const canCleanseMoment = currentCard === 'cleanse'
-  const canRefreshMoment = currentCard === 'agua'
-  const canButterPour    = currentCard === 'cut'
-  const canDessertReveal = currentCard === 'finish'
 
   async function fire(triggerType: string) {
     if (loading) return
@@ -44,67 +36,55 @@ export default function TableSideTriggers({ sessionId, currentCard, accessToken 
       <p style={helpStyle}>Push a fullscreen animation to all guest screens.</p>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-        {/* Pour Moment */}
         <TriggerButton
           label="The Pour"
           icon={<GlassIcon size={14} />}
-          subLabel="Active during The Pour"
-          enabled={canPourMoment}
+          subLabel="Fullscreen pour animation"
           loading={loading === 'pour_moment'}
           fired={fired === 'pour_moment'}
           onClick={() => fire('pour_moment')}
         />
 
-        {/* Bite Moment */}
         <TriggerButton
           label="The Bite"
           icon={<UtensilsIcon size={14} />}
-          subLabel="Active during The Bite"
-          enabled={canBiteMoment}
+          subLabel="Fullscreen bite animation"
           loading={loading === 'bite_moment'}
           fired={fired === 'bite_moment'}
           onClick={() => fire('bite_moment')}
         />
 
-        {/* Cleanse Moment */}
         <TriggerButton
           label="Cleanse Moment"
           icon={<SnowflakeIcon size={14} />}
-          subLabel="Active during The Cleanse"
-          enabled={canCleanseMoment}
+          subLabel="Fullscreen cleanse animation"
           loading={loading === 'cleanse_moment'}
           fired={fired === 'cleanse_moment'}
           onClick={() => fire('cleanse_moment')}
         />
 
-        {/* Refresh Moment */}
         <TriggerButton
           label="Refresh Moment"
           icon={<WindIcon size={14} />}
-          subLabel="Active during The Refresh"
-          enabled={canRefreshMoment}
+          subLabel="Fullscreen refresh animation"
           loading={loading === 'refresh_moment'}
           fired={fired === 'refresh_moment'}
           onClick={() => fire('refresh_moment')}
         />
 
-        {/* Butter Pour */}
         <TriggerButton
           label="Butter Pour"
           icon={<DropletIcon size={14} />}
-          subLabel="Active during The Cut"
-          enabled={canButterPour}
+          subLabel="Fullscreen butter pour shimmer"
           loading={loading === 'butter_pour'}
           fired={fired === 'butter_pour'}
           onClick={() => fire('butter_pour')}
         />
 
-        {/* Dessert Reveal */}
         <TriggerButton
           label="Dessert Reveal"
           icon={<SparklesIcon size={14} />}
-          subLabel="Active during The Finish"
-          enabled={canDessertReveal}
+          subLabel="Gold reveal on guest screens"
           loading={loading === 'dessert_reveal'}
           fired={fired === 'dessert_reveal'}
           onClick={() => fire('dessert_reveal')}
@@ -117,12 +97,11 @@ export default function TableSideTriggers({ sessionId, currentCard, accessToken 
 }
 
 function TriggerButton({
-  label, icon, subLabel, enabled, loading, fired, onClick
+  label, icon, subLabel, loading, fired, onClick
 }: {
   label: string
   icon?: React.ReactNode
   subLabel: string
-  enabled: boolean
   loading: boolean
   fired: boolean
   onClick: () => void
@@ -130,17 +109,16 @@ function TriggerButton({
   return (
     <button
       onClick={onClick}
-      disabled={!enabled || loading}
+      disabled={loading}
       style={{
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: '0.75rem 1rem',
-        backgroundColor: fired ? 'rgba(212, 175, 55, 0.15)' : enabled ? 'rgba(212, 175, 55, 0.08)' : 'transparent',
-        border: `1px solid ${enabled ? 'rgba(212, 175, 55, 0.35)' : 'rgba(255,255,255,0.08)'}`,
+        backgroundColor: fired ? 'rgba(212, 175, 55, 0.15)' : 'rgba(212, 175, 55, 0.08)',
+        border: '1px solid rgba(212, 175, 55, 0.35)',
         color: '#F5F0E8',
-        cursor: enabled && !loading ? 'pointer' : 'default',
-        opacity: enabled ? 1 : 0.3,
+        cursor: loading ? 'default' : 'pointer',
         textAlign: 'left',
         width: '100%',
         transition: 'all 0.2s',
@@ -160,7 +138,7 @@ function TriggerButton({
         letterSpacing: '0.15em',
         textTransform: 'uppercase',
         color: '#D4AF37',
-        opacity: enabled ? 0.8 : 0.3,
+        opacity: 0.8,
       }}>
         {fired ? <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>Fired <CheckIcon size={9} /></span> : loading ? '…' : 'Fire'}
       </span>

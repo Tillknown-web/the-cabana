@@ -122,7 +122,6 @@ export default function KitchenPage() {
 
         <TableSideTriggers
           sessionId={SESSION_ID}
-          currentCard={sessionState?.current_card ?? ''}
           accessToken={kitchenUser.accessToken}
         />
 
