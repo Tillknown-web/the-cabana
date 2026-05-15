@@ -187,17 +187,17 @@ export default function GalleryView({ guest, sessionId }: Props) {
                         bottom: 0,
                         left: 0,
                         right: 0,
-                        height: '40px',
+                        height: '56px',
                         backgroundColor: 'rgba(10, 10, 15, 0.82)',
                         borderTop: '1px solid rgba(212, 175, 55, 0.4)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between',
-                        padding: '0 10px',
+                        padding: '0 12px',
                       }}>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src="/logo-secondary.png" alt="The Cabana" style={{ height: '24px', width: 'auto', objectFit: 'contain', opacity: 0.9 }} />
-                        <span style={{ fontFamily: 'system-ui, sans-serif', fontSize: '9px', letterSpacing: '0.08em', color: 'rgba(212, 175, 55, 0.85)' }}>{formattedEventDate}</span>
+                        <img src="/logo-secondary.png" alt="The Cabana" style={{ height: '38px', width: 'auto', objectFit: 'contain', opacity: 0.9 }} />
+                        <span style={{ fontFamily: 'system-ui, sans-serif', fontSize: '11px', letterSpacing: '0.08em', color: 'rgba(212, 175, 55, 0.85)' }}>{formattedEventDate}</span>
                       </div>
                       {/* Guest name */}
                       <p style={{

@@ -130,17 +130,17 @@ const trademarkBarStyle: React.CSSProperties = {
   bottom: 0,
   left: 0,
   right: 0,
-  height: '40px',
+  height: '56px',
   backgroundColor: 'rgba(10, 10, 15, 0.82)',
   borderTop: '1px solid rgba(212, 175, 55, 0.4)',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  padding: '0 10px',
+  padding: '0 12px',
 }
 
 const trademarkLogoStyle: React.CSSProperties = {
-  height: '24px',
+  height: '38px',
   width: 'auto',
   objectFit: 'contain',
   opacity: 0.9,
@@ -148,7 +148,7 @@ const trademarkLogoStyle: React.CSSProperties = {
 
 const trademarkDateStyle: React.CSSProperties = {
   fontFamily: 'system-ui, sans-serif',
-  fontSize: '9px',
+  fontSize: '11px',
   letterSpacing: '0.08em',
   color: 'rgba(212, 175, 55, 0.85)',
 }
