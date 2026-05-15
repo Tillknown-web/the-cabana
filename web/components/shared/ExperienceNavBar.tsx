@@ -37,14 +37,19 @@ export default function ExperienceNavBar({ sessionId, currentCard, guestId, onSo
 
   const supabase = createClient()
 
-  // Spotify data fetch + live subscription
+  // Spotify data fetch + live subscription + 15-second fallback poll
   useEffect(() => {
-    supabase
-      .from('spotify_cache')
-      .select('track, artist')
-      .eq('session_id', sessionId)
-      .single()
-      .then(({ data }) => { if (data?.track) setNowPlaying(data as SpotifyRow) })
+    function fetchTrack() {
+      supabase
+        .from('spotify_cache')
+        .select('track, artist')
+        .eq('session_id', sessionId)
+        .single()
+        .then(({ data }) => { setNowPlaying(data?.track ? (data as SpotifyRow) : null) })
+    }
+
+    fetchTrack()
+    const interval = setInterval(fetchTrack, 15000)
 
     const channel = supabase
       .channel(`exp-nav-spotify-${sessionId}`)
@@ -58,7 +63,7 @@ export default function ExperienceNavBar({ sessionId, currentCard, guestId, onSo
       )
       .subscribe()
 
-    return () => { supabase.removeChannel(channel) }
+    return () => { clearInterval(interval); supabase.removeChannel(channel) }
   }, [sessionId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // While the reaction sheet is open, listen for the partner's next photo so the

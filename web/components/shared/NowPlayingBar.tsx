@@ -20,15 +20,19 @@ export default function NowPlayingBar({ sessionId, onSongRequest }: Props) {
   const supabase = createClient()
 
   useEffect(() => {
-    // Initial fetch
-    supabase
-      .from('spotify_cache')
-      .select('track, artist')
-      .eq('session_id', sessionId)
-      .single()
-      .then(({ data }) => { if (data?.track) setNowPlaying(data as SpotifyRow) })
+    function fetchTrack() {
+      supabase
+        .from('spotify_cache')
+        .select('track, artist')
+        .eq('session_id', sessionId)
+        .single()
+        .then(({ data }) => { setNowPlaying(data?.track ? (data as SpotifyRow) : null) })
+    }
 
-    // Subscribe to updates from the spotify-poll Edge Fn
+    fetchTrack()
+    const interval = setInterval(fetchTrack, 15000)
+
+    // Realtime subscription for instant updates when spotify_cache is in the publication
     const channel = supabase
       .channel(`spotify-${sessionId}`)
       .on(
@@ -41,7 +45,7 @@ export default function NowPlayingBar({ sessionId, onSongRequest }: Props) {
       )
       .subscribe()
 
-    return () => { supabase.removeChannel(channel) }
+    return () => { clearInterval(interval); supabase.removeChannel(channel) }
   }, [sessionId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
