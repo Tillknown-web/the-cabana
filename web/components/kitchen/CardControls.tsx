@@ -11,26 +11,32 @@ const CARD_SEQUENCE = [
   'intermission-1',
   'bite',
   'intermission-2',
-  'cut',
+  'cleanse',
+  'agua',
   'intermission-3',
+  'cut',
+  'intermission-4',
   'finish',
   'gallery',
 ] as const
 
 type Card = (typeof CARD_SEQUENCE)[number]
 
-const COURSE_CARDS = new Set<string>(['pour', 'bite', 'cut', 'finish', 'gallery'])
+const COURSE_CARDS = new Set<string>(['pour', 'bite', 'cleanse', 'agua', 'cut', 'finish', 'gallery'])
 
 const CARD_LABELS: Record<string, string> = {
-  welcome: 'Welcome',
-  pour: 'The Pour',
+  welcome:         'Welcome',
+  pour:            'The Opening Pour',
   'intermission-1': 'Intermission I',
-  bite: 'The Bite',
+  bite:            'The First Bite',
   'intermission-2': 'Intermission II',
-  cut: 'The Cut',
+  cleanse:         'The Cleanse',
+  agua:            'The Refresh',
   'intermission-3': 'Intermission III',
-  finish: 'The Finish',
-  gallery: 'Gallery',
+  cut:             'The Cut',
+  'intermission-4': 'Intermission IV',
+  finish:          'The Finish',
+  gallery:         'Gallery',
 }
 
 interface Props {

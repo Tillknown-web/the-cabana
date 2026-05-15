@@ -13,9 +13,10 @@ const INTERMISSION_MESSAGES = [
 ]
 
 const INTERMISSION_LABELS: Record<string, string> = {
-  'intermission-1': 'Between the pour & the bite',
-  'intermission-2': 'Between the bite & the cut',
-  'intermission-3': 'Before the finish',
+  'intermission-1': 'Between the pour & the first bite',
+  'intermission-2': 'Between the bite & the cleanse',
+  'intermission-3': 'Before the main course',
+  'intermission-4': 'Before the finish',
 }
 
 interface CountdownRow {
