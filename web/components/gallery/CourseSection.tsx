@@ -1,12 +1,18 @@
 import { COURSE_COURSE_LABELS } from '@/lib/constants'
 import { FlameIcon, HeartIcon, StarIcon } from '@/lib/icons'
 
+interface ReactionRow {
+  id: string
+  from_guest_id: string
+  reaction_type: string
+}
+
 interface PhotoEntry {
   id: string
   course: string
   signed_url: string | null
   guest: { id: string; name: string } | null
-  reaction: { id: string; from_guest_id: string; reaction_type: string } | null
+  reactions: ReactionRow[]
 }
 
 interface Props {
@@ -54,13 +60,17 @@ export default function CourseSection({ sectionKey, photos, guests }: Props) {
                 {/* Guest name */}
                 <p style={guestNameStyle}>{photo.guest?.name ?? 'Guest'}</p>
 
-                {/* Reaction badge */}
-                {photo.reaction && (
-                  <div style={{ ...reactionStyle, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem', color: '#D4AF37' }}>
-                    <ReactionIcon type={photo.reaction.reaction_type} />
-                    <span style={{ fontSize: '10px', opacity: 0.5, color: '#F5F0E8' }}>
-                      from {guests.find((g) => g.id === photo.reaction!.from_guest_id)?.name ?? 'Guest'}
-                    </span>
+                {/* Reaction badges — one per guest who reacted */}
+                {photo.reactions.length > 0 && (
+                  <div style={{ ...reactionStyle, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.2rem' }}>
+                    {photo.reactions.map((r) => (
+                      <div key={r.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem', color: '#D4AF37' }}>
+                        <ReactionIcon type={r.reaction_type} />
+                        <span style={{ fontSize: '10px', opacity: 0.5, color: '#F5F0E8' }}>
+                          from {guests.find((g) => g.id === r.from_guest_id)?.name ?? 'Guest'}
+                        </span>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>

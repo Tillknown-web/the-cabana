@@ -7,12 +7,18 @@ import { COURSE_COURSE_LABELS } from '@/lib/constants'
 import { FlameIcon, HeartIcon, StarIcon } from '@/lib/icons'
 import { createClient } from '@/lib/supabase/client'
 
+interface ReactionRow {
+  id: string
+  from_guest_id: string
+  reaction_type: string
+}
+
 interface PhotoEntry {
   id: string
   course: string
   signed_url: string | null
   guest: { id: string; name: string } | null
-  reaction: { id: string; from_guest_id: string; reaction_type: string } | null
+  reactions: ReactionRow[]
 }
 
 interface GalleryData {
@@ -26,7 +32,7 @@ interface Props {
   sessionId: string
 }
 
-const SECTION_ORDER = ['guest', 'pour', 'bite', 'cut', 'finish', 'booth']
+const SECTION_ORDER = ['guest', 'pour', 'bite', 'cleanse', 'agua', 'cut', 'finish', 'booth']
 
 export default function GalleryView({ guest, sessionId }: Props) {
   const [data, setData] = useState<GalleryData | null>(null)
@@ -155,7 +161,10 @@ export default function GalleryView({ guest, sessionId }: Props) {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
             {data.sections[sectionKey].map((photo) => {
               const isMyPhoto = photo.guest?.id === guest.id
-              const myReaction = isMyPhoto ? null : (photo.reaction?.from_guest_id === guest.id ? photo.reaction.reaction_type : null)
+              const myExistingReaction = photo.reactions.find((r) => r.from_guest_id === guest.id)?.reaction_type ?? null
+              const reactionsToShow = isMyPhoto
+                ? photo.reactions
+                : photo.reactions.filter((r) => r.from_guest_id !== guest.id)
 
               return (
                 <div key={photo.id}>
@@ -186,21 +195,26 @@ export default function GalleryView({ guest, sessionId }: Props) {
                         {photo.guest?.name ?? 'Guest'}
                       </p>
 
-                      {/* Reaction: only show picker on other guest's photos */}
+                      {/* Reaction picker: only on other guest's photos */}
                       {!isMyPhoto && (
                         <ReactionPicker
                           photoId={photo.id}
                           sessionId={sessionId}
-                          existingReaction={myReaction as 'fire' | 'heart' | 'chefs_kiss' | null}
+                          existingReaction={myExistingReaction as 'fire' | 'heart' | 'chefs_kiss' | null}
                         />
                       )}
 
-                      {/* Show reaction received on my photo */}
-                      {isMyPhoto && photo.reaction && (
-                        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '0.25rem', color: '#D4AF37' }}>
-                          {photo.reaction.reaction_type === 'fire' ? <FlameIcon size={20} />
-                            : photo.reaction.reaction_type === 'heart' ? <HeartIcon size={20} />
-                            : <StarIcon size={20} />}
+                      {/* All reactions on this photo (excluding self's reaction on
+                          partner photos, which the picker already represents). */}
+                      {reactionsToShow.length > 0 && (
+                        <div style={{ display: 'flex', justifyContent: 'center', gap: '0.4rem', marginTop: '0.25rem', color: '#D4AF37' }}>
+                          {reactionsToShow.map((r) => (
+                            <span key={r.id} title={`from ${data.guests.find((g) => g.id === r.from_guest_id)?.name ?? 'guest'}`} style={{ display: 'flex' }}>
+                              {r.reaction_type === 'fire' ? <FlameIcon size={20} />
+                                : r.reaction_type === 'heart' ? <HeartIcon size={20} />
+                                : <StarIcon size={20} />}
+                            </span>
+                          ))}
                         </div>
                       )}
                     </div>

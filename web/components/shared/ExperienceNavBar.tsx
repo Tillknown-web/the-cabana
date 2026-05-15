@@ -31,6 +31,7 @@ export default function ExperienceNavBar({ sessionId, currentCard, guestId, onSo
   const [reactionOpen, setReactionOpen]       = useState(false)
   const [reactionSending, setReactionSending] = useState(false)
   const [reactionSent, setReactionSent]       = useState<ReactionType | null>(null)
+  const [reactionError, setReactionError]     = useState<string | null>(null)
   const [toPhotoId, setToPhotoId]             = useState<string | null>(null)
   const [photoLookupDone, setPhotoLookupDone] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -136,6 +137,7 @@ export default function ExperienceNavBar({ sessionId, currentCard, guestId, onSo
     setSongPopoverOpen(false)
     setToPhotoId(null)
     setPhotoLookupDone(false)
+    setReactionError(null)
     setReactionOpen(true)
 
     const { data } = await supabase
@@ -154,12 +156,16 @@ export default function ExperienceNavBar({ sessionId, currentCard, guestId, onSo
   async function sendReaction(reactionType: ReactionType) {
     if (reactionSending || !toPhotoId) return
     setReactionSending(true)
+    setReactionError(null)
     try {
       const sc = createUploadClient()
       const { data: { session } } = await sc.auth.getSession()
-      if (!session) return
+      if (!session) {
+        setReactionError('Not signed in. Please refresh and check in again.')
+        return
+      }
 
-      await fetch(
+      const res = await fetch(
         `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/reaction`,
         {
           method: 'POST',
@@ -167,9 +173,26 @@ export default function ExperienceNavBar({ sessionId, currentCard, guestId, onSo
           body: JSON.stringify({ sessionId, toPhotoId, reactionType }),
         }
       )
+
+      if (!res.ok) {
+        let serverMessage = `Reaction failed (${res.status})`
+        try {
+          const json = await res.json() as { error?: string }
+          if (json.error) serverMessage = json.error
+        } catch { /* non-JSON body */ }
+        // eslint-disable-next-line no-console
+        console.error('[reaction] POST failed', { status: res.status, message: serverMessage, sessionId, toPhotoId, reactionType, selfGuestId: guestId })
+        setReactionError(serverMessage)
+        return
+      }
+
       setReactionSent(reactionType)
       setTimeout(() => { setReactionOpen(false); setReactionSent(null) }, 1200)
-    } catch { /* silent */ } finally {
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('[reaction] network error', err)
+      setReactionError('Network error. Check your connection and try again.')
+    } finally {
       setReactionSending(false)
     }
   }
@@ -242,37 +265,52 @@ export default function ExperienceNavBar({ sessionId, currentCard, guestId, onSo
           ) : !toPhotoId ? (
             <p style={{ ...popoverArtistStyle, opacity: 0.45 }}>Waiting for your partner&apos;s first photo…</p>
           ) : (
-            <div style={{ display: 'flex', gap: '1.25rem' }}>
-              {REACTIONS.map(({ type, icon, label }) => (
-                <button
-                  key={type}
-                  onClick={() => sendReaction(type)}
-                  disabled={reactionSending}
-                  title={label}
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: '0.3rem',
-                    background: 'none',
-                    border: reactionSent === type
-                      ? '1px solid rgba(212, 175, 55, 0.6)'
-                      : '1px solid transparent',
-                    borderRadius: '6px',
-                    padding: '0.5rem 0.65rem',
-                    cursor: reactionSending ? 'default' : 'pointer',
-                    color: reactionSent === type ? '#D4AF37' : '#F5F0E8',
-                    opacity: reactionSending && reactionSent !== type ? 0.4 : 1,
-                    transition: 'color 0.2s, border-color 0.2s',
-                  }}
-                >
-                  {icon}
-                  <span style={{ fontFamily: 'var(--font-sans)', fontSize: '9px', letterSpacing: '0.1em', textTransform: 'uppercase', opacity: 0.6 }}>
-                    {label}
-                  </span>
-                </button>
-              ))}
-            </div>
+            <>
+              <div style={{ display: 'flex', gap: '1.25rem' }}>
+                {REACTIONS.map(({ type, icon, label }) => (
+                  <button
+                    key={type}
+                    onClick={() => sendReaction(type)}
+                    disabled={reactionSending}
+                    title={label}
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: '0.3rem',
+                      background: 'none',
+                      border: reactionSent === type
+                        ? '1px solid rgba(212, 175, 55, 0.6)'
+                        : '1px solid transparent',
+                      borderRadius: '6px',
+                      padding: '0.5rem 0.65rem',
+                      cursor: reactionSending ? 'default' : 'pointer',
+                      color: reactionSent === type ? '#D4AF37' : '#F5F0E8',
+                      opacity: reactionSending && reactionSent !== type ? 0.4 : 1,
+                      transition: 'color 0.2s, border-color 0.2s',
+                    }}
+                  >
+                    {icon}
+                    <span style={{ fontFamily: 'var(--font-sans)', fontSize: '9px', letterSpacing: '0.1em', textTransform: 'uppercase', opacity: 0.6 }}>
+                      {label}
+                    </span>
+                  </button>
+                ))}
+              </div>
+              {reactionError && (
+                <p style={{
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: '10px',
+                  color: '#E27D60',
+                  opacity: 0.9,
+                  margin: '0.5rem 0 0',
+                  textAlign: 'center',
+                  maxWidth: '220px',
+                }}>
+                  {reactionError}
+                </p>
+              )}
+            </>
           )}
         </div>
       )}

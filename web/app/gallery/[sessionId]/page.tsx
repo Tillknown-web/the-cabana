@@ -1,12 +1,18 @@
 import CourseSection from '@/components/gallery/CourseSection'
 import KeepsakeReceipt from '@/components/gallery/KeepsakeReceipt'
 
+interface ReactionRow {
+  id: string
+  from_guest_id: string
+  reaction_type: string
+}
+
 interface PhotoEntry {
   id: string
   course: string
   signed_url: string | null
   guest: { id: string; name: string } | null
-  reaction: { id: string; from_guest_id: string; reaction_type: string } | null
+  reactions: ReactionRow[]
 }
 
 interface GalleryData {
@@ -15,7 +21,7 @@ interface GalleryData {
   sections: Record<string, PhotoEntry[]>
 }
 
-const SECTION_ORDER = ['guest', 'pour', 'bite', 'cut', 'finish', 'booth']
+const SECTION_ORDER = ['guest', 'pour', 'bite', 'cleanse', 'agua', 'cut', 'finish', 'booth']
 
 async function fetchGallery(sessionId: string): Promise<GalleryData | null> {
   try {

@@ -1,7 +1,7 @@
 import { handleCors, jsonResponse, errorResponse } from '../_shared/cors.ts'
 import { createServiceClient } from '../_shared/supabase-client.ts'
 
-const COURSE_ORDER = ['guest', 'pour', 'bite', 'cut', 'finish', 'booth'] as const
+const COURSE_ORDER = ['guest', 'pour', 'bite', 'cleanse', 'agua', 'cut', 'finish', 'booth'] as const
 type Course = (typeof COURSE_ORDER)[number]
 
 const SIGNED_URL_EXPIRY_SECONDS = 3600 // 1 hour
@@ -13,14 +13,14 @@ const SIGNED_URL_EXPIRY_SECONDS = 3600 // 1 hour
  * Returns all photos for a session grouped by course, with:
  * - 1-hour signed URLs for each photo
  * - Guest name for each photo
- * - Reaction (if any) received on each photo
+ * - All reactions received on each photo (one per other guest)
  *
  * Response shape:
  * {
  *   session: { session_id, event_date },
  *   guests: [{ id, name }],
  *   sections: {
- *     guest: [{ photo, guest, reaction }],
+ *     guest: [{ photo, guest, reactions: [{ id, from_guest_id, reaction_type }] }],
  *     pour: [...],
  *     ...
  *   }
@@ -86,8 +86,11 @@ Deno.serve(async (req) => {
 
       const guest = (guests ?? []).find((g) => g.id === photo.guest_id)
 
-      // A photo gets at most one reaction (from the other guest)
-      const reaction = (photo.reactions as { id: string; from_guest_id: string; reaction_type: string }[])?.[0] ?? null
+      // Return ALL reactions on this photo. The unique constraint on the
+      // reactions table is (from_guest_id, to_photo_id), so each guest can
+      // leave one reaction per photo — multiple guests reacting to the same
+      // photo is expected and previously truncated to one.
+      const reactions = (photo.reactions as { id: string; from_guest_id: string; reaction_type: string }[]) ?? []
 
       return {
         id: photo.id,
@@ -96,7 +99,7 @@ Deno.serve(async (req) => {
         signed_url: signedUrl,
         created_at: photo.created_at,
         guest: guest ?? null,
-        reaction,
+        reactions,
       }
     })
   )

@@ -21,15 +21,20 @@ interface Props {
 export default function ReactionPicker({ photoId, sessionId, existingReaction = null }: Props) {
   const [selected, setSelected] = useState<ReactionType | null>(existingReaction)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   async function react(reactionType: ReactionType) {
     if (loading) return
     setLoading(true)
+    setError(null)
 
     try {
       const supabase = createClient()
       const { data: { session } } = await supabase.auth.getSession()
-      if (!session) return
+      if (!session) {
+        setError('Not signed in')
+        return
+      }
 
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/reaction`,
@@ -43,44 +48,74 @@ export default function ReactionPicker({ photoId, sessionId, existingReaction = 
         }
       )
 
-      if (res.ok) setSelected(reactionType)
-    } catch { /* silent */ } finally {
+      if (res.ok) {
+        setSelected(reactionType)
+        return
+      }
+
+      let serverMessage = `Reaction failed (${res.status})`
+      try {
+        const json = await res.json() as { error?: string }
+        if (json.error) serverMessage = json.error
+      } catch { /* non-JSON */ }
+      // eslint-disable-next-line no-console
+      console.error('[reaction] POST failed', { status: res.status, message: serverMessage, photoId, reactionType })
+      setError(serverMessage)
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('[reaction] network error', err)
+      setError('Network error')
+    } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div style={{
-      display: 'flex',
-      gap: '0.5rem',
-      justifyContent: 'center',
-      marginTop: '0.75rem',
-    }}>
-      {REACTIONS.map(({ type, icon, label }) => (
-        <button
-          key={type}
-          onClick={() => react(type)}
-          disabled={loading}
-          title={label}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: 'none',
-            border: selected === type
-              ? '1px solid rgba(212, 175, 55, 0.6)'
-              : '1px solid transparent',
-            borderRadius: '4px',
-            cursor: loading ? 'default' : 'pointer',
-            padding: '0.3rem 0.5rem',
-            opacity: loading ? 0.5 : 1,
-            transition: 'border-color 0.2s, opacity 0.2s',
-            color: selected === type ? '#D4AF37' : '#F5F0E8',
-          }}
-        >
-          {icon}
-        </button>
-      ))}
+    <div>
+      <div style={{
+        display: 'flex',
+        gap: '0.5rem',
+        justifyContent: 'center',
+        marginTop: '0.75rem',
+      }}>
+        {REACTIONS.map(({ type, icon, label }) => (
+          <button
+            key={type}
+            onClick={() => react(type)}
+            disabled={loading}
+            title={label}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'none',
+              border: selected === type
+                ? '1px solid rgba(212, 175, 55, 0.6)'
+                : '1px solid transparent',
+              borderRadius: '4px',
+              cursor: loading ? 'default' : 'pointer',
+              padding: '0.3rem 0.5rem',
+              opacity: loading ? 0.5 : 1,
+              transition: 'border-color 0.2s, opacity 0.2s',
+              color: selected === type ? '#D4AF37' : '#F5F0E8',
+            }}
+          >
+            {icon}
+          </button>
+        ))}
+      </div>
+      {error && (
+        <p style={{
+          fontFamily: 'var(--font-sans)',
+          fontSize: '10px',
+          color: '#E27D60',
+          opacity: 0.85,
+          margin: '0.35rem 0 0',
+          textAlign: 'center',
+        }}>
+          {error}
+        </p>
+      )}
     </div>
   )
 }
