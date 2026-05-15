@@ -71,27 +71,15 @@ export default function LoadingScreen() {
               gap: '0.75rem',
             }}
           >
-            <p style={{
-              fontFamily: 'var(--font-sans)',
-              fontSize: '10px',
-              letterSpacing: '0.4em',
-              textTransform: 'uppercase',
-              color: '#D4AF37',
-              opacity: 0.7,
-            }}>
-              Est. 2026
-            </p>
-
-            <h1 style={{
-              fontFamily: 'var(--font-serif)',
-              fontSize: 'clamp(3.5rem, 10vw, 5.5rem)',
-              fontWeight: 400,
-              color: 'rgba(255,255,255,0.92)',
-              lineHeight: 0.9,
-              letterSpacing: '-0.01em',
-            }}>
-              The<br />Cabana
-            </h1>
+            <img
+              src="/logo-main.png"
+              alt="The Cabana"
+              style={{
+                width: 'clamp(200px, 50vw, 280px)',
+                height: 'auto',
+                mixBlendMode: 'screen',
+              }}
+            />
 
             <div style={{
               width: '32px',

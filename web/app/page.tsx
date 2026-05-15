@@ -6,6 +6,7 @@ import GlassNav from '@/components/landing/GlassNav'
 import ParticleField from '@/components/landing/ParticleField'
 import SeatCount from '@/components/landing/SeatCount'
 import { ArrowRightIcon } from '@/lib/icons'
+import { getTodayLA, getTodayYearLA } from '@/lib/date'
 
 // ─── Scroll-reveal wrapper ────────────────────────────────────────────────────
 function Reveal({
@@ -158,7 +159,7 @@ export default function LandingPage() {
               opacity: 0.8,
             }}
           >
-            Est. 2026
+            Est. {getTodayYearLA()}
           </motion.p>
 
           {/* Wordmark */}
@@ -223,7 +224,7 @@ export default function LandingPage() {
               marginBottom: '2rem',
             }}
           >
-            July 12, 2026
+            {getTodayLA()}
           </motion.p>
 
           {/* Seat count */}

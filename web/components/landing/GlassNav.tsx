@@ -64,17 +64,12 @@ export default function GlassNav() {
         }}
       >
         {/* Logo */}
-        <a
-          href="/"
-          style={{
-            fontFamily: 'var(--font-serif)',
-            fontSize: '1.1rem',
-            color: 'rgba(255,255,255,0.9)',
-            textDecoration: 'none',
-            letterSpacing: '0.02em',
-          }}
-        >
-          The Cabana
+        <a href="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
+          <img
+            src="/logo-secondary.png"
+            alt="The Cabana"
+            style={{ height: '36px', width: 'auto', mixBlendMode: 'screen' }}
+          />
         </a>
 
         {/* Desktop links */}
@@ -193,6 +188,21 @@ export default function GlassNav() {
               gap: '2.5rem',
             }}
           >
+            {/* Mobile overlay logo */}
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+              style={{ position: 'absolute', top: '2rem' }}
+            >
+              <img
+                src="/logo-secondary.png"
+                alt="The Cabana"
+                style={{ height: '40px', width: 'auto', mixBlendMode: 'screen' }}
+              />
+            </motion.div>
+
             {LINKS.map((link, i) => (
               <motion.a
                 key={link.href}
