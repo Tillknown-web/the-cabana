@@ -101,7 +101,7 @@ export default function PhotoBoothButton({ sessionId, eventDate = getTodayLA() }
       const blob = state.stage === 'preview' ? state.brandedBlob : await fetch(state.previewUrl).then(r => r.blob())
       await navigator.share({
         title: 'The Cabana',
-        text: 'poolside, after dark',
+        text: 'a night to remember — The Cabana',
         files: [new File([blob], 'the-cabana.jpg', { type: 'image/jpeg' })],
       })
     } catch { /* user cancelled */ }
@@ -297,27 +297,54 @@ async function applyBrandingOverlay(file: File, eventDate: string): Promise<Blob
       ctx.fillStyle = 'rgba(212, 175, 55, 0.5)'
       ctx.fillRect(0, h - bandH, w, 1)
 
-      // Brand text
-      ctx.fillStyle = '#F5F0E8'
-      ctx.font = `400 ${Math.round(bandH * 0.38)}px Georgia, serif`
-      ctx.textBaseline = 'middle'
-      ctx.textAlign = 'left'
-      ctx.fillText('The Cabana', 14, h - bandH / 2)
+      // Brand logo (left side of band)
+      const logoH = Math.round(bandH * 0.75)
+      const logoY = h - bandH + (bandH - logoH) / 2
+      const logo = new Image()
+      logo.onload = () => {
+        // Draw logo at natural aspect ratio, scaled to band height
+        const logoW = Math.round(logo.naturalWidth * (logoH / logo.naturalHeight))
+        ctx.drawImage(logo, 14, logoY, logoW, logoH)
 
-      // Date text (right side)
-      ctx.font = `400 ${Math.round(bandH * 0.3)}px system-ui, sans-serif`
-      ctx.fillStyle = 'rgba(212, 175, 55, 0.85)'
-      ctx.textAlign = 'right'
-      ctx.fillText(eventDate, w - 14, h - bandH / 2)
+        // Date text (right side)
+        ctx.font = `400 ${Math.round(bandH * 0.3)}px system-ui, sans-serif`
+        ctx.fillStyle = 'rgba(212, 175, 55, 0.85)'
+        ctx.textAlign = 'right'
+        ctx.textBaseline = 'middle'
+        ctx.fillText(eventDate, w - 14, h - bandH / 2)
 
-      canvas.toBlob(
-        (blob) => {
-          if (blob) resolve(blob)
-          else reject(new Error('Canvas export failed'))
-        },
-        'image/jpeg',
-        0.88
-      )
+        canvas.toBlob(
+          (blob) => {
+            if (blob) resolve(blob)
+            else reject(new Error('Canvas export failed'))
+          },
+          'image/jpeg',
+          0.88
+        )
+      }
+      logo.onerror = () => {
+        // Fallback to text if logo fails to load
+        ctx.fillStyle = '#F5F0E8'
+        ctx.font = `400 ${Math.round(bandH * 0.38)}px Georgia, serif`
+        ctx.textBaseline = 'middle'
+        ctx.textAlign = 'left'
+        ctx.fillText('The Cabana', 14, h - bandH / 2)
+
+        ctx.font = `400 ${Math.round(bandH * 0.3)}px system-ui, sans-serif`
+        ctx.fillStyle = 'rgba(212, 175, 55, 0.85)'
+        ctx.textAlign = 'right'
+        ctx.fillText(eventDate, w - 14, h - bandH / 2)
+
+        canvas.toBlob(
+          (blob) => {
+            if (blob) resolve(blob)
+            else reject(new Error('Canvas export failed'))
+          },
+          'image/jpeg',
+          0.88
+        )
+      }
+      logo.src = '/logo-main.png'
     }
 
     img.onerror = () => reject(new Error('Failed to load image'))

@@ -86,7 +86,7 @@ export default function WelcomeCard({ guest, sessionId }: Props) {
   return (
     <div style={{ ...centeredLayout, justifyContent: 'flex-start', paddingTop: '5rem' }}>
       <p style={labelStyle}>welcome</p>
-      <h1 style={headingStyle}>The Cabana</h1>
+      <img src="/logo-main.png" alt="The Cabana" style={{ width: 'clamp(180px, 60vw, 280px)', height: 'auto', marginBottom: '0.5rem' }} />
       <div style={dividerStyle} />
 
       {/* How tonight works callout */}

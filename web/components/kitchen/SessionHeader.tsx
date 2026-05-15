@@ -93,7 +93,7 @@ export default function SessionHeader({ sessionState, sessionId, accessToken, on
       }}>
         {/* Left: Wordmark */}
         <div>
-          <p style={wordmarkStyle}>The Cabana</p>
+          <img src="/logo-main.png" alt="The Cabana" style={{ height: '40px', width: 'auto', marginBottom: '0.25rem', display: 'block' }} />
           <p style={sessionStyle}>/ kitchen · {sessionId}</p>
         </div>
 

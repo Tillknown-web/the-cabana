@@ -44,7 +44,12 @@ export default function GalleryView({ guest, sessionId }: Props) {
     try {
       const url = new URL(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/gallery`)
       url.searchParams.set('sessionId', sessionId)
-      const res = await fetch(url.toString(), { cache: 'no-store' })
+      const res = await fetch(url.toString(), {
+        cache: 'no-store',
+        headers: {
+          Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+        },
+      })
       const json = await res.json()
       if (!res.ok) throw new Error(json.error ?? 'Failed to load gallery')
       setData(json as GalleryData)
@@ -126,18 +131,11 @@ export default function GalleryView({ guest, sessionId }: Props) {
       {/* Header */}
       <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
         {/* Brand wordmark */}
-        <p style={{
-          fontFamily: 'var(--font-serif)',
-          fontSize: 'clamp(3rem, 16vw, 6rem)',
-          fontWeight: 400,
-          color: '#D4AF37',
-          letterSpacing: '0.06em',
-          margin: '0 0 1.5rem',
-          lineHeight: 1,
-          opacity: 0.92,
-        }}>
-          The Cabana
-        </p>
+        <img
+          src="/logo-main.png"
+          alt="The Cabana"
+          style={{ width: 'clamp(200px, 65vw, 340px)', height: 'auto', margin: '0 auto 1.5rem', display: 'block' }}
+        />
         <p style={labelStyle}>The Evening</p>
         <h1 style={headingStyle}>Your Gallery</h1>
         <div style={dividerStyle} />
@@ -236,7 +234,10 @@ export default function GalleryView({ guest, sessionId }: Props) {
       {/* Footer */}
       <div style={{ textAlign: 'center', marginTop: '2rem' }}>
         <div style={dividerStyle} />
-        <p style={{ ...subStyle, opacity: 0.35 }}>The Cabana · {new Date(data.session.event_date).getFullYear()}</p>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', opacity: 0.35 }}>
+          <img src="/logo-main.png" alt="The Cabana" style={{ height: '28px', width: 'auto' }} />
+          · {new Date(data.session.event_date).getFullYear()}
+        </span>
       </div>
     </div>
   )

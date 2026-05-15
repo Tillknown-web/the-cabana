@@ -89,14 +89,14 @@ export default function CheckIn({ sessionId, onCheckedIn }: Props) {
         transition={{ duration: 0.6 }}
         style={{ position: 'relative', width: '100%', maxWidth: '280px', textAlign: 'center' }}
       >
-        <motion.p
+        <motion.img
+          src="/logo-main.png"
+          alt="The Cabana"
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          style={labelStyle}
-        >
-          The Cabana
-        </motion.p>
+          style={{ width: '160px', height: 'auto', marginBottom: '0.5rem' }}
+        />
 
         <motion.h1
           initial={{ opacity: 0, y: 16 }}
@@ -230,21 +230,14 @@ export default function CheckIn({ sessionId, onCheckedIn }: Props) {
             />
 
             {/* Welcome text */}
-            <motion.p
-              initial={{ opacity: 0, letterSpacing: '0.6em' }}
-              animate={{ opacity: 1, letterSpacing: '0.3em' }}
+            <motion.img
+              src="/logo-main.png"
+              alt="The Cabana"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.8 }}
               transition={{ duration: 0.65, delay: 0.5 }}
-              style={{
-                fontFamily: 'var(--font-sans)',
-                fontSize: '10px',
-                textTransform: 'uppercase',
-                color: '#D4AF37',
-                marginBottom: '1rem',
-                opacity: 0.8,
-              }}
-            >
-              The Cabana
-            </motion.p>
+              style={{ width: '120px', height: 'auto', marginBottom: '1rem' }}
+            />
 
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
@@ -289,7 +282,7 @@ export default function CheckIn({ sessionId, onCheckedIn }: Props) {
                 marginTop: '1rem',
               }}
             >
-              poolside, after dark
+              savour the occasion
             </motion.p>
           </motion.div>
         )}
