@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createKitchenServerClient } from '@/lib/supabase/kitchen-server'
 import { searchTracks, addToQueue } from '@/lib/spotify-server'
 
 export async function POST(req: NextRequest) {
-  const supabase = await createClient()
+  const supabase = await createKitchenServerClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user || user.user_metadata?.role !== 'kitchen') {

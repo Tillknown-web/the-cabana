@@ -36,7 +36,7 @@ export default function NowPlayingBar({ sessionId, onSongRequest }: Props) {
         { event: '*', schema: 'public', table: 'spotify_cache', filter: `session_id=eq.${sessionId}` },
         (payload) => {
           const row = payload.new as SpotifyRow
-          if (row?.track) setNowPlaying(row)
+          setNowPlaying(row?.track ? row : null)
         }
       )
       .subscribe()

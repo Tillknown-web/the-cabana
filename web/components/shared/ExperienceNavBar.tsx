@@ -53,13 +53,35 @@ export default function ExperienceNavBar({ sessionId, currentCard, guestId, onSo
         { event: '*', schema: 'public', table: 'spotify_cache', filter: `session_id=eq.${sessionId}` },
         (payload) => {
           const row = payload.new as SpotifyRow
-          if (row?.track) setNowPlaying(row)
+          setNowPlaying(row?.track ? row : null)
         }
       )
       .subscribe()
 
     return () => { supabase.removeChannel(channel) }
   }, [sessionId]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // While the reaction sheet is open, listen for the partner's next photo so the
+  // reaction buttons appear without needing to close and reopen the sheet.
+  useEffect(() => {
+    if (!reactionOpen) return
+
+    const channel = supabase
+      .channel(`reaction-photos-${sessionId}`)
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'photos', filter: `session_id=eq.${sessionId}` },
+        (payload) => {
+          const photo = payload.new as { id: string; guest_id: string }
+          if (photo.guest_id !== guestId && !toPhotoId) {
+            setToPhotoId(photo.id)
+          }
+        }
+      )
+      .subscribe()
+
+    return () => { supabase.removeChannel(channel) }
+  }, [reactionOpen, sessionId, guestId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   function handleTakePicture() {
     setSongPopoverOpen(false)
@@ -213,7 +235,7 @@ export default function ExperienceNavBar({ sessionId, currentCard, guestId, onSo
           {!photoLookupDone ? (
             <p style={{ ...popoverArtistStyle, opacity: 0.45 }}>Loading…</p>
           ) : !toPhotoId ? (
-            <p style={{ ...popoverArtistStyle, opacity: 0.45 }}>No photos to react to yet.</p>
+            <p style={{ ...popoverArtistStyle, opacity: 0.45 }}>Waiting for your partner&apos;s first photo…</p>
           ) : (
             <div style={{ display: 'flex', gap: '1.25rem' }}>
               {REACTIONS.map(({ type, icon, label }) => (

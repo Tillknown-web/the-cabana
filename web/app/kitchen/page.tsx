@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { createKitchenClient } from '@/lib/supabase/kitchen-client'
 import SessionHeader from '@/components/kitchen/SessionHeader'
 import CardControls from '@/components/kitchen/CardControls'
 import GuestTracker from '@/components/kitchen/GuestTracker'
@@ -35,7 +35,7 @@ export default function KitchenPage() {
   const [authError, setAuthError] = useState<string | null>(null)
   const [resetCount, setResetCount] = useState(0)
 
-  const supabase = createClient()
+  const supabase = createKitchenClient()
 
   useEffect(() => {
     async function signIn() {

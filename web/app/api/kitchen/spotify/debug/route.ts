@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createKitchenServerClient } from '@/lib/supabase/kitchen-server'
 
 const SPOTIFY_TOKEN_URL = 'https://accounts.spotify.com/api/token'
 const SPOTIFY_BASE_URL = 'https://api.spotify.com/v1'
 
 export async function GET() {
-  const supabase = await createClient()
+  const supabase = await createKitchenServerClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user || user.user_metadata?.role !== 'kitchen') {
