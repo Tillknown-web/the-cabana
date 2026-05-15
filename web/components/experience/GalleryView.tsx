@@ -168,37 +168,40 @@ export default function GalleryView({ guest, sessionId }: Props) {
               return (
                 <div key={photo.id}>
                   {photo.signed_url ? (
-                    <div style={{ position: 'relative' }}>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={photo.signed_url}
-                        alt={`${photo.guest?.name ?? 'Photo'} — ${sectionKey}`}
-                        style={{
-                          width: '100%',
-                          aspectRatio: '1',
-                          objectFit: 'cover',
-                          display: 'block',
-                          border: isMyPhoto ? '1px solid rgba(212, 175, 55, 0.25)' : '1px solid transparent',
-                        }}
-                      />
-                      {/* Trademark bar */}
-                      <div style={{
-                        position: 'absolute',
-                        bottom: 0,
-                        left: 0,
-                        right: 0,
-                        height: '56px',
-                        backgroundColor: 'rgba(10, 10, 15, 0.82)',
-                        borderTop: '1px solid rgba(212, 175, 55, 0.4)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        padding: '0 12px',
-                      }}>
+                    <div>
+                      <div style={{ position: 'relative' }}>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src="/logo-secondary.png" alt="The Cabana" style={{ height: '38px', width: 'auto', objectFit: 'contain', opacity: 0.9 }} />
-                        <span style={{ fontFamily: 'system-ui, sans-serif', fontSize: '11px', letterSpacing: '0.08em', color: 'rgba(212, 175, 55, 0.85)' }}>{formattedEventDate}</span>
+                        <img
+                          src={photo.signed_url}
+                          alt={`${photo.guest?.name ?? 'Photo'} — ${sectionKey}`}
+                          style={{
+                            width: '100%',
+                            aspectRatio: '1',
+                            objectFit: 'cover',
+                            display: 'block',
+                            border: isMyPhoto ? '1px solid rgba(212, 175, 55, 0.25)' : '1px solid transparent',
+                          }}
+                        />
+                        {/* Trademark bar */}
+                        <div style={{
+                          position: 'absolute',
+                          bottom: 0,
+                          left: 0,
+                          right: 0,
+                          height: '56px',
+                          backgroundColor: 'rgba(10, 10, 15, 0.82)',
+                          borderTop: '1px solid rgba(212, 175, 55, 0.4)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          padding: '0 12px',
+                        }}>
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src="/logo-secondary.png" alt="The Cabana" style={{ height: '38px', width: 'auto', objectFit: 'contain', opacity: 0.9 }} />
+                          <span style={{ fontFamily: 'system-ui, sans-serif', fontSize: '11px', letterSpacing: '0.08em', color: 'rgba(212, 175, 55, 0.85)' }}>{formattedEventDate}</span>
+                        </div>
                       </div>
+
                       {/* Guest name */}
                       <p style={{
                         fontFamily: 'var(--font-sans)',
