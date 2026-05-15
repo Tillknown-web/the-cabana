@@ -82,7 +82,7 @@ export default function PhotoBoothButton({ sessionId, guestId }: PhotoBoothButto
       const blob = await res.blob()
       const file = new File([blob], 'cabana-photo.jpg', { type: 'image/jpeg' })
       if (navigator.canShare?.({ files: [file] })) {
-        await navigator.share({ files: [file], title: 'The Cabana', text: 'poolside, after dark' })
+        await navigator.share({ files: [file], title: 'The Cabana', text: 'a night to remember — The Cabana' })
       } else {
         handleDownload()
       }

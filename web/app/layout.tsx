@@ -19,10 +19,10 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: 'The Cabana',
-  description: 'poolside, after dark — a private dining experience',
+  description: 'a private dining experience, curated for the discerning few',
   openGraph: {
     title: 'The Cabana',
-    description: 'poolside, after dark',
+    description: 'an evening of curated indulgence',
     type: 'website',
   },
 }

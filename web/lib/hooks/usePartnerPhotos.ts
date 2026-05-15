@@ -55,7 +55,12 @@ export function usePartnerPhotos(
       try {
         const url = new URL(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/gallery`)
         url.searchParams.set('sessionId', sessionId)
-        const res = await fetch(url.toString(), { cache: 'no-store' })
+        const res = await fetch(url.toString(), {
+          cache: 'no-store',
+          headers: {
+            Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+          },
+        })
         if (!res.ok) return
         const data = (await res.json()) as GalleryResponse
 

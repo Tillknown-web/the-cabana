@@ -27,7 +27,12 @@ async function fetchGallery(sessionId: string): Promise<GalleryData | null> {
   try {
     const url = new URL(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/gallery`)
     url.searchParams.set('sessionId', sessionId)
-    const res = await fetch(url.toString(), { next: { revalidate: 300 } })
+    const res = await fetch(url.toString(), {
+      next: { revalidate: 300 },
+      headers: {
+        Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+      },
+    })
     if (!res.ok) return null
     return res.json()
   } catch {

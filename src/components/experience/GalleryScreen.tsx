@@ -77,7 +77,7 @@ export default function GalleryScreen({ sessionId, guestId, guestName }: Gallery
 
     ctx.fillStyle = '#D4AF37'
     ctx.font = '500 10px Inter, sans-serif'
-    ctx.fillText('POOLSIDE · AFTER DARK', W / 2, y)
+    ctx.fillText('AN EVENING OF RARE DISTINCTION', W / 2, y)
     y += 28
 
     ctx.fillStyle = 'rgba(245,240,232,0.5)'
@@ -175,7 +175,7 @@ export default function GalleryScreen({ sessionId, guestId, guestName }: Gallery
       const file = new File([blob], 'cabana-receipt.png', { type: 'image/png' })
       try {
         if (navigator.canShare?.({ files: [file] })) {
-          await navigator.share({ files: [file], title: 'The Cabana', text: 'poolside, after dark' })
+          await navigator.share({ files: [file], title: 'The Cabana', text: 'a night to remember — The Cabana' })
         } else {
           await downloadReceipt()
         }
@@ -368,7 +368,7 @@ export default function GalleryScreen({ sessionId, guestId, guestName }: Gallery
           The Cabana
         </h2>
         <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 11, color: '#D4AF37', marginBottom: 16 }}>
-          poolside, after dark
+          where luxury lingers
         </p>
         <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 12, color: 'rgba(245,240,232,0.5)', marginBottom: 20 }}>
           July 12, 2026

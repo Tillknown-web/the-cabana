@@ -91,7 +91,7 @@ export default function LoadingScreen() {
               color: 'rgba(255,255,255,0.4)',
               letterSpacing: '0.03em',
             }}>
-              poolside, after dark
+              the art of a perfect evening
             </p>
           </motion.div>
 

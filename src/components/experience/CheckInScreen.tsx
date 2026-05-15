@@ -158,7 +158,7 @@ export default function CheckInScreen({ onCheckedIn, sessionId }: CheckInScreenP
             opacity: 0.6,
           }}
         >
-          poolside · after dark
+          savour the occasion
         </p>
 
         <GoldDivider width={56} style={{ marginBottom: 44 }} />

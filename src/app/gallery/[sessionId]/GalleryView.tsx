@@ -61,7 +61,7 @@ export default function GalleryView({ sessionId }: { sessionId: string }) {
         The Cabana
       </p>
       <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 11, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.3em', color: '#D4AF37', marginBottom: 8 }}>
-        poolside · after dark
+        an evening of rare distinction
       </p>
       <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, color: 'rgba(245,240,232,0.4)', marginBottom: 40 }}>
         July 12, 2026

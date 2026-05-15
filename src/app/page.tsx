@@ -161,7 +161,7 @@ export default function LandingPage() {
         <div style={{ width: 48, height: 1, backgroundColor: G, opacity: 0.55, margin: '0 auto 22px' }} />
 
         <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 'clamp(15px, 2.5vw, 19px)', fontStyle: 'italic', fontWeight: 300, color: P, opacity: 0.55, letterSpacing: '0.08em', marginBottom: 44 }}>
-          poolside, after dark
+          an evening of rare distinction
         </p>
 
         <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 11, color: P, opacity: 0.35, letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: 52 }}>
@@ -432,7 +432,7 @@ export default function LandingPage() {
           An evening unlike<br />any other.
         </h2>
         <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 'clamp(15px,2.5vw,18px)', fontStyle: 'italic', fontWeight: 300, color: `rgba(45,27,71,0.45)`, marginBottom: 52 }}>
-          poolside, after dark
+          where luxury lingers
         </p>
         <Link
           href="/experience"
@@ -458,7 +458,7 @@ export default function LandingPage() {
           The Cabana
         </p>
         <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 9, textTransform: 'uppercase', letterSpacing: '0.25em', color: `rgba(212,175,55,0.5)` }}>
-          poolside · after dark · est. 2026
+          a night unlike any other · est. 2026
         </p>
       </footer>
 
