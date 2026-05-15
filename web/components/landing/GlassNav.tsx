@@ -68,7 +68,7 @@ export default function GlassNav() {
           <img
             src="/logo-secondary.png"
             alt="The Cabana"
-            style={{ height: '36px', width: 'auto' }}
+            style={{ width: '200px', height: 'auto' }}
           />
         </a>
 
