@@ -155,7 +155,7 @@ function applyBrandingOverlay(blob: Blob, eventDate: string): Promise<Blob> {
       ctx.strokeRect(10, 10, w - 20, h - 20)
 
       // Bottom label band
-      const bandH = 36
+      const bandH = 44
       ctx.fillStyle = 'rgba(10, 10, 15, 0.82)'
       ctx.fillRect(0, h - bandH, w, bandH)
 
