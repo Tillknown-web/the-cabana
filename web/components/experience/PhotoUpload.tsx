@@ -3,15 +3,17 @@
 import { useRef, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { CameraIcon, ImageIcon } from '@/lib/icons'
+import { getTodayLA } from '@/lib/date'
 
 interface Props {
   course: string
   sessionId: string
+  eventDate?: string
   onUploaded: (previewUrl: string) => void
   onCancel: () => void
 }
 
-export default function PhotoUpload({ course, sessionId, onUploaded, onCancel }: Props) {
+export default function PhotoUpload({ course, sessionId, eventDate = getTodayLA(), onUploaded, onCancel }: Props) {
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const cameraInputRef = useRef<HTMLInputElement>(null)
@@ -22,9 +24,10 @@ export default function PhotoUpload({ course, sessionId, onUploaded, onCancel }:
     setError(null)
 
     try {
-      // Resize the image client-side to keep uploads fast
+      // Resize then brand the image client-side
       const resized = await resizeImage(file, 1200)
-      const previewUrl = URL.createObjectURL(resized)
+      const branded = await applyBrandingOverlay(resized, eventDate)
+      const previewUrl = URL.createObjectURL(branded)
 
       const supabase = createClient()
       const { data: { session } } = await supabase.auth.getSession()
@@ -35,7 +38,7 @@ export default function PhotoUpload({ course, sessionId, onUploaded, onCancel }:
       // to Storage with the guest's ES256 user JWT fails with
       // "Unsupported JWT algorithm ES256" (Supabase storage bug #741).
       const form = new FormData()
-      form.append('file', resized, `${course}.jpg`)
+      form.append('file', branded, `${course}.jpg`)
       form.append('sessionId', sessionId)
       form.append('course', course)
 
@@ -126,6 +129,77 @@ export default function PhotoUpload({ course, sessionId, onUploaded, onCancel }:
       )}
     </div>
   )
+}
+
+function applyBrandingOverlay(blob: Blob, eventDate: string): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    const url = URL.createObjectURL(blob)
+
+    img.onload = () => {
+      const w = img.width
+      const h = img.height
+
+      const canvas = document.createElement('canvas')
+      canvas.width = w
+      canvas.height = h
+      const ctx = canvas.getContext('2d')
+      if (!ctx) { reject(new Error('Canvas unavailable')); return }
+
+      ctx.drawImage(img, 0, 0, w, h)
+      URL.revokeObjectURL(url)
+
+      // Border frame
+      ctx.strokeStyle = 'rgba(10, 10, 15, 0.7)'
+      ctx.lineWidth = 3
+      ctx.strokeRect(10, 10, w - 20, h - 20)
+
+      // Bottom label band
+      const bandH = 36
+      ctx.fillStyle = 'rgba(10, 10, 15, 0.82)'
+      ctx.fillRect(0, h - bandH, w, bandH)
+
+      // Gold hairline above band
+      ctx.fillStyle = 'rgba(212, 175, 55, 0.5)'
+      ctx.fillRect(0, h - bandH, w, 1)
+
+      // Date text (right side)
+      ctx.font = `400 ${Math.round(bandH * 0.3)}px system-ui, sans-serif`
+      ctx.fillStyle = 'rgba(212, 175, 55, 0.85)'
+      ctx.textBaseline = 'middle'
+      ctx.textAlign = 'right'
+      ctx.fillText(eventDate, w - 14, h - bandH / 2)
+
+      const logoH = Math.round(bandH * 0.75)
+      const logoY = h - bandH + (bandH - logoH) / 2
+      const logo = new Image()
+      logo.onload = () => {
+        const logoW = Math.round(logo.naturalWidth * (logoH / logo.naturalHeight))
+        ctx.drawImage(logo, 14, logoY, logoW, logoH)
+        canvas.toBlob(
+          (b) => { if (b) resolve(b); else reject(new Error('Canvas export failed')) },
+          'image/jpeg',
+          0.88
+        )
+      }
+      logo.onerror = () => {
+        ctx.fillStyle = '#F5F0E8'
+        ctx.font = `400 ${Math.round(bandH * 0.38)}px Georgia, serif`
+        ctx.textBaseline = 'middle'
+        ctx.textAlign = 'left'
+        ctx.fillText('The Cabana', 14, h - bandH / 2)
+        canvas.toBlob(
+          (b) => { if (b) resolve(b); else reject(new Error('Canvas export failed')) },
+          'image/jpeg',
+          0.88
+        )
+      }
+      logo.src = '/logo-secondary.png'
+    }
+
+    img.onerror = () => reject(new Error('Failed to load image'))
+    img.src = url
+  })
 }
 
 function resizeImage(file: File, maxWidth: number): Promise<Blob> {

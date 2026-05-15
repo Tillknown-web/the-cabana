@@ -344,7 +344,7 @@ async function applyBrandingOverlay(file: File, eventDate: string): Promise<Blob
           0.88
         )
       }
-      logo.src = '/logo-main.png'
+      logo.src = '/logo-secondary.png'
     }
 
     img.onerror = () => reject(new Error('Failed to load image'))

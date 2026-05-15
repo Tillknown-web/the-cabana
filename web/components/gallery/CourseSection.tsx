@@ -19,6 +19,7 @@ interface Props {
   sectionKey: string
   photos: PhotoEntry[]
   guests: { id: string; name: string }[]
+  eventDate?: string
 }
 
 function ReactionIcon({ type }: { type: string }) {
@@ -27,7 +28,7 @@ function ReactionIcon({ type }: { type: string }) {
   return <StarIcon size={16} />
 }
 
-export default function CourseSection({ sectionKey, photos, guests }: Props) {
+export default function CourseSection({ sectionKey, photos, guests, eventDate }: Props) {
   const label = COURSE_COURSE_LABELS[sectionKey] ?? sectionKey
 
   return (
@@ -45,17 +46,25 @@ export default function CourseSection({ sectionKey, photos, guests }: Props) {
           <div key={photo.id}>
             {photo.signed_url ? (
               <div>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={photo.signed_url}
-                  alt={`${photo.guest?.name ?? 'Photo'} — ${label}`}
-                  style={{
-                    width: '100%',
-                    aspectRatio: '1',
-                    objectFit: 'cover',
-                    display: 'block',
-                  }}
-                />
+                <div style={{ position: 'relative' }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={photo.signed_url}
+                    alt={`${photo.guest?.name ?? 'Photo'} — ${label}`}
+                    style={{
+                      width: '100%',
+                      aspectRatio: '1',
+                      objectFit: 'cover',
+                      display: 'block',
+                    }}
+                  />
+                  {/* Trademark bar */}
+                  <div style={trademarkBarStyle}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="/logo-secondary.png" alt="The Cabana" style={trademarkLogoStyle} />
+                    {eventDate && <span style={trademarkDateStyle}>{eventDate}</span>}
+                  </div>
+                </div>
 
                 {/* Guest name */}
                 <p style={guestNameStyle}>{photo.guest?.name ?? 'Guest'}</p>
@@ -114,4 +123,32 @@ const reactionStyle: React.CSSProperties = {
   textAlign: 'center',
   marginTop: '0.25rem',
   color: '#F5F0E8',
+}
+
+const trademarkBarStyle: React.CSSProperties = {
+  position: 'absolute',
+  bottom: 0,
+  left: 0,
+  right: 0,
+  height: '32px',
+  backgroundColor: 'rgba(10, 10, 15, 0.82)',
+  borderTop: '1px solid rgba(212, 175, 55, 0.4)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  padding: '0 8px',
+}
+
+const trademarkLogoStyle: React.CSSProperties = {
+  height: '16px',
+  width: 'auto',
+  objectFit: 'contain',
+  opacity: 0.9,
+}
+
+const trademarkDateStyle: React.CSSProperties = {
+  fontFamily: 'system-ui, sans-serif',
+  fontSize: '9px',
+  letterSpacing: '0.08em',
+  color: 'rgba(212, 175, 55, 0.85)',
 }

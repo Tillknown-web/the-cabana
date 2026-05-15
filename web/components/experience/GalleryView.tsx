@@ -125,6 +125,7 @@ export default function GalleryView({ guest, sessionId }: Props) {
   }
 
   const sections = SECTION_ORDER.filter((s) => data.sections[s]?.length)
+  const formattedEventDate = new Date(data.session.event_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
 
   return (
     <div style={{ padding: '3rem 1.5rem 6rem', maxWidth: '480px', margin: '0 auto' }}>
@@ -180,6 +181,24 @@ export default function GalleryView({ guest, sessionId }: Props) {
                           border: isMyPhoto ? '1px solid rgba(212, 175, 55, 0.25)' : '1px solid transparent',
                         }}
                       />
+                      {/* Trademark bar */}
+                      <div style={{
+                        position: 'absolute',
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        height: '32px',
+                        backgroundColor: 'rgba(10, 10, 15, 0.82)',
+                        borderTop: '1px solid rgba(212, 175, 55, 0.4)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: '0 8px',
+                      }}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src="/logo-secondary.png" alt="The Cabana" style={{ height: '16px', width: 'auto', objectFit: 'contain', opacity: 0.9 }} />
+                        <span style={{ fontFamily: 'system-ui, sans-serif', fontSize: '9px', letterSpacing: '0.08em', color: 'rgba(212, 175, 55, 0.85)' }}>{formattedEventDate}</span>
+                      </div>
                       {/* Guest name */}
                       <p style={{
                         fontFamily: 'var(--font-sans)',
