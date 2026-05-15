@@ -480,12 +480,8 @@ export default function LandingPage() {
           </Reveal>
 
           <div className="client-grid">
-            <Reveal delay={0.08}><ClientCard initials="MJ" name="Marcus J." note="table 1 · every season" tier="founding" /></Reveal>
-            <Reveal delay={0.14}><ClientCard initials="SA" name="Sofia A." note="always the first reservation" tier="founding" /></Reveal>
-            <Reveal delay={0.20}><ClientCard initials="DL" name="Diana L." note="never misses a menu" tier="elite" /></Reveal>
-            <Reveal delay={0.26}><ClientCard initials="RP" name="René P." note="the reason we added the cleanse" tier="elite" /></Reveal>
-            <Reveal delay={0.32}><ClientCard initials="KW" name="Kai W." note="brought the playlist idea" tier="elite" /></Reveal>
-            <Reveal delay={0.38}><ClientCard initials="YB" name="Yvette B." note="her feedback shapes every season" tier="elite" /></Reveal>
+            <Reveal delay={0.08}><ClientCard initials="Jae" name="Jae" note="the youngest & most distinguished guest" tier="founding" photo="/jae.png" /></Reveal>
+            <Reveal delay={0.16}><ClientCard initials="?" name="???" note="seat reserved · to be announced" tier="elite" pending /></Reveal>
           </div>
         </div>
       </section>
@@ -630,7 +626,9 @@ export default function LandingPage() {
         .client-grid {
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 1rem;
+          gap: 1.5rem;
+          max-width: 640px;
+          margin: 0 auto;
         }
         @media (max-width: 639px) {
           .client-grid {
@@ -800,72 +798,110 @@ function CourseItem({
   )
 }
 
-function ClientCard({ initials, name, note, tier }: { initials: string; name: string; note: string; tier: 'founding' | 'elite' }) {
+function ClientCard({ initials, name, note, tier, photo, pending = false }: { initials: string; name: string; note: string; tier: 'founding' | 'elite'; photo?: string; pending?: boolean }) {
   const [hovered, setHovered] = useState(false)
   const tierColor = tier === 'founding' ? '#D4AF37' : '#4DD9C0'
-  const tierLabel = tier === 'founding' ? 'founding member' : 'elite guest'
+  const tierLabel = tier === 'founding' ? 'founding member' : 'seat reserved'
   return (
     <motion.div
-      whileHover={{ scale: 1.015, y: -3 }}
+      whileHover={{ scale: 1.015, y: -4 }}
       transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
       onHoverStart={() => setHovered(true)}
       onHoverEnd={() => setHovered(false)}
       style={{
-        padding: '1.75rem 1.5rem',
-        background: hovered ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.02)',
+        padding: '2.5rem 2rem',
+        background: hovered ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.02)',
         border: `1px solid ${hovered ? `${tierColor}40` : `${tierColor}14`}`,
         borderLeft: `2px solid ${hovered ? `${tierColor}99` : `${tierColor}33`}`,
         backdropFilter: 'blur(12px)',
         WebkitBackdropFilter: 'blur(12px)',
         transition: 'border-color 0.3s, box-shadow 0.3s, background 0.3s',
-        boxShadow: hovered ? `0 8px 32px ${tierColor}12` : 'none',
+        boxShadow: hovered ? `0 12px 48px ${tierColor}18` : 'none',
         display: 'flex',
+        flexDirection: 'column',
         alignItems: 'center',
-        gap: '1.25rem',
+        gap: '1.5rem',
+        textAlign: 'center',
       }}
     >
-      <div style={{
-        flexShrink: 0,
-        width: '48px',
-        height: '48px',
-        borderRadius: '50%',
-        border: `1px solid ${tierColor}40`,
-        background: `radial-gradient(circle at 40% 35%, ${tierColor}12 0%, rgba(10,10,15,0.6) 60%)`,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}>
-        <span style={{
-          fontFamily: 'var(--font-serif)',
-          fontSize: '1rem',
-          color: tierColor,
-          fontWeight: 400,
-        }}>{initials}</span>
+      {/* Avatar */}
+      <div style={{ position: 'relative' }}>
+        <div style={{
+          position: 'absolute',
+          inset: '-10px',
+          borderRadius: '50%',
+          background: `radial-gradient(circle, ${tierColor}14 0%, transparent 70%)`,
+          animation: 'glow-pulse 4s ease-in-out infinite',
+          pointerEvents: 'none',
+        }} />
+        <div style={{
+          width: '120px',
+          height: '120px',
+          borderRadius: '50%',
+          border: `1px solid ${tierColor}50`,
+          background: pending
+            ? `radial-gradient(circle at 40% 35%, ${tierColor}10 0%, rgba(10,10,15,0.6) 60%)`
+            : 'transparent',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          overflow: 'hidden',
+          boxShadow: `0 0 32px ${tierColor}20, inset 0 0 20px ${tierColor}06`,
+          animation: 'glow-pulse 3s ease-in-out infinite',
+          position: 'relative',
+        }}>
+          {photo ? (
+            <img
+              src={photo}
+              alt={name}
+              style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }}
+            />
+          ) : (
+            <span style={{
+              fontFamily: 'var(--font-serif)',
+              fontSize: '2rem',
+              color: tierColor,
+              fontWeight: 400,
+              opacity: pending ? 0.35 : 1,
+            }}>{initials}</span>
+          )}
+        </div>
       </div>
+
+      {/* Info */}
       <div>
         <p style={{
           fontFamily: 'var(--font-serif)',
-          fontSize: '1rem',
-          color: 'rgba(255,255,255,0.85)',
+          fontSize: '1.35rem',
+          color: pending ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.9)',
           margin: 0,
-          marginBottom: '0.2rem',
-          letterSpacing: '0.02em',
+          marginBottom: '0.35rem',
+          letterSpacing: '0.04em',
+          fontStyle: pending ? 'italic' : 'normal',
         }}>{name}</p>
         <p style={{
           fontFamily: 'var(--font-sans)',
-          fontSize: '10px',
-          letterSpacing: '0.18em',
+          fontSize: '9px',
+          letterSpacing: '0.28em',
           textTransform: 'uppercase',
-          color: `${tierColor}80`,
+          color: `${tierColor}70`,
           margin: 0,
-          marginBottom: '0.3rem',
+          marginBottom: '0.5rem',
         }}>{tierLabel}</p>
+        <div style={{
+          width: hovered ? '40px' : '20px',
+          height: '1px',
+          background: `${tierColor}50`,
+          margin: '0 auto 0.6rem',
+          transition: 'width 0.3s',
+        }} />
         <p style={{
           fontFamily: 'var(--font-sans)',
-          fontSize: '11px',
+          fontSize: '12px',
           fontStyle: 'italic',
-          color: 'rgba(255,255,255,0.3)',
+          color: pending ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.4)',
           margin: 0,
+          letterSpacing: '0.01em',
         }}>{note}</p>
       </div>
     </motion.div>
