@@ -2,15 +2,17 @@ import { handleCors, jsonResponse, errorResponse } from '../_shared/cors.ts'
 import { createServiceClient } from '../_shared/supabase-client.ts'
 import { requireKitchenAuth } from '../_shared/kitchen-auth.ts'
 
-const VALID_TRIGGERS = ['butter_pour', 'dessert_reveal', 'pour_moment', 'bite_moment'] as const
+const VALID_TRIGGERS = ['butter_pour', 'dessert_reveal', 'pour_moment', 'bite_moment', 'cleanse_moment', 'refresh_moment'] as const
 type TriggerType = (typeof VALID_TRIGGERS)[number]
 
 // Which card must be active for each trigger to be valid
 const TRIGGER_REQUIRES_CARD: Record<TriggerType, string> = {
-  butter_pour:    'cut',
-  dessert_reveal: 'finish',
-  pour_moment:    'pour',
-  bite_moment:    'bite',
+  butter_pour:     'cut',
+  dessert_reveal:  'finish',
+  pour_moment:     'pour',
+  bite_moment:     'bite',
+  cleanse_moment:  'cleanse',
+  refresh_moment:  'agua',
 }
 
 /**

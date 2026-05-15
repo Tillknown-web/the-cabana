@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { COURSE_DATA } from '@/lib/constants'
 
 interface TriggerRow {
-  trigger_type: 'butter_pour' | 'dessert_reveal' | 'pour_moment' | 'bite_moment'
+  trigger_type: 'butter_pour' | 'dessert_reveal' | 'pour_moment' | 'bite_moment' | 'cleanse_moment' | 'refresh_moment'
   expires_at: string
 }
 
@@ -54,9 +54,11 @@ export default function TableSidePrompt({ sessionId, currentCard: _currentCard, 
     setTimeout(() => setTrigger(null), 600)
   }
 
-  if (trigger.trigger_type === 'pour_moment')   return <PourMomentOverlay   visible={visible} onDismiss={dismiss} />
-  if (trigger.trigger_type === 'bite_moment')   return <BiteMomentOverlay   visible={visible} onDismiss={dismiss} />
-  if (trigger.trigger_type === 'butter_pour')   return <ButterPourOverlay   visible={visible} onDismiss={dismiss} />
+  if (trigger.trigger_type === 'pour_moment')    return <PourMomentOverlay    visible={visible} onDismiss={dismiss} />
+  if (trigger.trigger_type === 'bite_moment')    return <BiteMomentOverlay    visible={visible} onDismiss={dismiss} />
+  if (trigger.trigger_type === 'cleanse_moment') return <CleanseMomentOverlay visible={visible} onDismiss={dismiss} />
+  if (trigger.trigger_type === 'refresh_moment') return <RefreshMomentOverlay visible={visible} onDismiss={dismiss} />
+  if (trigger.trigger_type === 'butter_pour')    return <ButterPourOverlay    visible={visible} onDismiss={dismiss} />
 
   // dessert_reveal
   return (
@@ -133,10 +135,10 @@ function PourMomentOverlay({ visible, onDismiss }: { visible: boolean; onDismiss
         }}
       >
         <div style={{ animation: 'pm-content-rise 500ms ease 1400ms both' }}>
-          <p style={triggerLabelStyle}>The Pour</p>
-          <h2 style={triggerHeadingStyle}>Sunset Spritz</h2>
+          <p style={triggerLabelStyle}>{COURSE_DATA.pour.label}</p>
+          <h2 style={triggerHeadingStyle}>{COURSE_DATA.pour.dish}</h2>
           <div style={triggerDividerStyle} />
-          <p style={triggerSubStyle}>mango · pineapple · tajín</p>
+          <p style={triggerSubStyle}>{COURSE_DATA.pour.ingredients}</p>
         </div>
         <p style={{ ...tapToDismissStyle, animation: 'pm-content-rise 400ms ease 1700ms both' }}>
           Tap to dismiss
@@ -395,10 +397,10 @@ function BiteMomentOverlay({ visible, onDismiss }: { visible: boolean; onDismiss
           animation: 'bm-content-rise 500ms cubic-bezier(0.34,1.56,0.64,1) 750ms both',
         }}
       >
-        <p style={triggerLabelStyle}>The Bite</p>
-        <h2 style={triggerHeadingStyle}>Slider Trio</h2>
+        <p style={triggerLabelStyle}>{COURSE_DATA.bite.label}</p>
+        <h2 style={triggerHeadingStyle}>{COURSE_DATA.bite.dish}</h2>
         <div style={triggerDividerStyle} />
-        <p style={triggerSubStyle}>three sauces · slaw · brioche</p>
+        <p style={triggerSubStyle}>{COURSE_DATA.bite.ingredients}</p>
       </div>
 
       <p
@@ -439,6 +441,202 @@ function BiteMomentOverlay({ visible, onDismiss }: { visible: boolean; onDismiss
         @keyframes bm-dismiss-appear {
           from { opacity: 0; transform: translateY(8px); }
           to   { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
+    </div>
+  )
+}
+
+// ─── Cleanse Moment Overlay ───────────────────────────────────────────────────
+//
+// Timing:
+//   0 – 300 ms  : soft sherbet-orange radial glow blooms
+//   300 – 800 ms : ice crystal dots drift upward from center
+//   800 ms+     : "The Cleanse / Sorbetto d'Arancia" content rises into view
+
+function CleanseMomentOverlay({ visible, onDismiss }: { visible: boolean; onDismiss: () => void }) {
+  const crystals = [
+    { left: '42%', delay: 320, size: 5 },
+    { left: '50%', delay: 420, size: 6 },
+    { left: '57%', delay: 370, size: 4 },
+    { left: '46%', delay: 500, size: 5 },
+    { left: '54%', delay: 450, size: 3 },
+    { left: '48%', delay: 550, size: 6 },
+  ]
+  return (
+    <div
+      onClick={onDismiss}
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 300,
+        backgroundColor: '#0A0A0F',
+        cursor: 'pointer',
+        opacity: visible ? 1 : 0,
+        transition: 'opacity 0.8s ease',
+        overflow: 'hidden',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      {/* Sherbet-orange radial bloom */}
+      <div style={{
+        position: 'absolute',
+        inset: 0,
+        background: 'radial-gradient(ellipse 65% 55% at 50% 55%, rgba(255,160,60,0.14) 0%, #0A0A0F 70%)',
+        animation: 'cm-bloom 800ms ease 100ms both',
+      }} />
+
+      {/* Ice crystal dots rising */}
+      {crystals.map(({ left, delay, size }, i) => (
+        <div
+          key={i}
+          style={{
+            position: 'absolute',
+            top: '58%',
+            left,
+            width: `${size}px`,
+            height: `${size}px`,
+            borderRadius: '1px',
+            border: '1px solid rgba(255,200,120,0.7)',
+            background: 'rgba(255,220,160,0.18)',
+            transform: 'rotate(45deg)',
+            pointerEvents: 'none',
+            animation: `cm-crystal 1100ms ease ${delay}ms both`,
+          }}
+        />
+      ))}
+
+      {/* Content */}
+      <div style={{
+        position: 'absolute',
+        top: 'calc(50% + 3rem)',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        textAlign: 'center',
+        width: '90%',
+        animation: 'cm-content-rise 500ms ease 800ms both',
+      }}>
+        <p style={triggerLabelStyle}>{COURSE_DATA.cleanse.label}</p>
+        <h2 style={triggerHeadingStyle}>{COURSE_DATA.cleanse.dish}</h2>
+        <div style={triggerDividerStyle} />
+        <p style={triggerSubStyle}>{COURSE_DATA.cleanse.ingredients}</p>
+      </div>
+
+      <p style={{ ...tapToDismissStyle, position: 'absolute', bottom: '2rem', animation: 'cm-content-rise 400ms ease 1100ms both' }}>
+        Tap to dismiss
+      </p>
+
+      <style>{`
+        @keyframes cm-bloom {
+          from { opacity: 0; }
+          to   { opacity: 1; }
+        }
+        @keyframes cm-crystal {
+          0%   { opacity: 0; transform: rotate(45deg) translateY(0) scale(1); }
+          15%  { opacity: 0.9; }
+          80%  { opacity: 0.3; }
+          100% { opacity: 0; transform: rotate(45deg) translateY(-55vh) scale(0.4); }
+        }
+        @keyframes cm-content-rise {
+          from { opacity: 0; transform: translateX(-50%) translateY(14px); }
+          to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+      `}</style>
+    </div>
+  )
+}
+
+// ─── Refresh Moment Overlay ───────────────────────────────────────────────────
+//
+// Timing:
+//   0 – 300 ms  : watermelon-green radial glow blooms
+//   300 – 900 ms : horizontal ripple lines expand outward
+//   900 ms+     : "The Refresh / Melon Meridian" content rises into view
+
+function RefreshMomentOverlay({ visible, onDismiss }: { visible: boolean; onDismiss: () => void }) {
+  const ripples = [
+    { width: '50%', delay: 300, yPos: '52%' },
+    { width: '36%', delay: 450, yPos: '56%' },
+    { width: '44%', delay: 600, yPos: '60%' },
+  ]
+  return (
+    <div
+      onClick={onDismiss}
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 300,
+        backgroundColor: '#0A0A0F',
+        cursor: 'pointer',
+        opacity: visible ? 1 : 0,
+        transition: 'opacity 0.8s ease',
+        overflow: 'hidden',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      {/* Watermelon-green radial bloom */}
+      <div style={{
+        position: 'absolute',
+        inset: 0,
+        background: 'radial-gradient(ellipse 65% 55% at 50% 55%, rgba(80,200,120,0.12) 0%, #0A0A0F 70%)',
+        animation: 'rm-bloom 800ms ease 100ms both',
+      }} />
+
+      {/* Horizontal ripple lines */}
+      {ripples.map(({ width, delay, yPos }, i) => (
+        <div
+          key={i}
+          style={{
+            position: 'absolute',
+            top: yPos,
+            left: '50%',
+            width,
+            height: '1px',
+            background: 'linear-gradient(90deg, transparent, rgba(100,210,150,0.6), transparent)',
+            transform: 'translateX(-50%) scaleX(0)',
+            pointerEvents: 'none',
+            animation: `rm-ripple 900ms ease ${delay}ms both`,
+          }}
+        />
+      ))}
+
+      {/* Content */}
+      <div style={{
+        position: 'absolute',
+        top: 'calc(50% + 3rem)',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        textAlign: 'center',
+        width: '90%',
+        animation: 'rm-content-rise 500ms ease 900ms both',
+      }}>
+        <p style={triggerLabelStyle}>{COURSE_DATA.agua.label}</p>
+        <h2 style={triggerHeadingStyle}>{COURSE_DATA.agua.dish}</h2>
+        <div style={triggerDividerStyle} />
+        <p style={triggerSubStyle}>{COURSE_DATA.agua.ingredients}</p>
+      </div>
+
+      <p style={{ ...tapToDismissStyle, position: 'absolute', bottom: '2rem', animation: 'rm-content-rise 400ms ease 1200ms both' }}>
+        Tap to dismiss
+      </p>
+
+      <style>{`
+        @keyframes rm-bloom {
+          from { opacity: 0; }
+          to   { opacity: 1; }
+        }
+        @keyframes rm-ripple {
+          0%   { transform: translateX(-50%) scaleX(0); opacity: 0; }
+          20%  { opacity: 0.7; }
+          100% { transform: translateX(-50%) scaleX(1); opacity: 0; }
+        }
+        @keyframes rm-content-rise {
+          from { opacity: 0; transform: translateX(-50%) translateY(14px); }
+          to   { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
       `}</style>
     </div>
