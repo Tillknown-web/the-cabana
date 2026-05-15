@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { callEdgeFn } from '@/lib/edge-fn'
-import { DropletIcon, SparklesIcon, CheckIcon, GlassIcon, UtensilsIcon } from '@/lib/icons'
+import { DropletIcon, SparklesIcon, CheckIcon, GlassIcon, UtensilsIcon, SnowflakeIcon, WindIcon } from '@/lib/icons'
 
 interface Props {
   sessionId: string
@@ -17,6 +17,8 @@ export default function TableSideTriggers({ sessionId, currentCard, accessToken 
 
   const canPourMoment    = currentCard === 'pour'
   const canBiteMoment    = currentCard === 'bite'
+  const canCleanseMoment = currentCard === 'cleanse'
+  const canRefreshMoment = currentCard === 'agua'
   const canButterPour    = currentCard === 'cut'
   const canDessertReveal = currentCard === 'finish'
 
@@ -62,6 +64,28 @@ export default function TableSideTriggers({ sessionId, currentCard, accessToken 
           loading={loading === 'bite_moment'}
           fired={fired === 'bite_moment'}
           onClick={() => fire('bite_moment')}
+        />
+
+        {/* Cleanse Moment */}
+        <TriggerButton
+          label="Cleanse Moment"
+          icon={<SnowflakeIcon size={14} />}
+          subLabel="Active during The Cleanse"
+          enabled={canCleanseMoment}
+          loading={loading === 'cleanse_moment'}
+          fired={fired === 'cleanse_moment'}
+          onClick={() => fire('cleanse_moment')}
+        />
+
+        {/* Refresh Moment */}
+        <TriggerButton
+          label="Refresh Moment"
+          icon={<WindIcon size={14} />}
+          subLabel="Active during The Refresh"
+          enabled={canRefreshMoment}
+          loading={loading === 'refresh_moment'}
+          fired={fired === 'refresh_moment'}
+          onClick={() => fire('refresh_moment')}
         />
 
         {/* Butter Pour */}

@@ -177,3 +177,34 @@ export function ShareIcon({ size = 18 }: { size?: number }) {
     </svg>
   )
 }
+
+/** 6-arm snowflake — used for The Cleanse tableside trigger. */
+export function SnowflakeIcon({ size = 16 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <line x1="12" y1="2" x2="12" y2="22" />
+      <line x1="2" y1="12" x2="22" y2="12" />
+      <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
+      <line x1="19.07" y1="4.93" x2="4.93" y2="19.07" />
+      <polyline points="12 6 12 2 8 4" />
+      <polyline points="12 2 16 4" />
+      <polyline points="12 18 12 22 8 20" />
+      <polyline points="12 22 16 20" />
+      <polyline points="6 12 2 12 4 8" />
+      <polyline points="2 12 4 16" />
+      <polyline points="18 12 22 12 20 8" />
+      <polyline points="22 12 20 16" />
+    </svg>
+  )
+}
+
+/** Three ripple arcs — used for The Refresh (Agua) tableside trigger. */
+export function WindIcon({ size = 16 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M3 8h12a4 4 0 0 0 0-8 4 4 0 0 0-4 4" />
+      <path d="M3 12h16a4 4 0 0 1 0 8 4 4 0 0 1-4-4" />
+      <path d="M3 16h8" />
+    </svg>
+  )
+}

@@ -99,6 +99,96 @@ function PourAmbience() {
   )
 }
 
+// "The Cleanse" — sherbet-orange glow with drifting ice-crystal dots
+function CleanseAmbience() {
+  const crystals = [
+    { left: '42%', delay: '0.4s', size: 4 },
+    { left: '50%', delay: '0.8s', size: 5 },
+    { left: '57%', delay: '0.6s', size: 3 },
+    { left: '45%', delay: '1.1s', size: 4 },
+    { left: '54%', delay: '0.9s', size: 3 },
+    { left: '48%', delay: '1.3s', size: 5 },
+  ]
+  return (
+    <>
+      <style>{`
+        @keyframes crystal-drift {
+          0%   { transform: translateY(0) scale(1); opacity: 0; }
+          15%  { opacity: 0.85; }
+          80%  { opacity: 0.3; }
+          100% { transform: translateY(-52vh) scale(0.4); opacity: 0; }
+        }
+      `}</style>
+
+      {/* Soft sherbet-orange radial glow */}
+      <div aria-hidden="true" style={{
+        position: 'absolute', top: '30%', left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: '60vw', height: '60vw', borderRadius: '50%',
+        background: 'radial-gradient(circle, rgba(255,160,60,0.09) 0%, rgba(255,200,100,0.04) 45%, transparent 70%)',
+        pointerEvents: 'none',
+        animation: 'blob-drift-a 22s ease-in-out infinite',
+      }} />
+
+      {/* Ice crystal dots rising from center */}
+      {crystals.map((c, i) => (
+        <div key={i} aria-hidden="true" style={{
+          position: 'absolute', top: '55%', left: c.left,
+          width: `${c.size}px`, height: `${c.size}px`,
+          borderRadius: '1px',
+          border: '1px solid rgba(255,200,120,0.55)',
+          background: 'rgba(255,220,160,0.12)',
+          animation: `crystal-drift ${2.2 + i * 0.3}s ease-out ${c.delay} infinite`,
+          opacity: 0, pointerEvents: 'none',
+          transform: 'rotate(45deg)',
+        }} />
+      ))}
+    </>
+  )
+}
+
+// "The Refresh" — watermelon-green glow with soft horizontal ripple lines
+function AguaAmbience() {
+  const ripples = [
+    { width: '44%', delay: 0.3,  yPos: '52%' },
+    { width: '32%', delay: 0.55, yPos: '56%' },
+    { width: '38%', delay: 0.8,  yPos: '60%' },
+  ]
+  return (
+    <>
+      <style>{`
+        @keyframes agua-ripple {
+          0%   { transform: translateX(-50%) scaleX(0); opacity: 0; }
+          25%  { opacity: 0.5; }
+          100% { transform: translateX(-50%) scaleX(1); opacity: 0; }
+        }
+      `}</style>
+
+      {/* Soft watermelon-green ambient glow */}
+      <div aria-hidden="true" style={{
+        position: 'absolute', top: '30%', left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: '60vw', height: '60vw', borderRadius: '50%',
+        background: 'radial-gradient(circle, rgba(80,200,120,0.08) 0%, rgba(100,210,150,0.03) 45%, transparent 70%)',
+        pointerEvents: 'none',
+        animation: 'blob-drift-b 24s ease-in-out infinite',
+      }} />
+
+      {/* Horizontal ripple lines expanding outward */}
+      {ripples.map((r, i) => (
+        <div key={i} aria-hidden="true" style={{
+          position: 'absolute', top: r.yPos, left: '50%',
+          width: r.width, height: '1px',
+          background: 'linear-gradient(90deg, transparent, rgba(100,210,150,0.45), transparent)',
+          transform: 'translateX(-50%) scaleX(0)',
+          animation: `agua-ripple ${1.4 + i * 0.3}s ease-out ${r.delay}s infinite`,
+          pointerEvents: 'none',
+        }} />
+      ))}
+    </>
+  )
+}
+
 // "The Bite" — three slider-layer bars building in from alternating sides
 function BiteAmbience() {
   const layers = [
@@ -153,9 +243,11 @@ export default function CourseCard({ card, guest, sessionId, dessertRevealed = f
   const course = COURSE_DATA[card]
   if (!course) return null
 
-  const isPour   = card === 'pour'
-  const isBite   = card === 'bite'
-  const isFinish = card === 'finish'
+  const isPour    = card === 'pour'
+  const isBite    = card === 'bite'
+  const isCleanse = card === 'cleanse'
+  const isAgua    = card === 'agua'
+  const isFinish  = card === 'finish'
 
   function handleUploaded(previewUrl: string) {
     setPhotoPreviewUrl(previewUrl)
@@ -185,11 +277,13 @@ export default function CourseCard({ card, guest, sessionId, dessertRevealed = f
       overflow: 'hidden',
     }}>
       {/* Per-card signature ambience */}
-      {isPour   && <PourAmbience />}
-      {isBite   && <BiteAmbience />}
+      {isPour    && <PourAmbience />}
+      {isBite    && <BiteAmbience />}
+      {isCleanse && <CleanseAmbience />}
+      {isAgua    && <AguaAmbience />}
 
       {/* Fallback ambient glow for cut / finish */}
-      {!isPour && !isBite && (
+      {!isPour && !isBite && !isCleanse && !isAgua && (
         <div aria-hidden="true" style={{
           position: 'absolute',
           top: '30%', left: '50%',
