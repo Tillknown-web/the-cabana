@@ -12,9 +12,10 @@ interface TriggerRow {
 interface Props {
   sessionId: string
   currentCard: string
+  onTriggerFired?: (triggerType: string) => void
 }
 
-export default function TableSidePrompt({ sessionId, currentCard: _currentCard }: Props) {
+export default function TableSidePrompt({ sessionId, currentCard: _currentCard, onTriggerFired }: Props) {
   const [trigger, setTrigger] = useState<TriggerRow | null>(null)
   const [visible, setVisible] = useState(false)
 
@@ -29,6 +30,7 @@ export default function TableSidePrompt({ sessionId, currentCard: _currentCard }
         (payload) => {
           const row = payload.new as TriggerRow
           const expiresAt = new Date(row.expires_at).getTime()
+          onTriggerFired?.(row.trigger_type)
           if (Date.now() < expiresAt) {
             setTrigger(row)
             setVisible(true)
@@ -404,7 +406,7 @@ function BiteMomentOverlay({ visible, onDismiss }: { visible: boolean; onDismiss
           ...tapToDismissStyle,
           position: 'absolute',
           bottom: '2rem',
-          animation: 'bm-content-rise 400ms ease 1100ms both',
+          animation: 'bm-dismiss-appear 400ms ease 1100ms both',
         }}
       >
         Tap to dismiss
@@ -430,7 +432,12 @@ function BiteMomentOverlay({ visible, onDismiss }: { visible: boolean; onDismiss
         }
 
         @keyframes bm-content-rise {
-          from { opacity: 0; transform: translateY(18px); }
+          from { opacity: 0; transform: translateX(-50%) translateY(18px); }
+          to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+
+        @keyframes bm-dismiss-appear {
+          from { opacity: 0; transform: translateY(8px); }
           to   { opacity: 1; transform: translateY(0); }
         }
       `}</style>
@@ -822,8 +829,8 @@ function DessertUnboxingContent() {
         }
 
         @keyframes dr-title-rise {
-          from { opacity: 0; transform: translateY(24px); }
-          to   { opacity: 1; transform: translateY(0); }
+          from { opacity: 0; transform: translateX(-50%) translateY(24px); }
+          to   { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
 
         @keyframes dr-glow-pulse {

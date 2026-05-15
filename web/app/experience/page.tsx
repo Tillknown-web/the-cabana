@@ -27,6 +27,7 @@ export default function ExperiencePage() {
   const [currentCard, setCurrentCard] = useState<string>('welcome')
   const [loading, setLoading] = useState(true)
   const [songModalOpen, setSongModalOpen] = useState(false)
+  const [dessertRevealed, setDessertRevealed] = useState(false)
 
   const supabase = createClient()
 
@@ -129,6 +130,20 @@ export default function ExperiencePage() {
     }
   }, [guest]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // When the finish card is active, check if dessert_reveal was already fired
+  // (handles guests who arrive after the trigger expired or refresh the page).
+  useEffect(() => {
+    if (currentCard !== 'finish' || dessertRevealed) return
+    supabase
+      .from('tableside_triggers')
+      .select('id')
+      .eq('session_id', SESSION_ID)
+      .eq('trigger_type', 'dessert_reveal')
+      .limit(1)
+      .maybeSingle()
+      .then(({ data }) => { if (data) setDessertRevealed(true) })
+  }, [currentCard]) // eslint-disable-line react-hooks/exhaustive-deps
+
   const handleCheckedIn = useCallback((g: Guest) => {
     localStorage.setItem('cabana:guest', JSON.stringify(g))
     setGuest(g)
@@ -138,7 +153,7 @@ export default function ExperiencePage() {
     if (!guest) return null
     if (currentCard === 'welcome') return <WelcomeCard guest={guest} sessionId={SESSION_ID} />
     if (currentCard === 'gallery') return <GalleryView guest={guest} sessionId={SESSION_ID} />
-    if (COURSE_CARDS.has(currentCard)) return <CourseCard card={currentCard} guest={guest} sessionId={SESSION_ID} />
+    if (COURSE_CARDS.has(currentCard)) return <CourseCard card={currentCard} guest={guest} sessionId={SESSION_ID} dessertRevealed={dessertRevealed} />
     if (currentCard.startsWith('intermission')) return <IntermissionCard card={currentCard} sessionId={SESSION_ID} />
     return <WelcomeCard guest={guest} sessionId={SESSION_ID} />
   }
@@ -164,7 +179,11 @@ export default function ExperiencePage() {
       </AnimatePresence>
 
       <ChefNoteToast sessionId={SESSION_ID} />
-      <TableSidePrompt sessionId={SESSION_ID} currentCard={currentCard} />
+      <TableSidePrompt
+        sessionId={SESSION_ID}
+        currentCard={currentCard}
+        onTriggerFired={(type) => { if (type === 'dessert_reveal') setDessertRevealed(true) }}
+      />
       <ExperienceNavBar
         sessionId={SESSION_ID}
         currentCard={currentCard}

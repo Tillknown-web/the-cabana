@@ -11,6 +11,7 @@ interface Props {
   card: string
   guest: Guest
   sessionId: string
+  dessertRevealed?: boolean
 }
 
 // Staggered child animation helper
@@ -144,7 +145,7 @@ function BiteAmbience() {
   )
 }
 
-export default function CourseCard({ card, guest, sessionId }: Props) {
+export default function CourseCard({ card, guest, sessionId, dessertRevealed = false }: Props) {
   const [photoUploaded, setPhotoUploaded] = useState(false)
   const [photoPreviewUrl, setPhotoPreviewUrl] = useState<string | null>(null)
   const [showUpload, setShowUpload] = useState(false)
@@ -207,7 +208,7 @@ export default function CourseCard({ card, guest, sessionId }: Props) {
 
       {/* Dish name */}
       <motion.h1 {...headingAnim} style={headingStyle}>
-        {isFinish && !photoUploaded ? '???' : course.dish}
+        {isFinish && !dessertRevealed ? '???' : course.dish}
       </motion.h1>
 
       {/* Gold divider with shimmer */}
@@ -227,10 +228,10 @@ export default function CourseCard({ card, guest, sessionId }: Props) {
       </motion.div>
 
       {/* Ingredients */}
-      {(!isFinish || photoUploaded) && (
+      {(!isFinish || dessertRevealed) && (
         <motion.p {...item(0.26)} style={ingredientsStyle}>{course.ingredients}</motion.p>
       )}
-      {isFinish && !photoUploaded && (
+      {isFinish && !dessertRevealed && (
         <motion.p {...item(0.26)} style={ingredientsStyle}>revealed at the table</motion.p>
       )}
 
