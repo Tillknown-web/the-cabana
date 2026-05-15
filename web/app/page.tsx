@@ -360,16 +360,22 @@ export default function LandingPage() {
           {/* 2-col grid on desktop, 1-col on mobile */}
           <div className="menu-grid">
             <Reveal delay={0.1}>
-              <CourseItem courseNum="01" label="the pour" dish="Sunset Spritz" ingredients="mango · pineapple · tajín" />
+              <CourseItem courseNum="01" label="the opening pour" dish="Elixir Vert" ingredients="lemon · fresh mint · sparkling water · citrus zest" />
             </Reveal>
             <Reveal delay={0.18}>
-              <CourseItem courseNum="02" label="the bite" dish="Slider Trio" ingredients="three sauces · slaw · brioche" />
+              <CourseItem courseNum="02" label="the first bite" dish="The Gathering" ingredients="crispy chicken bites · mac & cheese gratin · honey bbq · honey mustard" />
             </Reveal>
             <Reveal delay={0.26}>
-              <CourseItem courseNum="03" label="the cut" dish="Steak, tableside" ingredients="compound butter · truffle fries" />
+              <CourseItem courseNum="03" label="the cleanse" dish="Sorbetto d'Arancia" ingredients="orange sherbet · citrus zest" />
             </Reveal>
             <Reveal delay={0.34}>
-              <CourseItem courseNum="04" label="the finish" dish="???" ingredients="revealed at the table" isHidden />
+              <CourseItem courseNum="04" label="the refresh" dish="Melon Meridian" ingredients="fresh watermelon · citrus · house agua fresca" />
+            </Reveal>
+            <Reveal delay={0.42}>
+              <CourseItem courseNum="05" label="the cut" dish="Le Grand Festin" ingredients="prime steak · tableside compound butter · truffle frites · cheese sauce" />
+            </Reveal>
+            <Reveal delay={0.50}>
+              <CourseItem courseNum="06" label="the finish" dish="???" ingredients="revealed at the table" isHidden />
             </Reveal>
           </div>
         </div>
