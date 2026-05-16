@@ -52,10 +52,13 @@ export function applyBrandingOverlay(input: Blob | File, eventDate: string): Pro
 
       const withShadow = (draw: () => void) => {
         ctx.save()
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.65)'
-        ctx.shadowBlur = 10
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.85)'
+        ctx.shadowBlur = 14
         ctx.shadowOffsetX = 0
         ctx.shadowOffsetY = 1
+        // Double-stamp so the shadow builds up enough to keep the white
+        // wordmark legible against bright regions of the photo.
+        draw()
         draw()
         ctx.restore()
       }
