@@ -16,7 +16,6 @@ interface Props {
   sessionId: string
   currentCard: string
   guestId: string
-  eventDate?: string
   onSongRequest: () => void
 }
 
@@ -28,7 +27,7 @@ const REACTIONS: Array<{ type: ReactionType; icon: React.ReactNode; label: strin
   { type: 'chefs_kiss', icon: <StarIcon  size={26} />, label: "Chef's Kiss" },
 ]
 
-export default function ExperienceNavBar({ sessionId, currentCard, guestId, eventDate, onSongRequest }: Props) {
+export default function ExperienceNavBar({ sessionId, currentCard, guestId, onSongRequest }: Props) {
   const [nowPlaying, setNowPlaying]           = useState<SpotifyRow | null>(null)
   const [songPopoverOpen, setSongPopoverOpen] = useState(false)
   const [reactionOpen, setReactionOpen]       = useState(false)
@@ -100,7 +99,7 @@ export default function ExperienceNavBar({ sessionId, currentCard, guestId, even
 
   async function handleFile(file: File) {
     try {
-      const branded = await applyBrandingOverlay(file, eventDate ?? getTodayLA())
+      const branded = await applyBrandingOverlay(file, getTodayLA())
 
       const sc = createUploadClient()
       const { data: { session } } = await sc.auth.getSession()

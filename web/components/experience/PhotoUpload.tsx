@@ -9,12 +9,11 @@ import { applyBrandingOverlay } from '@/lib/branding'
 interface Props {
   course: string
   sessionId: string
-  eventDate?: string
   onUploaded: (previewUrl: string) => void
   onCancel: () => void
 }
 
-export default function PhotoUpload({ course, sessionId, eventDate, onUploaded, onCancel }: Props) {
+export default function PhotoUpload({ course, sessionId, onUploaded, onCancel }: Props) {
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const cameraInputRef = useRef<HTMLInputElement>(null)
@@ -25,9 +24,9 @@ export default function PhotoUpload({ course, sessionId, eventDate, onUploaded, 
     setError(null)
 
     try {
-      // Brand the image client-side. The shared helper handles the resize
-      // internally so we don't need a separate resize pass.
-      const branded = await applyBrandingOverlay(file, eventDate ?? getTodayLA())
+      // Brand the image client-side with today's LA date. The shared helper
+      // handles the resize internally so we don't need a separate resize pass.
+      const branded = await applyBrandingOverlay(file, getTodayLA())
       const previewUrl = URL.createObjectURL(branded)
 
       const supabase = createClient()
