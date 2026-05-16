@@ -38,18 +38,18 @@ export default function ExperiencePage() {
   // alongside ours on each course card and surface a brief arrival toast.
   const { partnerPhotos, latestArrival } = usePartnerPhotos(SESSION_ID, guest?.id)
 
-  // Restore guest from localStorage + verify Supabase auth session
+  // Restore guest from sessionStorage + verify Supabase auth session
   useEffect(() => {
     async function restore() {
       try {
-        const stored = localStorage.getItem('cabana:guest')
+        const stored = sessionStorage.getItem('cabana:guest')
         if (!stored) { setLoading(false); return }
 
         const guestData = JSON.parse(stored) as Guest
         const { data: { session } } = await supabase.auth.getSession()
 
         if (!session) {
-          localStorage.removeItem('cabana:guest')
+          sessionStorage.removeItem('cabana:guest')
           setLoading(false)
           return
         }
@@ -58,13 +58,13 @@ export default function ExperiencePage() {
         // new anonymous session was issued), the storage upload would fail RLS.
         // Clear and force re-check-in rather than silently uploading to the wrong path.
         if (session.user.id !== guestData.id) {
-          localStorage.removeItem('cabana:guest')
+          sessionStorage.removeItem('cabana:guest')
           setLoading(false)
           return
         }
 
         // Verify the guest row still exists in the DB. It may have been deleted
-        // by a kitchen reset even though the auth session and localStorage are intact.
+        // by a kitchen reset even though the auth session and sessionStorage are intact.
         const { data: existingGuest } = await supabase
           .from('guests')
           .select('id')
@@ -72,14 +72,14 @@ export default function ExperiencePage() {
           .maybeSingle()
 
         if (!existingGuest) {
-          localStorage.removeItem('cabana:guest')
+          sessionStorage.removeItem('cabana:guest')
           setLoading(false)
           return
         }
 
         setGuest(guestData)
       } catch {
-        localStorage.removeItem('cabana:guest')
+        sessionStorage.removeItem('cabana:guest')
       } finally {
         setLoading(false)
       }
@@ -124,7 +124,7 @@ export default function ExperiencePage() {
         'postgres_changes',
         { event: 'DELETE', schema: 'public', table: 'guests', filter: `id=eq.${guest.id}` },
         () => {
-          localStorage.removeItem('cabana:guest')
+          sessionStorage.removeItem('cabana:guest')
           setCurrentCard('welcome')
           setGuest(null)
         }
@@ -152,7 +152,7 @@ export default function ExperiencePage() {
   }, [currentCard]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleCheckedIn = useCallback((g: Guest) => {
-    localStorage.setItem('cabana:guest', JSON.stringify(g))
+    sessionStorage.setItem('cabana:guest', JSON.stringify(g))
     setGuest(g)
   }, [])
 
