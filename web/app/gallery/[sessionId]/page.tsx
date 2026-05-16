@@ -91,7 +91,6 @@ export default async function GalleryPage({
               sectionKey={key}
               photos={data.sections[key]}
               guests={data.guests}
-              eventDate={formattedDate}
             />
             {i < presentSections.length - 1 && (
               <div style={{ height: '1px', backgroundColor: 'rgba(212, 175, 55, 0.12)', margin: '2.5rem 0' }} />

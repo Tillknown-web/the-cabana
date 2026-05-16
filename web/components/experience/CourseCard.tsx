@@ -14,6 +14,7 @@ interface Props {
   sessionId: string
   dessertRevealed?: boolean
   partnerPhoto?: { url: string; guestName: string } | null
+  eventDate?: string
 }
 
 // Staggered child animation helper
@@ -23,7 +24,7 @@ const item = (delay: number) => ({
   transition: { duration: 0.65, delay, ease: [0.16, 1, 0.3, 1] as const },
 })
 
-export default function CourseCard({ card, guest, sessionId, dessertRevealed = false, partnerPhoto = null }: Props) {
+export default function CourseCard({ card, guest, sessionId, dessertRevealed = false, partnerPhoto = null, eventDate }: Props) {
   const [photoUploaded, setPhotoUploaded] = useState(false)
   const [photoPreviewUrl, setPhotoPreviewUrl] = useState<string | null>(null)
   const [showUpload, setShowUpload] = useState(false)
@@ -141,6 +142,7 @@ export default function CourseCard({ card, guest, sessionId, dessertRevealed = f
           <PhotoUpload
             course={card}
             sessionId={sessionId}
+            eventDate={eventDate}
             onUploaded={handleUploaded}
             onCancel={() => setShowUpload(false)}
           />

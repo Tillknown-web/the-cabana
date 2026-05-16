@@ -31,6 +31,7 @@ export default function ExperiencePage() {
   const [loading, setLoading] = useState(true)
   const [songModalOpen, setSongModalOpen] = useState(false)
   const [dessertRevealed, setDessertRevealed] = useState(false)
+  const [eventDate, setEventDate] = useState<string | undefined>(undefined)
 
   const supabase = createClient()
 
@@ -102,6 +103,25 @@ export default function ExperiencePage() {
         if (data?.current_card) setCurrentCard(data.current_card)
       })
 
+    // Fetch the event date once so photo uploads can burn it into the
+    // trademark band (matches the format used by the gallery header).
+    supabase
+      .from('sessions')
+      .select('event_date')
+      .eq('session_id', SESSION_ID)
+      .single()
+      .then(({ data }) => {
+        if (data?.event_date) {
+          setEventDate(
+            new Date(data.event_date).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+            })
+          )
+        }
+      })
+
     // Live session-state updates (advances all connected guests together)
     const stateChannel = supabase
       .channel(`exp-state-${SESSION_ID}`)
@@ -171,6 +191,7 @@ export default function ExperiencePage() {
           sessionId={SESSION_ID}
           dessertRevealed={dessertRevealed}
           partnerPhoto={partnerPhoto}
+          eventDate={eventDate}
         />
       )
     }
@@ -210,6 +231,7 @@ export default function ExperiencePage() {
         sessionId={SESSION_ID}
         currentCard={currentCard}
         guestId={guest.id}
+        eventDate={eventDate}
         onSongRequest={() => setSongModalOpen(true)}
       />
       {songModalOpen && (

@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { CameraIcon, SmileIcon, HomeIcon, MusicNoteIcon, PlusIcon, FlameIcon, HeartIcon, StarIcon } from '@/lib/icons'
 import { createClient as createUploadClient } from '@/lib/supabase/client'
+import { applyBrandingOverlay } from '@/lib/branding'
+import { getTodayLA } from '@/lib/date'
 
 interface SpotifyRow {
   track: string | null
@@ -14,6 +16,7 @@ interface Props {
   sessionId: string
   currentCard: string
   guestId: string
+  eventDate?: string
   onSongRequest: () => void
 }
 
@@ -25,7 +28,7 @@ const REACTIONS: Array<{ type: ReactionType; icon: React.ReactNode; label: strin
   { type: 'chefs_kiss', icon: <StarIcon  size={26} />, label: "Chef's Kiss" },
 ]
 
-export default function ExperienceNavBar({ sessionId, currentCard, guestId, onSongRequest }: Props) {
+export default function ExperienceNavBar({ sessionId, currentCard, guestId, eventDate, onSongRequest }: Props) {
   const [nowPlaying, setNowPlaying]           = useState<SpotifyRow | null>(null)
   const [songPopoverOpen, setSongPopoverOpen] = useState(false)
   const [reactionOpen, setReactionOpen]       = useState(false)
@@ -97,31 +100,14 @@ export default function ExperienceNavBar({ sessionId, currentCard, guestId, onSo
 
   async function handleFile(file: File) {
     try {
-      const MAX = 1200
-      const img = new Image()
-      const url = URL.createObjectURL(file)
-      img.src = url
-      await new Promise<void>((res, rej) => { img.onload = () => res(); img.onerror = rej })
-
-      const scale = Math.min(1, MAX / Math.max(img.width, img.height))
-      const canvas = document.createElement('canvas')
-      canvas.width  = Math.round(img.width  * scale)
-      canvas.height = Math.round(img.height * scale)
-      const ctx = canvas.getContext('2d')
-      if (!ctx) return
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
-      URL.revokeObjectURL(url)
-
-      const blob: Blob = await new Promise((res, rej) =>
-        canvas.toBlob((b) => b ? res(b) : rej(new Error('Export failed')), 'image/jpeg', 0.88)
-      )
+      const branded = await applyBrandingOverlay(file, eventDate ?? getTodayLA())
 
       const sc = createUploadClient()
       const { data: { session } } = await sc.auth.getSession()
       if (!session) return
 
       const form = new FormData()
-      form.append('file', blob, `booth_${Date.now()}.jpg`)
+      form.append('file', branded, `booth_${Date.now()}.jpg`)
       form.append('sessionId', sessionId)
       form.append('course', 'booth')
       form.append('upsert', 'false')
